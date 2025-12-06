@@ -1,0 +1,184 @@
+{% extends "base.html" %}
+
+{% block title %}Library - Libram{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/main_view.css') }}">
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/main_view.js') }}"></script>
+{% endblock %}
+
+{% block content %}
+
+<!-- Stats Cards - 6 cards in 2 rows of 3 -->
+<div class="stats-container" id="stats-container">
+    <div class="stat-card blue" draggable="true" data-card-id="total-books">
+        <div class="stat-number">{{ stats.total_books }}</div>
+        <div class="stat-label">Total Books</div>
+    </div>
+    <div class="stat-card purple" draggable="true" data-card-id="books-year">
+        <div class="stat-number">{{ stats.books_this_year }}</div>
+        <div class="stat-label">Books This Year</div>
+    </div>
+    <div class="stat-card coral" draggable="true" data-card-id="pages-year">
+        <div class="stat-number">{{ "{:,}".format(stats.pages_this_year) }}</div>
+        <div class="stat-label">Pages This Year</div>
+    </div>
+    <div class="stat-card mint" draggable="true" data-card-id="avg-days">
+        <div class="stat-number">{{ stats.avg_days_to_finish }}</div>
+        <div class="stat-label">Avg Days to Finish</div>
+    </div>
+    <div class="stat-card peach" draggable="true" data-card-id="currently-reading">
+        <div class="stat-number">{{ stats.currently_reading }}</div>
+        <div class="stat-label">Currently Reading</div>
+    </div>
+    <div class="stat-card lavender nav-card" draggable="true" data-card-id="navigation">
+        <div class="grid-2-col">
+            <a href="{{ url_for('settings.settings_page') }}" class="nav-btn peach">
+                <i data-lucide="sliders-horizontal" class="icon-sm icon-inline"></i>Settings
+            </a>
+            <a href="{{ url_for('backups.backups_page') }}" class="nav-btn sage">
+                <i data-lucide="hard-drive-download" class="icon-sm icon-inline"></i>Backup
+            </a>
+            <a href="{{ url_for('books.export_csv') }}" class="nav-btn teal">
+                <i data-lucide="download" class="icon-sm icon-inline"></i>Export
+            </a>
+            <a href="{{ url_for('auth.logout') }}" class="nav-btn purple">
+                <i data-lucide="log-out" class="icon-sm icon-inline"></i>Logout
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Controls Bar -->
+<div class="controls-bar">
+    <div class="controls-left">
+        <!-- Search -->
+        <form method="get" class="search-box">
+            <input type="hidden" name="view" value="{{ view_mode }}">
+            <span class="search-icon"><i data-lucide="search"></i></span>
+            <input type="text" name="search" placeholder="Search books..." value="{{ search }}">
+            <button type="button" class="clear-search" {% if not search %}style="display: none;"{% endif %}>
+                <i data-lucide="x"></i>
+            </button>
+        </form>
+        
+        <!-- View Toggle -->
+        <div class="view-toggle">
+            <button type="button" class="view-toggle-btn {% if view_mode == 'detailed' %}active{% endif %}" 
+                    id="view-detailed-btn" onclick="setViewMode('detailed')">
+                Detailed
+            </button>
+            <button type="button" class="view-toggle-btn {% if view_mode == 'compact' %}active{% endif %}" 
+                    id="view-compact-btn" onclick="setViewMode('compact')">
+                Compact
+            </button>
+        </div>
+    </div>
+    
+    <div class="controls-right">
+        <a href="{{ url_for('books.add_book') }}" class="btn btn-primary">
+            <i data-lucide="plus" class="icon-sm icon-inline"></i> Add Book
+        </a>
+    </div>
+</div>
+
+<!-- Books List by Year -->
+{% if year_groups %}
+    <!-- Column Headers (for detailed view) -->
+    <div class="column-headers" id="column-headers">
+        <div class="col-number">#</div>
+        <div class="col-year-num">Yr#</div>
+        <div class="col-rating">Rating</div>
+        <div class="col-title">Title</div>
+        <div class="col-author">Author</div>
+        <div class="col-pages">Pages</div>
+        <div class="col-dates">Started / Finished</div>
+        <div class="col-days">Days</div>
+        <div class="col-pace">pg/day</div>
+    </div>
+    
+    <div class="books-container" id="books-container">
+        {% for year_group in year_groups %}
+        <div class="year-section">
+            <!-- Year Header -->
+            <div class="year-header" onclick="toggleYear('year-{{ year_group.year }}')">
+                <span class="year-header-text">
+                    <span id="year-{{ year_group.year }}-icon">{{ '▼' if year_group.is_current else '▶' }}</span>
+                    {{ year_group.year }}
+                </span>
+                <span class="entry-count">{{ year_group.total }} Book{{ 's' if year_group.total != 1 else '' }}</span>
+            </div>
+            
+            <!-- Year Content (collapsible) -->
+            <div id="year-{{ year_group.year }}-content" 
+                 class="year-content {% if year_group.is_current %}expanded{% endif %}">
+                
+                {% for book in year_group.books %}
+                <div class="book-card {% if book.did_not_finish %}did-not-finish{% endif %}"
+                     onclick="window.location='{{ url_for('books.edit_book', book_id=book.id) }}'">
+                    
+                    <!-- Detailed View Content -->
+                    <div class="detailed-content">
+                        <span class="book-number">{{ book.all_time_number }}</span>
+                        <span class="year-number">{{ book.yearly_number }}</span>
+                        <span class="book-rating">{{ book.rating|rating_star|safe }}</span>
+                        <span class="book-title">{{ book.title }}</span>
+                        <span class="book-author">{{ book.author }}</span>
+                        <span class="book-pages">{{ book.pages }}</span>
+                        <span class="book-dates">
+                            {{ book.date_begun_date|timestamp_to_short_date if book.date_begun else '-' }}
+                            <span class="date-sep">/</span>
+                            {{ book.date_finished_date|timestamp_to_short_date if book.date_finished else '-' }}
+                        </span>
+                        <span class="book-days">
+                            {% if book.total_days %}
+                                {{ book.total_days }}{% if book.days_paused %}<span class="days-paused">({{ book.days_paused }})</span>{% endif %}
+                            {% else %}-{% endif %}
+                        </span>
+                        <span class="book-pace">{{ book.pages_per_day or '-' }}</span>
+                    </div>
+                    
+                    <!-- Compact View Content -->
+                    <div class="compact-content">
+                        <div class="compact-header">
+                            <span class="book-number">#{{ book.all_time_number }}</span>
+                            <span class="book-rating">{{ book.rating|rating_star|safe }}</span>
+                        </div>
+                        <div class="book-title">{{ book.title }}</div>
+                        <div class="book-author">{{ book.author }}</div>
+                        <div class="compact-meta">
+                            <span>{{ book.pages }} pages</span>
+                            <span class="meta-sep">•</span>
+                            <span>{{ book.total_days or '?' }} days{% if book.days_paused %} ({{ book.days_paused }} paused){% endif %}</span>
+                            {% if book.pages_per_day %}
+                            <span class="meta-sep">•</span>
+                            <span>{{ book.pages_per_day }} pg/day</span>
+                            {% endif %}
+                        </div>
+                        <div class="compact-dates">
+                            {{ book.date_begun_date|timestamp_to_short_date if book.date_begun else '-' }}
+                            → 
+                            {{ book.date_finished_date|timestamp_to_short_date if book.date_finished else 'In progress' }}
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+{% else %}
+<div class="empty-state">
+    <div class="empty-icon">📚</div>
+    <h3>No books yet</h3>
+    <p>Start tracking your reading journey!</p>
+    <a href="{{ url_for('books.add_book') }}" class="btn btn-primary">
+        <i data-lucide="plus" class="icon-sm icon-inline"></i> Add Your First Book
+    </a>
+</div>
+{% endif %}
+
+{% endblock %}

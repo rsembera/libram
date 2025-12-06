@@ -1,0 +1,206 @@
+{% extends "base.html" %}
+
+{% block title %}{{ 'Edit Book' if mode == 'edit' else 'Add Book' }} - Libram{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/book_form.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/pickers.css') }}">
+{% endblock %}
+
+{% block content %}
+
+<div class="form-card">
+    <div class="form-header">
+        <h2>
+            <i data-lucide="{{ 'edit' if mode == 'edit' else 'plus' }}" class="page-icon"></i>
+            {{ 'Edit Book' if mode == 'edit' else 'Add Book' }}
+        </h2>
+        <a href="{{ url_for('books.index') }}" class="btn btn-secondary">
+            <i data-lucide="arrow-left" class="icon-sm icon-inline"></i> Back
+        </a>
+    </div>
+    
+    {% if errors %}
+    <div class="error-box">
+        <ul>
+            {% for error in errors %}
+            <li>{{ error }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+    
+    <form method="post" id="book-form">
+        <!-- Title & Author -->
+        <div class="form-row">
+            <div class="form-group">
+                <label for="title">Title</label>
+                <input type="text" id="title" name="title" 
+                       value="{{ book.title if book else '' }}"
+                       placeholder="Book title"
+                       required autofocus>
+            </div>
+            <div class="form-group">
+                <label for="author">Author</label>
+                <input type="text" id="author" name="author" 
+                       value="{{ book.author if book else '' }}"
+                       placeholder="Author name"
+                       required>
+            </div>
+        </div>
+        
+        <!-- Pages -->
+        <div class="form-row-half">
+            <div class="form-group">
+                <label for="pages">Pages</label>
+                <input type="number" id="pages" name="pages" 
+                       value="{{ book.pages if book else '' }}"
+                       placeholder="Number of pages"
+                       min="1"
+                       required>
+            </div>
+        </div>
+        
+        <!-- Dates with custom pickers -->
+        <div class="form-row">
+            <div class="form-group">
+                <label>Date Begun</label>
+                <div id="date-begun-picker"></div>
+                <input type="hidden" name="date_begun" id="date-begun-value" 
+                       value="{{ book.date_begun_date.strftime('%Y-%m-%d') if book and book.date_begun_date else '' }}">
+            </div>
+            <div class="form-group">
+                <label>Date Finished</label>
+                <div id="date-finished-picker"></div>
+                <input type="hidden" name="date_finished" id="date-finished-value"
+                       value="{{ book.date_finished_date.strftime('%Y-%m-%d') if book and book.date_finished_date else '' }}">
+                <small class="helper-text">Leave blank if still reading</small>
+            </div>
+        </div>
+        
+        <!-- Days Paused (optional) -->
+        <div class="form-row-half">
+            <div class="form-group">
+                <label for="days_paused">Days Paused</label>
+                <input type="number" id="days_paused" name="days_paused" 
+                       value="{{ book.days_paused if book and book.days_paused else '' }}"
+                       placeholder="0"
+                       min="0">
+                <small class="helper-text">Days you paused reading (for accurate pg/day)</small>
+            </div>
+        </div>
+        
+        <!-- Rating -->
+        <div class="form-row-half">
+            <div class="form-group">
+                <label for="rating">Rating</label>
+                <select id="rating" name="rating">
+                    <option value="0" {{ 'selected' if not book or book.rating == 0 else '' }}>No rating</option>
+                    <option value="1" {{ 'selected' if book and book.rating == 1 else '' }}>★ Black</option>
+                    <option value="2" {{ 'selected' if book and book.rating == 2 else '' }}>★ Bronze</option>
+                    <option value="3" {{ 'selected' if book and book.rating == 3 else '' }}>★ Silver</option>
+                    <option value="4" {{ 'selected' if book and book.rating == 4 else '' }}>★ Gold</option>
+                    <option value="5" {{ 'selected' if book and book.rating == 5 else '' }}>★ Green</option>
+                </select>
+            </div>
+        </div>
+        
+        <!-- Did Not Finish -->
+        <div class="form-group">
+            <label class="checkbox-label">
+                <input type="checkbox" name="did_not_finish" value="1"
+                       {{ 'checked' if book and book.did_not_finish else '' }}>
+                <span>Did not finish</span>
+            </label>
+        </div>
+        
+        <!-- Notes -->
+        <div class="form-group">
+            <label for="notes">Notes</label>
+            <textarea id="notes" name="notes" rows="4" 
+                      placeholder="Optional notes about this book...">{{ book.notes if book else '' }}</textarea>
+        </div>
+        
+        <!-- Actions -->
+        <div class="form-actions">
+            {% if mode == 'edit' %}
+            <button type="button" class="btn btn-danger" onclick="confirmDelete()">
+                <i data-lucide="trash-2" class="icon-sm icon-inline"></i> Delete
+            </button>
+            {% endif %}
+            <div class="actions-right">
+                <a href="{{ url_for('books.index') }}" class="btn btn-secondary">Cancel</a>
+                <button type="submit" class="btn btn-primary">
+                    {{ 'Save Changes' if mode == 'edit' else 'Add Book' }}
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<!-- Delete Confirmation Modal -->
+{% if mode == 'edit' %}
+<div id="delete-modal" class="modal">
+    <div class="modal-content">
+        <h3>Delete Book?</h3>
+        <p>Are you sure you want to delete "{{ book.title }}"? This cannot be undone.</p>
+        <div class="modal-actions">
+            <button type="button" class="btn btn-secondary" onclick="closeDeleteModal()">Cancel</button>
+            <form method="post" style="display: inline;">
+                <input type="hidden" name="action" value="delete">
+                <button type="submit" class="btn btn-danger">Delete</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/pickers.js') }}"></script>
+<script>
+// Initialize date pickers
+document.addEventListener('DOMContentLoaded', function() {
+    // Date Begun picker
+    const begunInitial = document.getElementById('date-begun-value').value;
+    initDatePicker('date-begun-picker', {
+        initialDate: begunInitial ? parseDateString(begunInitial) : new Date(),
+        placeholder: 'Select date begun',
+        onSelect: function(date) {
+            document.getElementById('date-begun-value').value = formatDateForServer(date);
+        }
+    });
+    // Set initial hidden value if default date used
+    if (!begunInitial) {
+        document.getElementById('date-begun-value').value = formatDateForServer(new Date());
+    }
+    
+    // Date Finished picker (with clear option)
+    const finishedInitial = document.getElementById('date-finished-value').value;
+    initDatePicker('date-finished-picker', {
+        initialDate: finishedInitial ? parseDateString(finishedInitial) : null,
+        placeholder: 'Still reading...',
+        allowClear: true,
+        onSelect: function(date) {
+            document.getElementById('date-finished-value').value = formatDateForServer(date);
+        }
+    });
+});
+
+// Delete modal functions
+function confirmDelete() {
+    document.getElementById('delete-modal').style.display = 'flex';
+}
+
+function closeDeleteModal() {
+    document.getElementById('delete-modal').style.display = 'none';
+}
+
+document.getElementById('delete-modal')?.addEventListener('click', function(e) {
+    if (e.target === this) {
+        closeDeleteModal();
+    }
+});
+</script>
+{% endblock %}

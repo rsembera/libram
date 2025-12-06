@@ -1,0 +1,94 @@
+/* Libram - Settings Page Styles */
+
+.settings-card {
+    max-width: 700px;
+}
+
+.settings-section {
+    background: #F9FAFB;
+    border-radius: 1rem;
+    margin-bottom: 1rem;
+    overflow: hidden;
+}
+
+.settings-section-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    padding: 1.25rem 1.5rem;
+    cursor: pointer;
+    user-select: none;
+    list-style: none;
+    transition: background 0.2s;
+}
+
+.settings-section-header:hover {
+    background: #F2F4F5;
+}
+
+.settings-section-header::-webkit-details-marker {
+    display: none;
+}
+
+.settings-section-header .arrow {
+    color: #9CA3AF;
+    font-size: 0.75rem;
+    transition: transform 0.2s;
+    line-height: 1.5rem;
+}
+
+details[open] .settings-section-header .arrow {
+    transform: rotate(90deg);
+}
+
+.settings-section-header h3 {
+    margin: 0;
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: #1F2937;
+}
+
+.settings-section-header p {
+    margin: 0.25rem 0 0 0;
+    font-size: 0.875rem;
+    color: #6B7280;
+}
+
+.settings-section-content {
+    padding: 0 1.5rem 1.5rem 1.5rem;
+}
+
+.settings-section-content .form-group {
+    max-width: 350px;
+}
+
+/* About section */
+.about-section {
+    text-align: center;
+    padding: 2rem;
+    margin-top: 2rem;
+    border-top: 1px solid #E5E7EB;
+}
+
+.about-logo {
+    font-size: 3rem;
+    margin-bottom: 0.5rem;
+}
+
+.about-section h3 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #1F2937;
+    margin-bottom: 0.25rem;
+}
+
+.about-section .version {
+    color: var(--color-primary);
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.about-section .credits {
+    color: #6B7280;
+    font-size: 0.875rem;
+}

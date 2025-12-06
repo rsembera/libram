@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+
+{% block title %}Settings - Libram{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/settings.css') }}">
+{% endblock %}
+
+{% block content %}
+
+<div class="settings-card">
+    <div class="settings-header">
+        <h2><i data-lucide="sliders-horizontal" class="page-icon"></i>Settings</h2>
+        <a href="{{ url_for('books.index') }}" class="btn btn-secondary">
+            <i data-lucide="arrow-left" class="icon-sm icon-inline"></i> Back
+        </a>
+    </div>
+    
+    <!-- Appearance Section -->
+    <details class="settings-section" open>
+        <summary class="settings-section-header">
+            <span class="arrow">▶</span>
+            <div>
+                <h3>Appearance</h3>
+                <p>Customize how Libram looks</p>
+            </div>
+        </summary>
+        <div class="settings-section-content">
+            <div class="form-group">
+                <label for="card-style">Info Card Style</label>
+                <select id="card-style" onchange="saveCardStyle()">
+                    <option value="strait-laced" {{ 'selected' if settings.card_style == 'strait-laced' else '' }}>Strait-Laced (White)</option>
+                    <option value="garden-path" {{ 'selected' if settings.card_style == 'garden-path' else '' }}>Garden Path (Green/sage)</option>
+                    <option value="ocean-breeze" {{ 'selected' if settings.card_style == 'ocean-breeze' else '' }}>Ocean Breeze (Blue/teal)</option>
+                    <option value="sunset-glow" {{ 'selected' if settings.card_style == 'sunset-glow' else '' }}>Sunset Glow (Warm peach)</option>
+                    <option value="tutti-frutti" {{ 'selected' if settings.card_style == 'tutti-frutti' else '' }}>Tutti-Frutti (Mixed pastels)</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="background-style">Background</label>
+                <select id="background-style" onchange="saveBackground()">
+                    <option value="suit-grey" {{ 'selected' if settings.background_style == 'suit-grey' else '' }}>Suit Grey</option>
+                    <option value="sage-mist" {{ 'selected' if settings.background_style == 'sage-mist' else '' }}>Sage Mist</option>
+                    <option value="soft-cream" {{ 'selected' if settings.background_style == 'soft-cream' else '' }}>Soft Cream</option>
+                    <option value="warm-stone" {{ 'selected' if settings.background_style == 'warm-stone' else '' }}>Warm Stone</option>
+                </select>
+            </div>
+        </div>
+    </details>
+    
+    <!-- Security Section -->
+    <details class="settings-section">
+        <summary class="settings-section-header">
+            <span class="arrow">▶</span>
+            <div>
+                <h3>Security</h3>
+                <p>Password and session settings</p>
+            </div>
+        </summary>
+        <div class="settings-section-content">
+            <div class="form-group">
+                <label>Password</label>
+                <a href="{{ url_for('auth.change_password') }}" class="btn btn-sm">
+                    <i data-lucide="key" class="icon-sm icon-inline"></i>
+                    Change Password
+                </a>
+            </div>
+            
+            <div class="form-group">
+                <label for="session-timeout">Auto-Logout After Inactivity</label>
+                <select id="session-timeout" onchange="saveTimeout()">
+                    <option value="15" {{ 'selected' if settings.session_timeout == '15' else '' }}>15 minutes</option>
+                    <option value="30" {{ 'selected' if settings.session_timeout == '30' else '' }}>30 minutes</option>
+                    <option value="60" {{ 'selected' if settings.session_timeout == '60' else '' }}>1 hour</option>
+                    <option value="120" {{ 'selected' if settings.session_timeout == '120' else '' }}>2 hours</option>
+                    <option value="0" {{ 'selected' if settings.session_timeout == '0' else '' }}>Never</option>
+                </select>
+            </div>
+        </div>
+    </details>
+    
+    <!-- About Section -->
+    <div class="about-section">
+        <div class="about-logo">📚</div>
+        <h3>Libram</h3>
+        <p class="version">Personal Reading Tracker</p>
+        <p class="credits">Designed by Richard Sembera</p>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/settings.js') }}"></script>
+{% endblock %}
