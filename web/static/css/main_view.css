@@ -241,15 +241,15 @@ body.strait-laced .stat-card { background: #FFFFFF; }
     display: none;
 }
 
-.col-number { width: 45px; flex-shrink: 0; }
-.col-year-num { width: 45px; flex-shrink: 0; }
-.col-rating { width: 60px; flex-shrink: 0; text-align: center; }
-.col-title { flex: 1; min-width: 120px; }
-.col-author { flex: 1; min-width: 100px; margin-left: 1.5rem; margin-right: 2.5rem; }
-.col-pages { width: 70px; flex-shrink: 0; text-align: right; }
-.col-dates { width: 180px; flex-shrink: 0; text-align: center; margin: 0 2rem; }
-.col-days { width: 70px; flex-shrink: 0; text-align: right; }
-.col-pace { width: 90px; flex-shrink: 0; text-align: right; }
+.col-number { width: 45px; flex-shrink: 0; text-align: center; }
+.col-year-num { width: 65px; flex-shrink: 0; text-align: center; }
+.col-rating { width: 50px; flex-shrink: 0; text-align: center; }
+.col-title { flex: 1.2; min-width: 120px; }
+.col-author { flex: 0.8; min-width: 80px; margin-left: 1.5rem; margin-right: 3.5rem; }
+.col-pages { width: 70px; flex-shrink: 0; text-align: center; }
+.col-dates { width: 180px; flex-shrink: 0; text-align: center; margin: 0 1rem; }
+.col-days { width: 70px; flex-shrink: 0; text-align: center; }
+.col-pace { width: 90px; flex-shrink: 0; text-align: center; }
 
 /* ============================================
    BOOKS CONTAINER
@@ -336,23 +336,26 @@ body.strait-laced .stat-card { background: #FFFFFF; }
     font-weight: 700;
     color: #6B7280;
     font-size: 0.875rem;
+    text-align: center;
 }
 
 .detailed-content .year-number {
-    width: 45px;
+    width: 65px;
     flex-shrink: 0;
-    color: #9CA3AF;
-    font-size: 0.8125rem;
+    color: #6B7280;
+    font-size: 0.875rem;
+    font-weight: 700;
+    text-align: center;
 }
 
 .detailed-content .book-rating {
-    width: 60px;
+    width: 50px;
     flex-shrink: 0;
     text-align: center;
 }
 
 .detailed-content .book-title {
-    flex: 1;
+    flex: 1.2;
     min-width: 120px;
     font-weight: 600;
     color: #111827;
@@ -362,20 +365,20 @@ body.strait-laced .stat-card { background: #FFFFFF; }
 }
 
 .detailed-content .book-author {
-    flex: 1;
-    min-width: 100px;
+    flex: 0.8;
+    min-width: 80px;
     color: #4B5563;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
     margin-left: 1.5rem;
-    margin-right: 2.5rem;
+    margin-right: 3.5rem;
 }
 
 .detailed-content .book-pages {
     width: 70px;
     flex-shrink: 0;
-    text-align: right;
+    text-align: center;
     color: #6B7280;
     font-size: 0.875rem;
 }
@@ -383,10 +386,11 @@ body.strait-laced .stat-card { background: #FFFFFF; }
 .detailed-content .book-dates {
     width: 180px;
     flex-shrink: 0;
-    text-align: center;
+    display: flex;
+    justify-content: center;
     color: #6B7280;
     font-size: 0.8125rem;
-    margin: 0 2rem;
+    margin: 0 1rem;
 }
 
 .date-sep {
@@ -397,7 +401,7 @@ body.strait-laced .stat-card { background: #FFFFFF; }
 .detailed-content .book-days {
     width: 70px;
     flex-shrink: 0;
-    text-align: right;
+    text-align: center;
     color: #6B7280;
     font-size: 0.875rem;
 }
@@ -411,7 +415,7 @@ body.strait-laced .stat-card { background: #FFFFFF; }
 .detailed-content .book-pace {
     width: 90px;
     flex-shrink: 0;
-    text-align: right;
+    text-align: center;
     color: #6B7280;
     font-size: 0.875rem;
 }

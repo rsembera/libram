@@ -90,7 +90,7 @@
     <!-- Column Headers (for detailed view) -->
     <div class="column-headers" id="column-headers">
         <div class="col-number">#</div>
-        <div class="col-year-num">Yr#</div>
+        <div class="col-year-num">Yr. #</div>
         <div class="col-rating">Rating</div>
         <div class="col-title">Title</div>
         <div class="col-author">Author</div>
@@ -129,9 +129,9 @@
                         <span class="book-author">{{ book.author }}</span>
                         <span class="book-pages">{{ book.pages }}</span>
                         <span class="book-dates">
-                            {{ book.date_begun_date|timestamp_to_short_date if book.date_begun else '-' }}
+                            {{ book.date_begun|timestamp_to_short_date if book.date_begun else '-' }}
                             <span class="date-sep">/</span>
-                            {{ book.date_finished_date|timestamp_to_short_date if book.date_finished else '-' }}
+                            {{ book.date_finished|timestamp_to_short_date if book.date_finished else '-' }}
                         </span>
                         <span class="book-days">
                             {% if book.total_days %}
@@ -159,9 +159,9 @@
                             {% endif %}
                         </div>
                         <div class="compact-dates">
-                            {{ book.date_begun_date|timestamp_to_short_date if book.date_begun else '-' }}
+                            {{ book.date_begun|timestamp_to_short_date if book.date_begun else '-' }}
                             → 
-                            {{ book.date_finished_date|timestamp_to_short_date if book.date_finished else 'In progress' }}
+                            {{ book.date_finished|timestamp_to_short_date if book.date_finished else 'In progress' }}
                         </div>
                     </div>
                 </div>
