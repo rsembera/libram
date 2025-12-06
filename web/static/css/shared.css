@@ -28,10 +28,48 @@
     font-display: swap;
 }
 
+@font-face {
+    font-family: 'Lexend';
+    src: url('../fonts/Lexend-Regular.ttf') format('truetype');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Lexend';
+    src: url('../fonts/Lexend-Medium.ttf') format('truetype');
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Lexend';
+    src: url('../fonts/Lexend-SemiBold.ttf') format('truetype');
+    font-weight: 600;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Lexend';
+    src: url('../fonts/Lexend-Bold.ttf') format('truetype');
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+}
+
 /* ============================================
    CSS CUSTOM PROPERTIES (COLORS)
    ============================================ */
 :root {
+    /* Font stacks */
+    --font-system-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+    --font-system-serif: Georgia, 'Times New Roman', Times, serif;
+    --font-lexend: 'Lexend', var(--font-system-sans);
+    --font-libre: 'Libre Baskerville', var(--font-system-serif);
+    
     /* Primary colors */
     --color-primary: #667eea;
     --color-primary-light: #818cf8;
@@ -69,7 +107,6 @@
 }
 
 body {
-    font-family: 'Libre Baskerville', Georgia, serif;
     color: var(--color-text);
     line-height: 1.6;
     min-height: 100vh;
@@ -85,6 +122,14 @@ body {
 .bg-warm-stone { background: #E8E4E0; }
 
 /* ============================================
+   FONT STYLES
+   ============================================ */
+.font-system-sans { font-family: var(--font-system-sans); }
+.font-system-serif { font-family: var(--font-system-serif); }
+.font-lexend { font-family: var(--font-lexend); }
+.font-libre-baskerville { font-family: var(--font-libre); }
+
+/* ============================================
    BUTTONS
    ============================================ */
 .btn {
@@ -96,7 +141,7 @@ body {
     border-radius: 0.75rem;
     font-size: 0.875rem;
     font-weight: 700;
-    font-family: 'Libre Baskerville', Georgia, serif;
+    font-family: inherit;
     cursor: pointer;
     transition: all 0.2s;
     text-decoration: none;
@@ -177,7 +222,7 @@ body {
     border: 2px solid var(--color-border);
     border-radius: 0.75rem;
     font-size: 0.9375rem;
-    font-family: 'Libre Baskerville', Georgia, serif;
+    font-family: inherit;
     color: var(--color-text);
     background: white;
     transition: border-color 0.2s;

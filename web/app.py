@@ -88,17 +88,19 @@ def create_app():
     # Context processor to inject theme settings into all templates
     @app.context_processor
     def inject_theme_settings():
-        """Inject card_style and background_style into all templates."""
+        """Inject card_style, background_style, and font_style into all templates."""
         try:
             db = get_db()
             return {
                 'card_style': db.get_setting('card_style', 'tutti-frutti'),
-                'background_style': db.get_setting('background_style', 'suit-grey')
+                'background_style': db.get_setting('background_style', 'suit-grey'),
+                'font_style': db.get_setting('font_style', 'libre-baskerville')
             }
         except:
             return {
                 'card_style': 'tutti-frutti',
-                'background_style': 'suit-grey'
+                'background_style': 'suit-grey',
+                'font_style': 'libre-baskerville'
             }
     
     # Register blueprints

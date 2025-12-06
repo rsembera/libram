@@ -17,6 +17,7 @@ def settings_page():
     settings = {
         'card_style': db.get_setting('card_style', 'tutti-frutti'),
         'background_style': db.get_setting('background_style', 'suit-grey'),
+        'font_style': db.get_setting('font_style', 'libre-baskerville'),
         'session_timeout': db.get_setting('session_timeout', '30'),
     }
     
@@ -48,6 +49,18 @@ def save_background():
     
     style = data.get('style', 'suit-grey')
     db.set_setting('background_style', style)
+    
+    return jsonify({'status': 'ok'})
+
+
+@settings_bp.route('/api/font', methods=['POST'])
+def save_font():
+    """Save font preference."""
+    db = current_app.get_db()
+    data = request.get_json()
+    
+    style = data.get('style', 'libre-baskerville')
+    db.set_setting('font_style', style)
     
     return jsonify({'status': 'ok'})
 

@@ -8,7 +8,7 @@
     background: #F9FAFB;
     border-radius: 1rem;
     margin-bottom: 1rem;
-    overflow: hidden;
+    overflow: visible;
 }
 
 .settings-section-header {
@@ -55,7 +55,8 @@ details[open] .settings-section-header .arrow {
 }
 
 .settings-section-content {
-    padding: 0 1.5rem 1.5rem 1.5rem;
+    padding: 0 1.5rem 2rem 1.5rem;
+    overflow: visible;
 }
 
 .settings-section-content .form-group {
@@ -92,3 +93,98 @@ details[open] .settings-section-header .arrow {
     color: #6B7280;
     font-size: 0.875rem;
 }
+
+/* ============================================
+   CUSTOM DROPDOWN
+   ============================================ */
+.custom-dropdown {
+    position: relative;
+    width: 100%;
+}
+
+.custom-dropdown-trigger {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 2px solid var(--color-border);
+    border-radius: 0.75rem;
+    font-size: 0.9375rem;
+    font-family: inherit;
+    color: var(--color-text);
+    background: white;
+    cursor: pointer;
+    transition: border-color 0.2s;
+    text-align: left;
+}
+
+.custom-dropdown-trigger:hover {
+    border-color: #C0C5CC;
+}
+
+.custom-dropdown-trigger:focus {
+    outline: none;
+    border-color: var(--color-border-focus);
+}
+
+.custom-dropdown-trigger .dropdown-arrow {
+    color: #9CA3AF;
+    transition: transform 0.2s;
+}
+
+.custom-dropdown.open .dropdown-arrow {
+    transform: rotate(180deg);
+}
+
+.custom-dropdown-menu {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    right: 0;
+    background: white;
+    border: 2px solid var(--color-border);
+    border-radius: 0.75rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    z-index: 100;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-8px);
+    transition: all 0.2s;
+}
+
+.custom-dropdown.open .custom-dropdown-menu {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.custom-dropdown-option {
+    padding: 0.75rem 1rem;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.custom-dropdown-option:first-child {
+    border-radius: 0.6rem 0.6rem 0 0;
+}
+
+.custom-dropdown-option:last-child {
+    border-radius: 0 0 0.6rem 0.6rem;
+}
+
+.custom-dropdown-option:hover {
+    background: #F3F4F6;
+}
+
+.custom-dropdown-option.selected {
+    background: #EEF2FF;
+    color: var(--color-primary);
+    font-weight: 600;
+}
+
+/* Font preview in dropdown */
+.font-option-system-sans { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+.font-option-system-serif { font-family: Georgia, 'Times New Roman', Times, serif; }
+.font-option-lexend { font-family: 'Lexend', sans-serif; }
+.font-option-libre-baskerville { font-family: 'Libre Baskerville', Georgia, serif; }

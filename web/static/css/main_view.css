@@ -160,7 +160,7 @@ body.strait-laced .stat-card { background: #FFFFFF; }
     border-radius: 0.75rem;
     font-size: 0.875rem;
     width: 280px;
-    font-family: 'Libre Baskerville', Georgia, serif;
+    font-family: inherit;
     transition: border-color 0.2s;
 }
 
@@ -203,7 +203,7 @@ body.strait-laced .stat-card { background: #FFFFFF; }
     border-radius: 0.5rem;
     font-size: 0.875rem;
     font-weight: 700;
-    font-family: 'Libre Baskerville', Georgia, serif;
+    font-family: inherit;
     color: #5B6571;
     background: transparent;
     cursor: pointer;
