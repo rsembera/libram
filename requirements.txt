@@ -1,16 +1,1 @@
-# Libram - Personal Reading Tracker
-# Requirements
-
-# Web framework
-Flask==3.0.0
-Werkzeug==3.0.1
-
-# Database (SQLCipher for encryption)
-sqlcipher3==0.5.2
-pysqlcipher3==1.2.0
-
-# For CSV export
-# (using built-in csv module)
-
-# Development
-pytest==7.4.3
+flask>=3.0.0
