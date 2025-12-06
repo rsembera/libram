@@ -13,7 +13,7 @@
     
     {% block extra_css %}{% endblock %}
 </head>
-<body class="{{ card_style or 'tutti-frutti' }} bg-{{ background_style or 'suit-grey' }} font-{{ font_style or 'libre-baskerville' }}">
+<body class="{{ card_style or 'tutti-frutti' }} {% if not background_style.startswith('user:') %}bg-{{ background_style or 'suit-grey' }}{% endif %} font-{{ font_style or 'libre-baskerville' }}"{% if background_style.startswith('user:') %} style="background-image: url('/static/user_backgrounds/{{ background_style[5:] }}'); background-size: cover; background-position: center; background-attachment: fixed;"{% endif %}>
     
     {% block content %}{% endblock %}
     
