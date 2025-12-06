@@ -188,3 +188,81 @@ details[open] .settings-section-header .arrow {
 .font-option-system-serif { font-family: Georgia, 'Times New Roman', Times, serif; }
 .font-option-lexend { font-family: 'Lexend', sans-serif; }
 .font-option-libre-baskerville { font-family: 'Libre Baskerville', Georgia, serif; }
+
+/* ============================================
+   BACKGROUND DROPDOWN EXTRAS
+   ============================================ */
+.dropdown-group-label {
+    padding: 0.5rem 1rem 0.25rem;
+    font-size: 0.6875rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #9CA3AF;
+}
+
+.dropdown-group-label:not(:first-child) {
+    border-top: 1px solid #E5E7EB;
+    margin-top: 0.25rem;
+    padding-top: 0.75rem;
+}
+
+.bg-preview {
+    display: inline-block;
+    width: 24px;
+    height: 24px;
+    border-radius: 4px;
+    margin-right: 0.75rem;
+    vertical-align: middle;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    flex-shrink: 0;
+}
+
+.bg-preview-suit-grey { background: #EDF2F5; }
+.bg-preview-sage-mist { background: #E8F0E8; }
+.bg-preview-soft-cream { background: #F5F0E8; }
+.bg-preview-warm-stone { background: #E8E4E0; }
+
+.bg-preview-image {
+    background-size: cover;
+    background-position: center;
+}
+
+.custom-dropdown-option {
+    display: flex;
+    align-items: center;
+}
+
+.background-actions {
+    margin-top: 0.5rem;
+}
+
+.btn-danger-light {
+    background: #FEE2E2;
+    color: #991B1B;
+}
+
+.btn-danger-light:hover {
+    background: #FECACA;
+}
+
+/* Upload row */
+.upload-row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.upload-status {
+    font-size: 0.875rem;
+    margin-top: 0.5rem;
+    display: none;
+}
+
+.upload-status.success { color: #059669; }
+.upload-status.error { color: #DC2626; }
+.upload-status.info { color: #6B7280; }
+
+/* Hidden utility */
+.hidden { display: none !important; }

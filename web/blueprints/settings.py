@@ -3,7 +3,9 @@ Libram Settings Blueprint
 Application configuration and preferences.
 """
 
+from pathlib import Path
 from flask import Blueprint, render_template, request, redirect, url_for, current_app, jsonify
+from werkzeug.utils import secure_filename
 
 settings_bp = Blueprint('settings', __name__)
 
@@ -88,3 +90,101 @@ def save_timeout():
     db.set_setting('session_timeout', timeout)
     
     return jsonify({'status': 'ok'})
+
+
+# ============================================================================
+# BACKGROUND IMAGES
+# ============================================================================
+
+@settings_bp.route('/api/backgrounds')
+def list_backgrounds():
+    """Return list of available backgrounds (solid colors + user uploads)."""
+    # Solid color options
+    solid_colors = [
+        {'value': 'suit-grey', 'name': 'Suit Grey'},
+        {'value': 'sage-mist', 'name': 'Sage Mist'},
+        {'value': 'soft-cream', 'name': 'Soft Cream'},
+        {'value': 'warm-stone', 'name': 'Warm Stone'},
+    ]
+    
+    # User backgrounds (uploaded)
+    user_dir = Path(__file__).parent.parent / 'static' / 'user_backgrounds'
+    user_backgrounds = []
+    
+    if user_dir.exists():
+        for file in user_dir.iterdir():
+            if file.is_file() and file.suffix.lower() in ['.png', '.jpg', '.jpeg', '.gif', '.webp']:
+                user_backgrounds.append({
+                    'value': 'user:' + file.name,
+                    'name': file.stem.replace('_', ' ').replace('-', ' ').title(),
+                    'filename': file.name
+                })
+    
+    return jsonify({
+        'solid': solid_colors,
+        'user': sorted(user_backgrounds, key=lambda x: x['name'])
+    })
+
+
+@settings_bp.route('/upload_background', methods=['POST'])
+def upload_background():
+    """Handle background image upload."""
+    if 'background' not in request.files:
+        return jsonify({'success': False, 'error': 'No file provided'})
+    
+    file = request.files['background']
+    
+    if file.filename == '':
+        return jsonify({'success': False, 'error': 'No file selected'})
+    
+    # Validate file type
+    allowed_extensions = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
+    file_ext = file.filename.rsplit('.', 1)[1].lower() if '.' in file.filename else ''
+    
+    if file_ext not in allowed_extensions:
+        return jsonify({'success': False, 'error': 'Invalid file type. Use: png, jpg, jpeg, gif, or webp'})
+    
+    # Create safe filename
+    filename = secure_filename(file.filename)
+    
+    # Create user_backgrounds directory if it doesn't exist
+    upload_dir = Path(__file__).parent.parent / 'static' / 'user_backgrounds'
+    upload_dir.mkdir(exist_ok=True)
+    
+    # Save file
+    upload_path = upload_dir / filename
+    
+    try:
+        file.save(str(upload_path))
+        return jsonify({'success': True, 'filename': filename})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)})
+
+
+@settings_bp.route('/delete_background', methods=['POST'])
+def delete_background():
+    """Delete a user-uploaded background."""
+    data = request.get_json()
+    filename = data.get('filename')
+    
+    if not filename:
+        return jsonify({'success': False, 'error': 'No filename provided'})
+    
+    # Only allow deletion from user_backgrounds directory
+    user_dir = Path(__file__).parent.parent / 'static' / 'user_backgrounds'
+    file_path = user_dir / filename
+    
+    # Security check: ensure the path is within user_backgrounds
+    try:
+        file_path.resolve().relative_to(user_dir.resolve())
+    except ValueError:
+        return jsonify({'success': False, 'error': 'Invalid path'})
+    
+    if not file_path.exists():
+        return jsonify({'success': False, 'error': 'File not found'})
+    
+    try:
+        file_path.unlink()
+        return jsonify({'success': True})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)})
