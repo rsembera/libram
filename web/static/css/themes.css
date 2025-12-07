@@ -5,9 +5,9 @@
 
 /* Default Theme - Quiet Sky (purple/lavender) */
 :root {
-    /* Page backgrounds */
-    --bg-page: #f9f8fc;
-    --bg-page-alt: #f5f3f9;
+    /* Page backgrounds - darker for contrast */
+    --bg-page: #d8d4e8;
+    --bg-page-alt: #e0dce8;
     
     /* Card backgrounds */
     --bg-card: #ffffff;
@@ -30,21 +30,17 @@
     --accent-hover: #7b80c0;
     --accent-light: #c5c8e8;
     
-    /* Borders and shadows */
-    --border-color: #e0dce8;
-    --shadow-color: rgba(155,159,216,0.15);
+    /* Borders, dividers, and shadows */
+    --border-color: #c8c4d8;
+    --divider-color: #9B9FD8;
+    --chart-grid: #c8c4d8;
+    --shadow-color: rgba(155,159,216,0.2);
     
     /* Button colors */
     --btn-primary-bg: #9B9FD8;
     --btn-primary-text: #ffffff;
     --btn-secondary-bg: #E8E4F0;
     --btn-secondary-text: #3a3545;
-    
-    /* Nav button colors */
-    --nav-btn-1: #E8D4E8;
-    --nav-btn-2: #D4E8D8;
-    --nav-btn-3: #D4E0E8;
-    --nav-btn-4: #E0D4E8;
     
     /* Chart colors */
     --chart-bar: #9B9FD8;
@@ -53,15 +49,15 @@
     
     /* Book list */
     --book-row-even: #ffffff;
-    --book-row-odd: #f9f8fc;
-    --book-row-hover: #f0eef6;
+    --book-row-odd: #f5f3fa;
+    --book-row-hover: #eeeaf4;
     --year-header-bg: #E8E4F0;
 }
 
 /* Gentle Dawn - Pink/Rose tones */
 [data-theme="gentle-dawn"] {
-    --bg-page: #fdf8f8;
-    --bg-page-alt: #fcf3f3;
+    --bg-page: #e8d0d0;
+    --bg-page-alt: #f0d8d8;
     
     --bg-card: #ffffff;
     --bg-card-alt: #faf0f0;
@@ -80,33 +76,30 @@
     --accent-hover: #d88585;
     --accent-light: #f5d0d0;
     
-    --border-color: #f0d5d5;
-    --shadow-color: rgba(232,165,165,0.15);
+    --border-color: #e0c0c0;
+    --divider-color: #E8A5A5;
+    --chart-grid: #e0c0c0;
+    --shadow-color: rgba(232,165,165,0.2);
     
     --btn-primary-bg: #E8A5A5;
     --btn-primary-text: #ffffff;
     --btn-secondary-bg: #F5E0E0;
     --btn-secondary-text: #4a3535;
     
-    --nav-btn-1: #F5D5D5;
-    --nav-btn-2: #D5E8D8;
-    --nav-btn-3: #D5E0E8;
-    --nav-btn-4: #E8D5E0;
-    
     --chart-bar: #E8A5A5;
     --chart-bar-alt: #7bc88f;
     --chart-empty: #F0E5E5;
     
     --book-row-even: #ffffff;
-    --book-row-odd: #fdf8f8;
-    --book-row-hover: #faf0f0;
+    --book-row-odd: #fdf6f6;
+    --book-row-hover: #faeaea;
     --year-header-bg: #F5E0E0;
 }
 
 /* Warm Ember - Amber/Orange tones */
 [data-theme="warm-ember"] {
-    --bg-page: #fefaf6;
-    --bg-page-alt: #fcf5ed;
+    --bg-page: #e8d8c0;
+    --bg-page-alt: #f0e0c8;
     
     --bg-card: #ffffff;
     --bg-card-alt: #fdf6ee;
@@ -125,33 +118,30 @@
     --accent-hover: #e08d45;
     --accent-light: #fad4a8;
     
-    --border-color: #f5e0c8;
-    --shadow-color: rgba(244,164,96,0.15);
+    --border-color: #e0d0b8;
+    --divider-color: #F4A460;
+    --chart-grid: #e0d0b8;
+    --shadow-color: rgba(244,164,96,0.2);
     
     --btn-primary-bg: #F4A460;
     --btn-primary-text: #ffffff;
     --btn-secondary-bg: #FAE8D0;
     --btn-secondary-text: #4a3a2a;
     
-    --nav-btn-1: #FAE0C8;
-    --nav-btn-2: #D8E8D0;
-    --nav-btn-3: #D0E0E8;
-    --nav-btn-4: #E8D8C8;
-    
     --chart-bar: #F4A460;
     --chart-bar-alt: #7bc88f;
     --chart-empty: #F5EDE0;
     
     --book-row-even: #ffffff;
-    --book-row-odd: #fefaf6;
-    --book-row-hover: #fdf5ed;
+    --book-row-odd: #fdf9f4;
+    --book-row-hover: #faf3e8;
     --year-header-bg: #FAE8D0;
 }
 
 /* Garden Path - Green/Sage tones */
 [data-theme="garden-path"] {
-    --bg-page: #f8fbf8;
-    --bg-page-alt: #f3f8f3;
+    --bg-page: #c0d8c0;
+    --bg-page-alt: #c8e0c8;
     
     --bg-card: #ffffff;
     --bg-card-alt: #f0f7f2;
@@ -170,33 +160,30 @@
     --accent-hover: #6fa07b;
     --accent-light: #c0dcc8;
     
-    --border-color: #d8e8d8;
-    --shadow-color: rgba(136,184,148,0.15);
+    --border-color: #b0d0b0;
+    --divider-color: #88B894;
+    --chart-grid: #b0d0b0;
+    --shadow-color: rgba(136,184,148,0.2);
     
     --btn-primary-bg: #88B894;
     --btn-primary-text: #ffffff;
     --btn-secondary-bg: #D8E8D8;
     --btn-secondary-text: #2d3f2d;
     
-    --nav-btn-1: #E0D8D8;
-    --nav-btn-2: #D0E0D0;
-    --nav-btn-3: #D0E0E8;
-    --nav-btn-4: #D8D8E0;
-    
     --chart-bar: #88B894;
     --chart-bar-alt: #5FB3B3;
     --chart-empty: #E0E8E0;
     
     --book-row-even: #ffffff;
-    --book-row-odd: #f8fbf8;
-    --book-row-hover: #f0f7f2;
+    --book-row-odd: #f6faf6;
+    --book-row-hover: #eef5ee;
     --year-header-bg: #D8E8D8;
 }
 
 /* Deep Water - Teal/Cyan tones */
 [data-theme="deep-water"] {
-    --bg-page: #f6fbfc;
-    --bg-page-alt: #f0f8f9;
+    --bg-page: #b8d8d8;
+    --bg-page-alt: #c0e0e0;
     
     --bg-card: #ffffff;
     --bg-card-alt: #eff7f7;
@@ -215,33 +202,30 @@
     --accent-hover: #4a9999;
     --accent-light: #a0d8d8;
     
-    --border-color: #cee8e8;
-    --shadow-color: rgba(95,179,179,0.15);
+    --border-color: #a0d0d0;
+    --divider-color: #5FB3B3;
+    --chart-grid: #a0d0d0;
+    --shadow-color: rgba(95,179,179,0.2);
     
     --btn-primary-bg: #5FB3B3;
     --btn-primary-text: #ffffff;
     --btn-secondary-bg: #D0E8E8;
     --btn-secondary-text: #2a3f3f;
     
-    --nav-btn-1: #E0D8D8;
-    --nav-btn-2: #D0E8D8;
-    --nav-btn-3: #C8E0E8;
-    --nav-btn-4: #D8D8E8;
-    
     --chart-bar: #5FB3B3;
     --chart-bar-alt: #88B894;
     --chart-empty: #E0E8E8;
     
     --book-row-even: #ffffff;
-    --book-row-odd: #f6fbfc;
-    --book-row-hover: #eff7f7;
+    --book-row-odd: #f4fafa;
+    --book-row-hover: #eaf5f5;
     --year-header-bg: #D0E8E8;
 }
 
 /* Soft Earth - Brown/Tan tones */
 [data-theme="soft-earth"] {
-    --bg-page: #faf8f5;
-    --bg-page-alt: #f5f2ed;
+    --bg-page: #d8d0c0;
+    --bg-page-alt: #e0d8c8;
     
     --bg-card: #ffffff;
     --bg-card-alt: #f7f4f0;
@@ -260,33 +244,30 @@
     --accent-hover: #8f7d6e;
     --accent-light: #d0c8c0;
     
-    --border-color: #e5dfd5;
-    --shadow-color: rgba(168,149,134,0.15);
+    --border-color: #c8c0b0;
+    --divider-color: #A89586;
+    --chart-grid: #c8c0b0;
+    --shadow-color: rgba(168,149,134,0.2);
     
     --btn-primary-bg: #A89586;
     --btn-primary-text: #ffffff;
     --btn-secondary-bg: #E8E0D8;
     --btn-secondary-text: #3f3630;
     
-    --nav-btn-1: #E8D8D0;
-    --nav-btn-2: #D8E0D0;
-    --nav-btn-3: #D0D8E0;
-    --nav-btn-4: #E0D8D8;
-    
     --chart-bar: #A89586;
     --chart-bar-alt: #88B894;
     --chart-empty: #E8E0D8;
     
     --book-row-even: #ffffff;
-    --book-row-odd: #faf8f5;
-    --book-row-hover: #f5f2ed;
+    --book-row-odd: #f9f7f4;
+    --book-row-hover: #f3f0ea;
     --year-header-bg: #E8E0D8;
 }
 
 /* Evening Ritual - Dark Mode */
 [data-theme="evening-ritual"] {
-    --bg-page: #1a1d2e;
-    --bg-page-alt: #1f2233;
+    --bg-page: #12141f;
+    --bg-page-alt: #181a28;
     
     --bg-card: #252837;
     --bg-card-alt: #2a2d3f;
@@ -305,18 +286,15 @@
     --accent-hover: #8590c8;
     --accent-light: #4a5280;
     
-    --border-color: #3a3f58;
-    --shadow-color: rgba(0,0,0,0.3);
+    --border-color: #4a4f68;
+    --divider-color: #6B7AB8;
+    --chart-grid: #4a4f68;
+    --shadow-color: rgba(0,0,0,0.4);
     
     --btn-primary-bg: #6B7AB8;
     --btn-primary-text: #ffffff;
     --btn-secondary-bg: #3a3f58;
     --btn-secondary-text: #e8e6f0;
-    
-    --nav-btn-1: #4a3f50;
-    --nav-btn-2: #3f4a48;
-    --nav-btn-3: #3f4550;
-    --nav-btn-4: #483f50;
     
     --chart-bar: #6B7AB8;
     --chart-bar-alt: #5FB3B3;

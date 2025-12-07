@@ -249,7 +249,7 @@ function renderBooksChart(container, data) {
     const barColor = styles.getPropertyValue('--chart-bar').trim() || '#667eea';
     const emptyColor = styles.getPropertyValue('--chart-empty').trim() || '#E5E7EB';
     const textColor = styles.getPropertyValue('--text-secondary').trim() || '#4B5563';
-    const gridColor = styles.getPropertyValue('--border-color').trim() || '#E5E7EB';
+    const gridColor = styles.getPropertyValue('--chart-grid').trim() || '#c8c4d8';
     
     // Chart dimensions
     const width = container.clientWidth || 280;
@@ -318,7 +318,7 @@ function renderPagesChart(container, data) {
     const barColor = styles.getPropertyValue('--chart-bar-alt').trim() || '#10B981';
     const emptyColor = styles.getPropertyValue('--chart-empty').trim() || '#E5E7EB';
     const textColor = styles.getPropertyValue('--text-secondary').trim() || '#4B5563';
-    const gridColor = styles.getPropertyValue('--border-color').trim() || '#E5E7EB';
+    const gridColor = styles.getPropertyValue('--chart-grid').trim() || '#c8c4d8';
     
     // Chart dimensions
     const width = container.clientWidth || 280;
