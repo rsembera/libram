@@ -12,11 +12,11 @@
 <div class="form-card">
     <div class="form-header">
         <h2>
-            <i data-lucide="{{ 'edit' if mode == 'edit' else 'plus' }}" class="page-icon"></i>
+            <i class="ph ph-{{ 'pencil-simple' if mode == 'edit' else 'plus' }} page-icon"></i>
             {{ 'Edit Book' if mode == 'edit' else 'Add Book' }}
         </h2>
         <a href="{{ url_for('books.index') }}" class="btn btn-secondary">
-            <i data-lucide="arrow-left" class="icon-sm icon-inline"></i> Back
+            <i class="ph ph-arrow-left" class="icon-sm icon-inline"></i> Back
         </a>
     </div>
     
@@ -125,7 +125,7 @@
         <div class="form-actions">
             {% if mode == 'edit' %}
             <button type="button" class="btn btn-danger" onclick="confirmDelete()">
-                <i data-lucide="trash-2" class="icon-sm icon-inline"></i> Delete
+                <i class="ph ph-trash" class="icon-sm icon-inline"></i> Delete
             </button>
             {% endif %}
             <div class="actions-right">

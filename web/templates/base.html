@@ -11,10 +11,10 @@
     <link rel="icon" type="image/png" sizes="16x16" href="{{ url_for('static', filename='img/favicon-16.png') }}">
     <link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('static', filename='img/apple-touch-icon.png') }}">
     
-    <!-- Lucide Icons -->
-    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Phosphor Icons -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/phosphor.css') }}">
     
-    <!-- Shared CSS (includes local Libre Baskerville font) -->
+    <!-- Shared CSS (includes local fonts) -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/shared.css') }}">
     
     {% block extra_css %}{% endblock %}
@@ -22,11 +22,6 @@
 <body class="{{ card_style or 'tutti-frutti' }} {% if not background_style.startswith('user:') %}bg-{{ background_style or 'suit-grey' }}{% endif %} font-{{ font_style or 'libre-baskerville' }}"{% if background_style.startswith('user:') %} style="background-image: url('/static/user_backgrounds/{{ background_style[5:] }}'); background-size: cover; background-position: center; background-attachment: fixed;"{% endif %}>
     
     {% block content %}{% endblock %}
-    
-    <!-- Initialize Lucide Icons -->
-    <script>
-        lucide.createIcons();
-    </script>
     
     {% block extra_js %}{% endblock %}
 </body>
