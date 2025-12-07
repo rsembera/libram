@@ -185,10 +185,54 @@ details[open] .settings-section-header .arrow {
 }
 
 /* Font preview in dropdown */
-.font-option-system-sans { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
-.font-option-system-serif { font-family: Georgia, 'Times New Roman', Times, serif; }
 .font-option-lexend { font-family: 'Lexend', sans-serif; }
 .font-option-libre-baskerville { font-family: 'Libre Baskerville', Georgia, serif; }
+.font-option-lora { font-family: 'Lora', Georgia, serif; }
+.font-option-source-sans { font-family: 'Source Sans 3', sans-serif; }
+.font-option-literata { font-family: 'Literata', Georgia, serif; }
+
+/* Font controls wrapper */
+.font-controls {
+    display: flex;
+    align-items: stretch;
+    gap: 0.75rem;
+}
+
+.font-controls .custom-dropdown {
+    flex: 1;
+}
+
+/* Font size toggle */
+.font-size-toggle {
+    display: flex;
+    border: 1px solid var(--border-color);
+    border-radius: 0.5rem;
+    overflow: hidden;
+}
+
+.font-size-toggle .size-btn {
+    padding: 0.5rem 0.75rem;
+    border: none;
+    background: var(--bg-card);
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.font-size-toggle .size-btn:not(:last-child) {
+    border-right: 1px solid var(--border-color);
+}
+
+.font-size-toggle .size-btn:hover {
+    background: var(--bg-card-hover);
+}
+
+.font-size-toggle .size-btn.active {
+    background: var(--accent-primary);
+    color: var(--text-on-accent);
+}
 
 /* ============================================
    BACKGROUND DROPDOWN EXTRAS

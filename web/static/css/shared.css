@@ -60,6 +60,78 @@
     font-display: swap;
 }
 
+@font-face {
+    font-family: 'Lora';
+    src: url('../fonts/Lora-Regular.ttf') format('truetype');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Lora';
+    src: url('../fonts/Lora-Bold.ttf') format('truetype');
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Lora';
+    src: url('../fonts/Lora-Italic.ttf') format('truetype');
+    font-weight: 400;
+    font-style: italic;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Source Sans 3';
+    src: url('../fonts/SourceSans3-Regular.ttf') format('truetype');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Source Sans 3';
+    src: url('../fonts/SourceSans3-Bold.ttf') format('truetype');
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Source Sans 3';
+    src: url('../fonts/SourceSans3-It.ttf') format('truetype');
+    font-weight: 400;
+    font-style: italic;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Literata';
+    src: url('../fonts/Literata-Regular.ttf') format('truetype');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Literata';
+    src: url('../fonts/Literata-Bold.ttf') format('truetype');
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Literata';
+    src: url('../fonts/Literata-Italic.ttf') format('truetype');
+    font-weight: 400;
+    font-style: italic;
+    font-display: swap;
+}
+
 /* ============================================
    CSS CUSTOM PROPERTIES (COLORS)
    ============================================ */
@@ -69,6 +141,9 @@
     --font-system-serif: Georgia, 'Times New Roman', Times, serif;
     --font-lexend: 'Lexend', var(--font-system-sans);
     --font-libre: 'Libre Baskerville', var(--font-system-serif);
+    --font-lora: 'Lora', var(--font-system-serif);
+    --font-source-sans: 'Source Sans 3', var(--font-system-sans);
+    --font-literata: 'Literata', var(--font-system-serif);
     
     /* Primary colors */
     --color-primary: #667eea;
@@ -117,10 +192,16 @@ body {
 /* ============================================
    FONT STYLES
    ============================================ */
-.font-system-sans { font-family: var(--font-system-sans); }
-.font-system-serif { font-family: var(--font-system-serif); }
 .font-lexend { font-family: var(--font-lexend); }
 .font-libre-baskerville { font-family: var(--font-libre); }
+.font-lora { font-family: var(--font-lora); }
+.font-source-sans { font-family: var(--font-source-sans); }
+.font-literata { font-family: var(--font-literata); }
+
+/* Font sizes */
+.font-size-s { font-size: 16px; }
+.font-size-m { font-size: 18px; }
+.font-size-l { font-size: 20px; }
 
 /* ============================================
    BUTTONS

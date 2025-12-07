@@ -101,8 +101,27 @@ function selectFont(element) {
     }).then(() => {
         // Update body class for immediate preview
         document.body.className = document.body.className
-            .replace(/\bfont-[\w-]+\b/g, '')
+            .replace(/\bfont-(?!size)[\w-]+\b/g, '')
             .trim() + ' font-' + value;
+    });
+}
+
+function selectFontSize(size) {
+    // Update active state
+    document.querySelectorAll('.font-size-toggle .size-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.size === size);
+    });
+    
+    // Save to server
+    fetch('/settings/api/font-size', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ size: size })
+    }).then(() => {
+        // Update body class for immediate preview
+        document.body.className = document.body.className
+            .replace(/\bfont-size-\w+\b/g, '')
+            .trim() + ' font-size-' + size;
     });
 }
 

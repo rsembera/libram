@@ -101,28 +101,39 @@
             
             <div class="form-group">
                 <label>Font</label>
-                <div class="custom-dropdown" id="font-dropdown">
-                    <button type="button" class="custom-dropdown-trigger" onclick="toggleFontDropdown()">
-                        <span id="font-selected-text">Libre Baskerville</span>
-                        <i class="ph ph-caret-down" class="dropdown-arrow" style="width: 18px; height: 18px;"></i>
-                    </button>
-                    <div class="custom-dropdown-menu">
-                        <div class="custom-dropdown-option font-option-system-sans {{ 'selected' if settings.font_style == 'system-sans' else '' }}" 
-                             data-value="system-sans" onclick="selectFont(this)">
-                            System Sans Serif
+                <div class="font-controls">
+                    <div class="custom-dropdown" id="font-dropdown">
+                        <button type="button" class="custom-dropdown-trigger" onclick="toggleFontDropdown()">
+                            <span id="font-selected-text">Lexend</span>
+                            <i class="ph ph-caret-down" class="dropdown-arrow" style="width: 18px; height: 18px;"></i>
+                        </button>
+                        <div class="custom-dropdown-menu">
+                            <div class="custom-dropdown-option font-option-lexend {{ 'selected' if settings.font_style == 'lexend' or not settings.font_style else '' }}" 
+                                 data-value="lexend" onclick="selectFont(this)">
+                                Lexend
+                            </div>
+                            <div class="custom-dropdown-option font-option-libre-baskerville {{ 'selected' if settings.font_style == 'libre-baskerville' else '' }}" 
+                                 data-value="libre-baskerville" onclick="selectFont(this)">
+                                Libre Baskerville
+                            </div>
+                            <div class="custom-dropdown-option font-option-lora {{ 'selected' if settings.font_style == 'lora' else '' }}" 
+                                 data-value="lora" onclick="selectFont(this)">
+                                Lora
+                            </div>
+                            <div class="custom-dropdown-option font-option-source-sans {{ 'selected' if settings.font_style == 'source-sans' else '' }}" 
+                                 data-value="source-sans" onclick="selectFont(this)">
+                                Source Sans 3
+                            </div>
+                            <div class="custom-dropdown-option font-option-literata {{ 'selected' if settings.font_style == 'literata' else '' }}" 
+                                 data-value="literata" onclick="selectFont(this)">
+                                Literata
+                            </div>
                         </div>
-                        <div class="custom-dropdown-option font-option-system-serif {{ 'selected' if settings.font_style == 'system-serif' else '' }}" 
-                             data-value="system-serif" onclick="selectFont(this)">
-                            System Serif
-                        </div>
-                        <div class="custom-dropdown-option font-option-lexend {{ 'selected' if settings.font_style == 'lexend' else '' }}" 
-                             data-value="lexend" onclick="selectFont(this)">
-                            Lexend
-                        </div>
-                        <div class="custom-dropdown-option font-option-libre-baskerville {{ 'selected' if settings.font_style == 'libre-baskerville' or not settings.font_style else '' }}" 
-                             data-value="libre-baskerville" onclick="selectFont(this)">
-                            Libre Baskerville
-                        </div>
+                    </div>
+                    <div class="font-size-toggle">
+                        <button type="button" class="size-btn {{ 'active' if settings.font_size == 's' or not settings.font_size else '' }}" data-size="s" onclick="selectFontSize('s')">S</button>
+                        <button type="button" class="size-btn {{ 'active' if settings.font_size == 'm' else '' }}" data-size="m" onclick="selectFontSize('m')">M</button>
+                        <button type="button" class="size-btn {{ 'active' if settings.font_size == 'l' else '' }}" data-size="l" onclick="selectFontSize('l')">L</button>
                     </div>
                 </div>
             </div>
