@@ -19,7 +19,8 @@ def settings_page():
     settings = {
         'theme': db.get_setting('theme', 'quiet-sky'),
         'background_style': db.get_setting('background_style', ''),
-        'font_style': db.get_setting('font_style', 'libre-baskerville'),
+        'font_style': db.get_setting('font_style', 'lexend'),
+        'font_size': db.get_setting('font_size', 's'),
         'session_timeout': db.get_setting('session_timeout', '30'),
     }
     
@@ -60,8 +61,20 @@ def save_font():
     db = current_app.get_db()
     data = request.get_json()
     
-    style = data.get('style', 'libre-baskerville')
+    style = data.get('style', 'lexend')
     db.set_setting('font_style', style)
+    
+    return jsonify({'status': 'ok'})
+
+
+@settings_bp.route('/api/font-size', methods=['POST'])
+def save_font_size():
+    """Save font size preference."""
+    db = current_app.get_db()
+    data = request.get_json()
+    
+    size = data.get('size', 's')
+    db.set_setting('font_size', size)
     
     return jsonify({'status': 'ok'})
 
