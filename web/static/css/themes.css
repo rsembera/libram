@@ -1,0 +1,329 @@
+/* ============================================
+   LIBRAM THEME SYSTEM
+   Adapted from Mirror's color palettes
+   ============================================ */
+
+/* Default Theme - Quiet Sky (purple/lavender) */
+:root {
+    /* Page backgrounds */
+    --bg-page: #f9f8fc;
+    --bg-page-alt: #f5f3f9;
+    
+    /* Card backgrounds */
+    --bg-card: #ffffff;
+    --bg-card-alt: #f4f2f8;
+    --bg-card-hover: #eeeaF4;
+    
+    /* Info card accent colors (for the 3 stat cards) */
+    --bg-card-1: #E8E4F0;
+    --bg-card-2: #DCD8E8;
+    --bg-card-3: #D0CCE0;
+    
+    /* Text colors */
+    --text-primary: #3a3545;
+    --text-secondary: #6a6575;
+    --text-muted: #8a8595;
+    --text-on-accent: #ffffff;
+    
+    /* Accent colors */
+    --accent-primary: #9B9FD8;
+    --accent-hover: #7b80c0;
+    --accent-light: #c5c8e8;
+    
+    /* Borders and shadows */
+    --border-color: #e0dce8;
+    --shadow-color: rgba(155,159,216,0.15);
+    
+    /* Button colors */
+    --btn-primary-bg: #9B9FD8;
+    --btn-primary-text: #ffffff;
+    --btn-secondary-bg: #E8E4F0;
+    --btn-secondary-text: #3a3545;
+    
+    /* Nav button colors */
+    --nav-btn-1: #E8D4E8;
+    --nav-btn-2: #D4E8D8;
+    --nav-btn-3: #D4E0E8;
+    --nav-btn-4: #E0D4E8;
+    
+    /* Chart colors */
+    --chart-bar: #9B9FD8;
+    --chart-bar-alt: #7bc88f;
+    --chart-empty: #E5E7EB;
+    
+    /* Book list */
+    --book-row-even: #ffffff;
+    --book-row-odd: #f9f8fc;
+    --book-row-hover: #f0eef6;
+    --year-header-bg: #E8E4F0;
+}
+
+/* Gentle Dawn - Pink/Rose tones */
+[data-theme="gentle-dawn"] {
+    --bg-page: #fdf8f8;
+    --bg-page-alt: #fcf3f3;
+    
+    --bg-card: #ffffff;
+    --bg-card-alt: #faf0f0;
+    --bg-card-hover: #f8e8e8;
+    
+    --bg-card-1: #F5E0E0;
+    --bg-card-2: #F0D5D5;
+    --bg-card-3: #E8C8C8;
+    
+    --text-primary: #4a3535;
+    --text-secondary: #8a6565;
+    --text-muted: #a88585;
+    --text-on-accent: #ffffff;
+    
+    --accent-primary: #E8A5A5;
+    --accent-hover: #d88585;
+    --accent-light: #f5d0d0;
+    
+    --border-color: #f0d5d5;
+    --shadow-color: rgba(232,165,165,0.15);
+    
+    --btn-primary-bg: #E8A5A5;
+    --btn-primary-text: #ffffff;
+    --btn-secondary-bg: #F5E0E0;
+    --btn-secondary-text: #4a3535;
+    
+    --nav-btn-1: #F5D5D5;
+    --nav-btn-2: #D5E8D8;
+    --nav-btn-3: #D5E0E8;
+    --nav-btn-4: #E8D5E0;
+    
+    --chart-bar: #E8A5A5;
+    --chart-bar-alt: #7bc88f;
+    --chart-empty: #F0E5E5;
+    
+    --book-row-even: #ffffff;
+    --book-row-odd: #fdf8f8;
+    --book-row-hover: #faf0f0;
+    --year-header-bg: #F5E0E0;
+}
+
+/* Warm Ember - Amber/Orange tones */
+[data-theme="warm-ember"] {
+    --bg-page: #fefaf6;
+    --bg-page-alt: #fcf5ed;
+    
+    --bg-card: #ffffff;
+    --bg-card-alt: #fdf6ee;
+    --bg-card-hover: #faf0e0;
+    
+    --bg-card-1: #FAE8D0;
+    --bg-card-2: #F5E0C0;
+    --bg-card-3: #F0D8B0;
+    
+    --text-primary: #4a3a2a;
+    --text-secondary: #8a6a4a;
+    --text-muted: #a88a6a;
+    --text-on-accent: #ffffff;
+    
+    --accent-primary: #F4A460;
+    --accent-hover: #e08d45;
+    --accent-light: #fad4a8;
+    
+    --border-color: #f5e0c8;
+    --shadow-color: rgba(244,164,96,0.15);
+    
+    --btn-primary-bg: #F4A460;
+    --btn-primary-text: #ffffff;
+    --btn-secondary-bg: #FAE8D0;
+    --btn-secondary-text: #4a3a2a;
+    
+    --nav-btn-1: #FAE0C8;
+    --nav-btn-2: #D8E8D0;
+    --nav-btn-3: #D0E0E8;
+    --nav-btn-4: #E8D8C8;
+    
+    --chart-bar: #F4A460;
+    --chart-bar-alt: #7bc88f;
+    --chart-empty: #F5EDE0;
+    
+    --book-row-even: #ffffff;
+    --book-row-odd: #fefaf6;
+    --book-row-hover: #fdf5ed;
+    --year-header-bg: #FAE8D0;
+}
+
+/* Garden Path - Green/Sage tones */
+[data-theme="garden-path"] {
+    --bg-page: #f8fbf8;
+    --bg-page-alt: #f3f8f3;
+    
+    --bg-card: #ffffff;
+    --bg-card-alt: #f0f7f2;
+    --bg-card-hover: #e8f2ea;
+    
+    --bg-card-1: #D8E8D8;
+    --bg-card-2: #C8DCC8;
+    --bg-card-3: #B8D0B8;
+    
+    --text-primary: #2d3f2d;
+    --text-secondary: #5d6f5d;
+    --text-muted: #7d8f7d;
+    --text-on-accent: #ffffff;
+    
+    --accent-primary: #88B894;
+    --accent-hover: #6fa07b;
+    --accent-light: #c0dcc8;
+    
+    --border-color: #d8e8d8;
+    --shadow-color: rgba(136,184,148,0.15);
+    
+    --btn-primary-bg: #88B894;
+    --btn-primary-text: #ffffff;
+    --btn-secondary-bg: #D8E8D8;
+    --btn-secondary-text: #2d3f2d;
+    
+    --nav-btn-1: #E0D8D8;
+    --nav-btn-2: #D0E0D0;
+    --nav-btn-3: #D0E0E8;
+    --nav-btn-4: #D8D8E0;
+    
+    --chart-bar: #88B894;
+    --chart-bar-alt: #5FB3B3;
+    --chart-empty: #E0E8E0;
+    
+    --book-row-even: #ffffff;
+    --book-row-odd: #f8fbf8;
+    --book-row-hover: #f0f7f2;
+    --year-header-bg: #D8E8D8;
+}
+
+/* Deep Water - Teal/Cyan tones */
+[data-theme="deep-water"] {
+    --bg-page: #f6fbfc;
+    --bg-page-alt: #f0f8f9;
+    
+    --bg-card: #ffffff;
+    --bg-card-alt: #eff7f7;
+    --bg-card-hover: #e5f0f0;
+    
+    --bg-card-1: #D0E8E8;
+    --bg-card-2: #C0E0E0;
+    --bg-card-3: #B0D8D8;
+    
+    --text-primary: #2a3f3f;
+    --text-secondary: #5a6f6f;
+    --text-muted: #7a8f8f;
+    --text-on-accent: #ffffff;
+    
+    --accent-primary: #5FB3B3;
+    --accent-hover: #4a9999;
+    --accent-light: #a0d8d8;
+    
+    --border-color: #cee8e8;
+    --shadow-color: rgba(95,179,179,0.15);
+    
+    --btn-primary-bg: #5FB3B3;
+    --btn-primary-text: #ffffff;
+    --btn-secondary-bg: #D0E8E8;
+    --btn-secondary-text: #2a3f3f;
+    
+    --nav-btn-1: #E0D8D8;
+    --nav-btn-2: #D0E8D8;
+    --nav-btn-3: #C8E0E8;
+    --nav-btn-4: #D8D8E8;
+    
+    --chart-bar: #5FB3B3;
+    --chart-bar-alt: #88B894;
+    --chart-empty: #E0E8E8;
+    
+    --book-row-even: #ffffff;
+    --book-row-odd: #f6fbfc;
+    --book-row-hover: #eff7f7;
+    --year-header-bg: #D0E8E8;
+}
+
+/* Soft Earth - Brown/Tan tones */
+[data-theme="soft-earth"] {
+    --bg-page: #faf8f5;
+    --bg-page-alt: #f5f2ed;
+    
+    --bg-card: #ffffff;
+    --bg-card-alt: #f7f4f0;
+    --bg-card-hover: #f0ece5;
+    
+    --bg-card-1: #E8E0D8;
+    --bg-card-2: #E0D8D0;
+    --bg-card-3: #D8D0C8;
+    
+    --text-primary: #3f3630;
+    --text-secondary: #6f6660;
+    --text-muted: #8f8680;
+    --text-on-accent: #ffffff;
+    
+    --accent-primary: #A89586;
+    --accent-hover: #8f7d6e;
+    --accent-light: #d0c8c0;
+    
+    --border-color: #e5dfd5;
+    --shadow-color: rgba(168,149,134,0.15);
+    
+    --btn-primary-bg: #A89586;
+    --btn-primary-text: #ffffff;
+    --btn-secondary-bg: #E8E0D8;
+    --btn-secondary-text: #3f3630;
+    
+    --nav-btn-1: #E8D8D0;
+    --nav-btn-2: #D8E0D0;
+    --nav-btn-3: #D0D8E0;
+    --nav-btn-4: #E0D8D8;
+    
+    --chart-bar: #A89586;
+    --chart-bar-alt: #88B894;
+    --chart-empty: #E8E0D8;
+    
+    --book-row-even: #ffffff;
+    --book-row-odd: #faf8f5;
+    --book-row-hover: #f5f2ed;
+    --year-header-bg: #E8E0D8;
+}
+
+/* Evening Ritual - Dark Mode */
+[data-theme="evening-ritual"] {
+    --bg-page: #1a1d2e;
+    --bg-page-alt: #1f2233;
+    
+    --bg-card: #252837;
+    --bg-card-alt: #2a2d3f;
+    --bg-card-hover: #32354a;
+    
+    --bg-card-1: #2f3347;
+    --bg-card-2: #353950;
+    --bg-card-3: #3b3f58;
+    
+    --text-primary: #e8e6f0;
+    --text-secondary: #a8a6b0;
+    --text-muted: #787680;
+    --text-on-accent: #ffffff;
+    
+    --accent-primary: #6B7AB8;
+    --accent-hover: #8590c8;
+    --accent-light: #4a5280;
+    
+    --border-color: #3a3f58;
+    --shadow-color: rgba(0,0,0,0.3);
+    
+    --btn-primary-bg: #6B7AB8;
+    --btn-primary-text: #ffffff;
+    --btn-secondary-bg: #3a3f58;
+    --btn-secondary-text: #e8e6f0;
+    
+    --nav-btn-1: #4a3f50;
+    --nav-btn-2: #3f4a48;
+    --nav-btn-3: #3f4550;
+    --nav-btn-4: #483f50;
+    
+    --chart-bar: #6B7AB8;
+    --chart-bar-alt: #5FB3B3;
+    --chart-empty: #3a3f58;
+    
+    --book-row-even: #252837;
+    --book-row-odd: #2a2d3f;
+    --book-row-hover: #32354a;
+    --year-header-bg: #2f3347;
+}

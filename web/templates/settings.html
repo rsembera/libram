@@ -27,42 +27,50 @@
         </summary>
         <div class="settings-section-content">
             <div class="form-group">
-                <label>Info Card Style</label>
-                <div class="custom-dropdown" id="card-style-dropdown">
-                    <button type="button" class="custom-dropdown-trigger" onclick="toggleCardStyleDropdown()">
-                        <span id="card-style-selected-text">Tutti-Frutti</span>
+                <label>Theme</label>
+                <div class="custom-dropdown" id="theme-dropdown">
+                    <button type="button" class="custom-dropdown-trigger" onclick="toggleThemeDropdown()">
+                        <span id="theme-selected-text">Quiet Sky</span>
                         <i class="ph ph-caret-down" class="dropdown-arrow" style="width: 18px; height: 18px;"></i>
                     </button>
                     <div class="custom-dropdown-menu">
-                        <div class="custom-dropdown-option {{ 'selected' if settings.card_style == 'strait-laced' else '' }}" 
-                             data-value="strait-laced" onclick="selectCardStyle(this)">
-                            <span class="card-style-preview card-style-preview-strait-laced"></span>Strait-Laced (White)
+                        <div class="custom-dropdown-option {{ 'selected' if settings.theme == 'quiet-sky' or not settings.theme else '' }}" 
+                             data-value="quiet-sky" onclick="selectTheme(this)">
+                            <span class="theme-preview theme-preview-quiet-sky"></span>Quiet Sky
                         </div>
-                        <div class="custom-dropdown-option {{ 'selected' if settings.card_style == 'garden-path' else '' }}" 
-                             data-value="garden-path" onclick="selectCardStyle(this)">
-                            <span class="card-style-preview card-style-preview-garden-path"></span>Garden Path (Green)
+                        <div class="custom-dropdown-option {{ 'selected' if settings.theme == 'gentle-dawn' else '' }}" 
+                             data-value="gentle-dawn" onclick="selectTheme(this)">
+                            <span class="theme-preview theme-preview-gentle-dawn"></span>Gentle Dawn
                         </div>
-                        <div class="custom-dropdown-option {{ 'selected' if settings.card_style == 'ocean-breeze' else '' }}" 
-                             data-value="ocean-breeze" onclick="selectCardStyle(this)">
-                            <span class="card-style-preview card-style-preview-ocean-breeze"></span>Ocean Breeze (Blue)
+                        <div class="custom-dropdown-option {{ 'selected' if settings.theme == 'warm-ember' else '' }}" 
+                             data-value="warm-ember" onclick="selectTheme(this)">
+                            <span class="theme-preview theme-preview-warm-ember"></span>Warm Ember
                         </div>
-                        <div class="custom-dropdown-option {{ 'selected' if settings.card_style == 'sunset-glow' else '' }}" 
-                             data-value="sunset-glow" onclick="selectCardStyle(this)">
-                            <span class="card-style-preview card-style-preview-sunset-glow"></span>Sunset Glow (Peach)
+                        <div class="custom-dropdown-option {{ 'selected' if settings.theme == 'garden-path' else '' }}" 
+                             data-value="garden-path" onclick="selectTheme(this)">
+                            <span class="theme-preview theme-preview-garden-path"></span>Garden Path
                         </div>
-                        <div class="custom-dropdown-option {{ 'selected' if settings.card_style == 'tutti-frutti' or not settings.card_style else '' }}" 
-                             data-value="tutti-frutti" onclick="selectCardStyle(this)">
-                            <span class="card-style-preview card-style-preview-tutti-frutti"></span>Tutti-Frutti (Mixed)
+                        <div class="custom-dropdown-option {{ 'selected' if settings.theme == 'deep-water' else '' }}" 
+                             data-value="deep-water" onclick="selectTheme(this)">
+                            <span class="theme-preview theme-preview-deep-water"></span>Deep Water
+                        </div>
+                        <div class="custom-dropdown-option {{ 'selected' if settings.theme == 'soft-earth' else '' }}" 
+                             data-value="soft-earth" onclick="selectTheme(this)">
+                            <span class="theme-preview theme-preview-soft-earth"></span>Soft Earth
+                        </div>
+                        <div class="custom-dropdown-option {{ 'selected' if settings.theme == 'evening-ritual' else '' }}" 
+                             data-value="evening-ritual" onclick="selectTheme(this)">
+                            <span class="theme-preview theme-preview-evening-ritual"></span>Evening Ritual (Dark)
                         </div>
                     </div>
                 </div>
             </div>
             
             <div class="form-group">
-                <label>Background</label>
+                <label>Custom Background (Optional)</label>
                 <div class="custom-dropdown" id="background-dropdown">
                     <button type="button" class="custom-dropdown-trigger" onclick="toggleBackgroundDropdown()">
-                        <span id="background-selected-text">Suit Grey</span>
+                        <span id="background-selected-text">Theme Default</span>
                         <i class="ph ph-caret-down" class="dropdown-arrow" style="width: 18px; height: 18px;"></i>
                     </button>
                     <div class="custom-dropdown-menu" id="background-dropdown-menu">
@@ -167,6 +175,7 @@
 <script>
     // Pass current settings to JavaScript
     window.currentSettings = {
+        theme: '{{ settings.theme }}',
         backgroundStyle: '{{ settings.background_style }}',
         fontStyle: '{{ settings.font_style }}'
     };

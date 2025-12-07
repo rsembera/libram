@@ -244,6 +244,13 @@ async function toggleChartView() {
 }
 
 function renderBooksChart(container, data) {
+    // Get theme colors from CSS variables
+    const styles = getComputedStyle(document.documentElement);
+    const barColor = styles.getPropertyValue('--chart-bar').trim() || '#667eea';
+    const emptyColor = styles.getPropertyValue('--chart-empty').trim() || '#E5E7EB';
+    const textColor = styles.getPropertyValue('--text-secondary').trim() || '#4B5563';
+    const gridColor = styles.getPropertyValue('--border-color').trim() || '#E5E7EB';
+    
     // Chart dimensions
     const width = container.clientWidth || 280;
     const height = container.clientHeight || 100;
@@ -272,12 +279,12 @@ function renderBooksChart(container, data) {
         
         // Gridline
         svg += `<line x1="${padding.left}" y1="${y}" x2="${width - padding.right}" y2="${y}" 
-                      stroke="#E5E7EB" stroke-width="1" />`;
+                      stroke="${gridColor}" stroke-width="1" />`;
         
         // Y-axis label (only show a few)
         if (i === 0 || i === gridLines || i === gridLines / 2) {
             svg += `<text x="${padding.left - 6}" y="${y + 3}" 
-                          text-anchor="end" font-size="9" fill="#4B5563">${value}</text>`;
+                          text-anchor="end" font-size="9" fill="${textColor}">${value}</text>`;
         }
     }
     
@@ -288,16 +295,16 @@ function renderBooksChart(container, data) {
         const y = padding.top + chartHeight - barHeight;
         
         // Bar
-        const barColor = d.count > 0 ? '#667eea' : '#E5E7EB';
+        const color = d.count > 0 ? barColor : emptyColor;
         svg += `<rect x="${x}" y="${y}" width="${barWidth}" height="${barHeight}" 
-                      fill="${barColor}" rx="2" class="chart-bar">
+                      fill="${color}" rx="2" class="chart-bar">
                   <title>${d.label} ${d.year}: ${d.count} book${d.count !== 1 ? 's' : ''}</title>
                 </rect>`;
         
         // X-axis label (show every other month to avoid crowding)
         if (i % 2 === 0 || barCount <= 6) {
             svg += `<text x="${x + barWidth / 2}" y="${height - 4}" 
-                          text-anchor="middle" font-size="9" fill="#4B5563">${d.label}</text>`;
+                          text-anchor="middle" font-size="9" fill="${textColor}">${d.label}</text>`;
         }
     });
     
@@ -306,6 +313,13 @@ function renderBooksChart(container, data) {
 }
 
 function renderPagesChart(container, data) {
+    // Get theme colors from CSS variables
+    const styles = getComputedStyle(document.documentElement);
+    const barColor = styles.getPropertyValue('--chart-bar-alt').trim() || '#10B981';
+    const emptyColor = styles.getPropertyValue('--chart-empty').trim() || '#E5E7EB';
+    const textColor = styles.getPropertyValue('--text-secondary').trim() || '#4B5563';
+    const gridColor = styles.getPropertyValue('--border-color').trim() || '#E5E7EB';
+    
     // Chart dimensions
     const width = container.clientWidth || 280;
     const height = container.clientHeight || 100;
@@ -334,12 +348,12 @@ function renderPagesChart(container, data) {
         
         // Gridline
         svg += `<line x1="${padding.left}" y1="${y}" x2="${width - padding.right}" y2="${y}" 
-                      stroke="#E5E7EB" stroke-width="1" />`;
+                      stroke="${gridColor}" stroke-width="1" />`;
         
         // Y-axis label (only show a few)
         if (i === 0 || i === gridLines || i === gridLines / 2) {
             svg += `<text x="${padding.left - 6}" y="${y + 3}" 
-                          text-anchor="end" font-size="9" fill="#4B5563">${value}</text>`;
+                          text-anchor="end" font-size="9" fill="${textColor}">${value}</text>`;
         }
     }
     
@@ -350,16 +364,16 @@ function renderPagesChart(container, data) {
         const y = padding.top + chartHeight - barHeight;
         
         // Bar
-        const barColor = d.avg > 0 ? '#10B981' : '#E5E7EB';
+        const color = d.avg > 0 ? barColor : emptyColor;
         svg += `<rect x="${x}" y="${y}" width="${barWidth}" height="${barHeight}" 
-                      fill="${barColor}" rx="2" class="chart-bar">
+                      fill="${color}" rx="2" class="chart-bar">
                   <title>${d.label} ${d.year}: ${d.avg} pg/day avg</title>
                 </rect>`;
         
         // X-axis label (show every other month to avoid crowding)
         if (i % 2 === 0 || barCount <= 6) {
             svg += `<text x="${x + barWidth / 2}" y="${height - 4}" 
-                          text-anchor="middle" font-size="9" fill="#4B5563">${d.label}</text>`;
+                          text-anchor="middle" font-size="9" fill="${textColor}">${d.label}</text>`;
         }
     });
     

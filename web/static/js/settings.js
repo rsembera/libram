@@ -15,43 +15,51 @@ function saveTimeout() {
 }
 
 // ============================================================================
-// CARD STYLE DROPDOWN
+// THEME DROPDOWN
 // ============================================================================
 
-function toggleCardStyleDropdown() {
-    const dropdown = document.getElementById('card-style-dropdown');
+const themeNames = {
+    'quiet-sky': 'Quiet Sky',
+    'gentle-dawn': 'Gentle Dawn',
+    'warm-ember': 'Warm Ember',
+    'garden-path': 'Garden Path',
+    'deep-water': 'Deep Water',
+    'soft-earth': 'Soft Earth',
+    'evening-ritual': 'Evening Ritual (Dark)'
+};
+
+function toggleThemeDropdown() {
+    const dropdown = document.getElementById('theme-dropdown');
     dropdown.classList.toggle('open');
     // Close other dropdowns
     document.getElementById('background-dropdown').classList.remove('open');
     document.getElementById('font-dropdown').classList.remove('open');
 }
 
-function selectCardStyle(element) {
+function selectTheme(element) {
     const value = element.dataset.value;
     const text = element.textContent.trim();
     
     // Update selected text
-    document.getElementById('card-style-selected-text').textContent = text;
+    document.getElementById('theme-selected-text').textContent = text;
     
     // Update selected state
-    document.querySelectorAll('#card-style-dropdown .custom-dropdown-option').forEach(opt => {
+    document.querySelectorAll('#theme-dropdown .custom-dropdown-option').forEach(opt => {
         opt.classList.remove('selected');
     });
     element.classList.add('selected');
     
     // Close dropdown
-    document.getElementById('card-style-dropdown').classList.remove('open');
+    document.getElementById('theme-dropdown').classList.remove('open');
     
     // Save to server
-    fetch('/settings/api/card-style', {
+    fetch('/settings/api/theme', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ style: value })
+        body: JSON.stringify({ theme: value })
     }).then(() => {
-        // Update body class for immediate preview
-        document.body.className = document.body.className
-            .replace(/\b(strait-laced|garden-path|ocean-breeze|sunset-glow|tutti-frutti)\b/g, '')
-            .trim() + ' ' + value;
+        // Update data-theme attribute for immediate preview
+        document.documentElement.setAttribute('data-theme', value);
     });
 }
 
@@ -64,7 +72,7 @@ function toggleFontDropdown() {
     dropdown.classList.toggle('open');
     // Close other dropdowns
     document.getElementById('background-dropdown').classList.remove('open');
-    document.getElementById('card-style-dropdown').classList.remove('open');
+    document.getElementById('theme-dropdown').classList.remove('open');
 }
 
 function selectFont(element) {
@@ -113,25 +121,16 @@ async function loadBackgroundOptions() {
         // Store user backgrounds for delete check
         userBackgrounds = data.user || [];
         
-        // Add solid colors
-        if (data.solid && data.solid.length > 0) {
-            const solidLabel = document.createElement('div');
-            solidLabel.className = 'dropdown-group-label';
-            solidLabel.textContent = 'Solid Colors';
-            menu.appendChild(solidLabel);
-            
-            data.solid.forEach(bg => {
-                const option = document.createElement('div');
-                option.className = 'custom-dropdown-option';
-                option.dataset.value = bg.value;
-                option.innerHTML = `<span class="bg-preview bg-preview-${bg.value}"></span>${bg.name}`;
-                option.onclick = () => selectBackground(option);
-                if (bg.value === currentBackgroundValue) {
-                    option.classList.add('selected');
-                }
-                menu.appendChild(option);
-            });
+        // Add "Theme Default" option
+        const defaultOption = document.createElement('div');
+        defaultOption.className = 'custom-dropdown-option';
+        defaultOption.dataset.value = '';
+        defaultOption.innerHTML = '<span class="bg-preview bg-preview-default"></span>Theme Default';
+        defaultOption.onclick = () => selectBackground(defaultOption);
+        if (!currentBackgroundValue) {
+            defaultOption.classList.add('selected');
         }
+        menu.appendChild(defaultOption);
         
         // Add user backgrounds
         if (data.user && data.user.length > 0) {
@@ -169,7 +168,7 @@ function toggleBackgroundDropdown() {
     dropdown.classList.toggle('open');
     // Close other dropdowns
     document.getElementById('font-dropdown').classList.remove('open');
-    document.getElementById('card-style-dropdown').classList.remove('open');
+    document.getElementById('theme-dropdown').classList.remove('open');
 }
 
 function selectBackground(element) {
@@ -216,29 +215,26 @@ function updateBackgroundSelectedText() {
 function applyBackground(value) {
     const body = document.body;
     
-    // Remove existing background classes and styles
-    body.className = body.className.replace(/\bbg-[\w-]+\b/g, '').trim();
+    // Remove existing background styles
     body.style.backgroundImage = '';
     body.style.backgroundSize = '';
     body.style.backgroundPosition = '';
     body.style.backgroundAttachment = '';
     
-    if (value.startsWith('user:')) {
+    if (value && value.startsWith('user:')) {
         // User uploaded image
         const filename = value.substring(5);
         body.style.backgroundImage = `url('/static/user_backgrounds/${filename}')`;
         body.style.backgroundSize = 'cover';
         body.style.backgroundPosition = 'center';
         body.style.backgroundAttachment = 'fixed';
-    } else {
-        // Solid color
-        body.className = body.className + ' bg-' + value;
     }
+    // If empty or no value, theme background applies via CSS
 }
 
 function updateDeleteButtonVisibility() {
     const deleteBtn = document.getElementById('delete-bg-button');
-    if (currentBackgroundValue.startsWith('user:')) {
+    if (currentBackgroundValue && currentBackgroundValue.startsWith('user:')) {
         deleteBtn.classList.remove('hidden');
     } else {
         deleteBtn.classList.add('hidden');
@@ -246,7 +242,7 @@ function updateDeleteButtonVisibility() {
 }
 
 async function deleteBackground() {
-    if (!currentBackgroundValue.startsWith('user:')) {
+    if (!currentBackgroundValue || !currentBackgroundValue.startsWith('user:')) {
         return;
     }
     
@@ -266,16 +262,16 @@ async function deleteBackground() {
         const result = await response.json();
         
         if (result.success) {
-            // Reset to default background
-            currentBackgroundValue = 'suit-grey';
+            // Reset to theme default
+            currentBackgroundValue = '';
             await loadBackgroundOptions();
-            applyBackground('suit-grey');
+            applyBackground('');
             
             // Save to server
             fetch('/settings/api/background', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ style: 'suit-grey' })
+                body: JSON.stringify({ style: '' })
             });
             
             showUploadStatus('✓ Background deleted', 'success');
@@ -378,7 +374,7 @@ function showUploadStatus(message, type) {
 document.addEventListener('click', function(e) {
     const fontDropdown = document.getElementById('font-dropdown');
     const bgDropdown = document.getElementById('background-dropdown');
-    const cardStyleDropdown = document.getElementById('card-style-dropdown');
+    const themeDropdown = document.getElementById('theme-dropdown');
     
     if (fontDropdown && !fontDropdown.contains(e.target)) {
         fontDropdown.classList.remove('open');
@@ -386,17 +382,17 @@ document.addEventListener('click', function(e) {
     if (bgDropdown && !bgDropdown.contains(e.target)) {
         bgDropdown.classList.remove('open');
     }
-    if (cardStyleDropdown && !cardStyleDropdown.contains(e.target)) {
-        cardStyleDropdown.classList.remove('open');
+    if (themeDropdown && !themeDropdown.contains(e.target)) {
+        themeDropdown.classList.remove('open');
     }
 });
 
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', function() {
-    // Initialize card style dropdown
-    const selectedCardStyleOption = document.querySelector('#card-style-dropdown .custom-dropdown-option.selected');
-    if (selectedCardStyleOption) {
-        document.getElementById('card-style-selected-text').textContent = selectedCardStyleOption.textContent.trim();
+    // Initialize theme dropdown
+    const selectedThemeOption = document.querySelector('#theme-dropdown .custom-dropdown-option.selected');
+    if (selectedThemeOption) {
+        document.getElementById('theme-selected-text').textContent = selectedThemeOption.textContent.trim();
     }
     
     // Initialize font dropdown
@@ -409,7 +405,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Initialize background dropdown
     if (window.currentSettings) {
-        currentBackgroundValue = window.currentSettings.backgroundStyle || 'suit-grey';
+        currentBackgroundValue = window.currentSettings.backgroundStyle || '';
     }
     loadBackgroundOptions();
     setupUploadHandler();
