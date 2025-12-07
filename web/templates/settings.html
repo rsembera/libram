@@ -10,9 +10,9 @@
 
 <div class="settings-card">
     <div class="settings-header">
-        <h2><i data-lucide="sliders-horizontal" class="page-icon"></i>Settings</h2>
+        <h2><i class="ph ph-sliders-horizontal" class="page-icon"></i>Settings</h2>
         <a href="{{ url_for('books.index') }}" class="btn btn-secondary">
-            <i data-lucide="arrow-left" class="icon-sm icon-inline"></i> Back
+            <i class="ph ph-arrow-left" class="icon-sm icon-inline"></i> Back
         </a>
     </div>
     
@@ -31,7 +31,7 @@
                 <div class="custom-dropdown" id="card-style-dropdown">
                     <button type="button" class="custom-dropdown-trigger" onclick="toggleCardStyleDropdown()">
                         <span id="card-style-selected-text">Tutti-Frutti</span>
-                        <i data-lucide="chevron-down" class="dropdown-arrow" style="width: 18px; height: 18px;"></i>
+                        <i class="ph ph-caret-down" class="dropdown-arrow" style="width: 18px; height: 18px;"></i>
                     </button>
                     <div class="custom-dropdown-menu">
                         <div class="custom-dropdown-option {{ 'selected' if settings.card_style == 'strait-laced' else '' }}" 
@@ -63,7 +63,7 @@
                 <div class="custom-dropdown" id="background-dropdown">
                     <button type="button" class="custom-dropdown-trigger" onclick="toggleBackgroundDropdown()">
                         <span id="background-selected-text">Suit Grey</span>
-                        <i data-lucide="chevron-down" class="dropdown-arrow" style="width: 18px; height: 18px;"></i>
+                        <i class="ph ph-caret-down" class="dropdown-arrow" style="width: 18px; height: 18px;"></i>
                     </button>
                     <div class="custom-dropdown-menu" id="background-dropdown-menu">
                         <!-- Options populated by JavaScript -->
@@ -71,7 +71,7 @@
                 </div>
                 <div class="background-actions">
                     <button type="button" id="delete-bg-button" class="btn btn-sm btn-danger-light hidden" onclick="deleteBackground()">
-                        <i data-lucide="trash-2" class="icon-sm icon-inline"></i> Delete
+                        <i class="ph ph-trash" class="icon-sm icon-inline"></i> Delete
                     </button>
                 </div>
             </div>
@@ -81,7 +81,7 @@
                 <input type="file" id="background-upload" accept="image/*" style="display: none;">
                 <div class="upload-row">
                     <button type="button" onclick="document.getElementById('background-upload').click()" class="btn btn-sm">
-                        <i data-lucide="image-plus" class="icon-sm icon-inline"></i> Choose Image
+                        <i class="ph ph-image" class="icon-sm icon-inline"></i> Choose Image
                     </button>
                     <span id="upload-filename" class="text-muted text-sm"></span>
                     <button type="button" onclick="uploadBackground()" id="upload-button" class="btn btn-sm btn-primary hidden">
@@ -96,7 +96,7 @@
                 <div class="custom-dropdown" id="font-dropdown">
                     <button type="button" class="custom-dropdown-trigger" onclick="toggleFontDropdown()">
                         <span id="font-selected-text">Libre Baskerville</span>
-                        <i data-lucide="chevron-down" class="dropdown-arrow" style="width: 18px; height: 18px;"></i>
+                        <i class="ph ph-caret-down" class="dropdown-arrow" style="width: 18px; height: 18px;"></i>
                     </button>
                     <div class="custom-dropdown-menu">
                         <div class="custom-dropdown-option font-option-system-sans {{ 'selected' if settings.font_style == 'system-sans' else '' }}" 
@@ -134,7 +134,7 @@
             <div class="form-group">
                 <label>Password</label>
                 <a href="{{ url_for('auth.change_password') }}" class="btn btn-sm">
-                    <i data-lucide="key" class="icon-sm icon-inline"></i>
+                    <i class="ph ph-key" class="icon-sm icon-inline"></i>
                     Change Password
                 </a>
             </div>

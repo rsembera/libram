@@ -10,13 +10,13 @@
 
 <div class="backups-card">
     <div class="backups-header">
-        <h2><i data-lucide="hard-drive-download" class="page-icon"></i>Backups</h2>
+        <h2><i class="ph ph-hard-drives" class="page-icon"></i>Backups</h2>
         <div class="header-actions">
             <button class="btn btn-primary" onclick="createBackup()">
-                <i data-lucide="plus" class="icon-sm icon-inline"></i> Create Backup
+                <i class="ph ph-plus" class="icon-sm icon-inline"></i> Create Backup
             </button>
             <a href="{{ url_for('books.index') }}" class="btn btn-secondary">
-                <i data-lucide="arrow-left" class="icon-sm icon-inline"></i> Back
+                <i class="ph ph-arrow-left" class="icon-sm icon-inline"></i> Back
             </a>
         </div>
     </div>
@@ -38,17 +38,17 @@
             <div class="backup-actions">
                 <a href="{{ url_for('backups.download_backup', filename=backup.filename) }}" 
                    class="btn btn-sm btn-icon" title="Download">
-                    <i data-lucide="download"></i>
+                    <i class="ph ph-download-simple"></i>
                 </a>
                 <button class="btn btn-sm btn-icon" 
                         onclick="confirmRestore('{{ backup.filename }}')" 
                         title="Restore">
-                    <i data-lucide="rotate-ccw"></i>
+                    <i class="ph ph-arrow-counter-clockwise"></i>
                 </button>
                 <button class="btn btn-sm btn-icon btn-danger-light" 
                         onclick="confirmDelete('{{ backup.filename }}')" 
                         title="Delete">
-                    <i data-lucide="trash-2"></i>
+                    <i class="ph ph-trash"></i>
                 </button>
             </div>
         </div>
@@ -56,7 +56,7 @@
     </div>
     {% else %}
     <div class="empty-state">
-        <i data-lucide="hard-drive" class="empty-icon"></i>
+        <i class="ph ph-hard-drive" class="empty-icon"></i>
         <p>No backups yet. Create one to protect your reading history.</p>
     </div>
     {% endif %}

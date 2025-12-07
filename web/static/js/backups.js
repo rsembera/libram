@@ -5,7 +5,7 @@ let pendingFilename = null;
 function createBackup() {
     const btn = event.target.closest('button');
     const originalText = btn.innerHTML;
-    btn.innerHTML = '<i data-lucide="loader" class="icon-sm icon-inline"></i> Creating...';
+    btn.innerHTML = '<i class="ph ph-circle-notch icon-sm icon-inline"></i> Creating...';
     btn.disabled = true;
     
     fetch('/backups/create', {
@@ -19,14 +19,12 @@ function createBackup() {
             alert('Error creating backup: ' + data.message);
             btn.innerHTML = originalText;
             btn.disabled = false;
-            lucide.createIcons();
         }
     })
     .catch(err => {
         alert('Error creating backup');
         btn.innerHTML = originalText;
         btn.disabled = false;
-        lucide.createIcons();
     });
 }
 

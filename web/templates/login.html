@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - Libram</title>
     
-    <!-- Lucide Icons (local) -->
-    <script src="/static/js/lucide.min.js"></script>
+    <!-- Phosphor Icons -->
+    <link rel="stylesheet" href="/static/css/phosphor.css">
     
     <style>
         @font-face {
@@ -54,8 +54,7 @@
         }
         
         .logo-icon {
-            width: 64px;
-            height: 64px;
+            font-size: 80px !important;
             color: #667eea;
             margin-bottom: 0.5rem;
         }
@@ -169,21 +168,21 @@
 <body>
     <div class="login-card">
         <div class="logo">
-            <i data-lucide="book-open" class="logo-icon"></i>
+            <i class="ph ph-book-open logo-icon"></i>
             <h1>Libram</h1>
             <p>Personal Reading Tracker</p>
         </div>
         
         {% if timeout %}
         <div class="timeout-message">
-            <i data-lucide="clock" style="width: 16px; height: 16px; display: inline; vertical-align: -3px; margin-right: 0.5rem;"></i>
+            <i class="ph ph-clock" style="width: 16px; height: 16px; display: inline; vertical-align: -3px; margin-right: 0.5rem;"></i>
             Session expired. Please log in again.
         </div>
         {% endif %}
         
         {% if error %}
         <div class="error-message">
-            <i data-lucide="alert-circle" style="width: 16px; height: 16px; display: inline; vertical-align: -3px; margin-right: 0.5rem;"></i>
+            <i class="ph ph-warning-circle" style="width: 16px; height: 16px; display: inline; vertical-align: -3px; margin-right: 0.5rem;"></i>
             {{ error }}
         </div>
         {% endif %}
@@ -199,22 +198,20 @@
                            autofocus
                            required>
                     <button type="button" class="toggle-password" onclick="togglePassword('password', this)">
-                        <i data-lucide="eye" class="icon-show"></i>
-                        <i data-lucide="eye-off" class="icon-hide" style="display: none;"></i>
+                        <i class="ph ph-eye" class="icon-show"></i>
+                        <i class="ph ph-eye-slash" class="icon-hide" style="display: none;"></i>
                     </button>
                 </div>
             </div>
             
             <button type="submit" class="btn-login">
-                <i data-lucide="log-in" style="width: 20px; height: 20px;"></i>
+                <i class="ph ph-sign-in" style="width: 20px; height: 20px;"></i>
                 Log In
             </button>
         </form>
     </div>
     
     <script>
-        lucide.createIcons();
-        
         function togglePassword(inputId, btn) {
             const input = document.getElementById(inputId);
             const showIcon = btn.querySelector('.icon-show');
