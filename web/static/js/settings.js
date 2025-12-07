@@ -4,21 +4,6 @@
 let currentBackgroundValue = '';
 let userBackgrounds = [];
 
-function saveCardStyle() {
-    const style = document.getElementById('card-style').value;
-    
-    fetch('/settings/api/card-style', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ style: style })
-    }).then(() => {
-        // Update body class for immediate preview
-        document.body.className = document.body.className
-            .replace(/\b(strait-laced|garden-path|ocean-breeze|sunset-glow|tutti-frutti)\b/g, '')
-            .trim() + ' ' + style;
-    });
-}
-
 function saveTimeout() {
     const timeout = document.getElementById('session-timeout').value;
     
@@ -30,14 +15,56 @@ function saveTimeout() {
 }
 
 // ============================================================================
+// CARD STYLE DROPDOWN
+// ============================================================================
+
+function toggleCardStyleDropdown() {
+    const dropdown = document.getElementById('card-style-dropdown');
+    dropdown.classList.toggle('open');
+    // Close other dropdowns
+    document.getElementById('background-dropdown').classList.remove('open');
+    document.getElementById('font-dropdown').classList.remove('open');
+}
+
+function selectCardStyle(element) {
+    const value = element.dataset.value;
+    const text = element.textContent.trim();
+    
+    // Update selected text
+    document.getElementById('card-style-selected-text').textContent = text;
+    
+    // Update selected state
+    document.querySelectorAll('#card-style-dropdown .custom-dropdown-option').forEach(opt => {
+        opt.classList.remove('selected');
+    });
+    element.classList.add('selected');
+    
+    // Close dropdown
+    document.getElementById('card-style-dropdown').classList.remove('open');
+    
+    // Save to server
+    fetch('/settings/api/card-style', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ style: value })
+    }).then(() => {
+        // Update body class for immediate preview
+        document.body.className = document.body.className
+            .replace(/\b(strait-laced|garden-path|ocean-breeze|sunset-glow|tutti-frutti)\b/g, '')
+            .trim() + ' ' + value;
+    });
+}
+
+// ============================================================================
 // FONT DROPDOWN
 // ============================================================================
 
 function toggleFontDropdown() {
     const dropdown = document.getElementById('font-dropdown');
     dropdown.classList.toggle('open');
-    // Close background dropdown if open
+    // Close other dropdowns
     document.getElementById('background-dropdown').classList.remove('open');
+    document.getElementById('card-style-dropdown').classList.remove('open');
 }
 
 function selectFont(element) {
@@ -140,8 +167,9 @@ async function loadBackgroundOptions() {
 function toggleBackgroundDropdown() {
     const dropdown = document.getElementById('background-dropdown');
     dropdown.classList.toggle('open');
-    // Close font dropdown if open
+    // Close other dropdowns
     document.getElementById('font-dropdown').classList.remove('open');
+    document.getElementById('card-style-dropdown').classList.remove('open');
 }
 
 function selectBackground(element) {
@@ -350,6 +378,7 @@ function showUploadStatus(message, type) {
 document.addEventListener('click', function(e) {
     const fontDropdown = document.getElementById('font-dropdown');
     const bgDropdown = document.getElementById('background-dropdown');
+    const cardStyleDropdown = document.getElementById('card-style-dropdown');
     
     if (fontDropdown && !fontDropdown.contains(e.target)) {
         fontDropdown.classList.remove('open');
@@ -357,10 +386,19 @@ document.addEventListener('click', function(e) {
     if (bgDropdown && !bgDropdown.contains(e.target)) {
         bgDropdown.classList.remove('open');
     }
+    if (cardStyleDropdown && !cardStyleDropdown.contains(e.target)) {
+        cardStyleDropdown.classList.remove('open');
+    }
 });
 
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', function() {
+    // Initialize card style dropdown
+    const selectedCardStyleOption = document.querySelector('#card-style-dropdown .custom-dropdown-option.selected');
+    if (selectedCardStyleOption) {
+        document.getElementById('card-style-selected-text').textContent = selectedCardStyleOption.textContent.trim();
+    }
+    
     // Initialize font dropdown
     const selectedFontOption = document.querySelector('#font-dropdown .custom-dropdown-option.selected');
     if (selectedFontOption) {
