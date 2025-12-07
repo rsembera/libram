@@ -21,7 +21,7 @@ def main():
     app = create_app()
     
     # Get port from environment or use default
-    port = int(os.environ.get('LIBRAM_PORT', 8080))
+    port = int(os.environ.get('LIBRAM_PORT', 8090))
     host = os.environ.get('LIBRAM_HOST', '127.0.0.1')
     
     print(f"""
@@ -29,15 +29,15 @@ def main():
     ║                                                       ║
     ║   📚  LIBRAM - Personal Reading Tracker              ║
     ║                                                       ║
-    ║   Running at: http://{host}:{port}                   ║
+    ║   Running at: http://{host}:{port}                  ║
     ║                                                       ║
     ║   Press Ctrl+C to stop                               ║
     ║                                                       ║
     ╚═══════════════════════════════════════════════════════╝
     """)
     
-    # Open browser after short delay (gives server time to start)
-    if os.environ.get('LIBRAM_NO_BROWSER') != '1':
+    # Open browser after short delay (only if explicitly requested)
+    if os.environ.get('LIBRAM_BROWSER') == '1':
         def open_browser():
             time.sleep(1.0)
             webbrowser.open(f'http://{host}:{port}')
