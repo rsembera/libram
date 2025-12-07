@@ -27,14 +27,35 @@
         </summary>
         <div class="settings-section-content">
             <div class="form-group">
-                <label for="card-style">Info Card Style</label>
-                <select id="card-style" onchange="saveCardStyle()">
-                    <option value="strait-laced" {{ 'selected' if settings.card_style == 'strait-laced' else '' }}>Strait-Laced (White)</option>
-                    <option value="garden-path" {{ 'selected' if settings.card_style == 'garden-path' else '' }}>Garden Path (Green/sage)</option>
-                    <option value="ocean-breeze" {{ 'selected' if settings.card_style == 'ocean-breeze' else '' }}>Ocean Breeze (Blue/teal)</option>
-                    <option value="sunset-glow" {{ 'selected' if settings.card_style == 'sunset-glow' else '' }}>Sunset Glow (Warm peach)</option>
-                    <option value="tutti-frutti" {{ 'selected' if settings.card_style == 'tutti-frutti' else '' }}>Tutti-Frutti (Mixed pastels)</option>
-                </select>
+                <label>Info Card Style</label>
+                <div class="custom-dropdown" id="card-style-dropdown">
+                    <button type="button" class="custom-dropdown-trigger" onclick="toggleCardStyleDropdown()">
+                        <span id="card-style-selected-text">Tutti-Frutti</span>
+                        <i data-lucide="chevron-down" class="dropdown-arrow" style="width: 18px; height: 18px;"></i>
+                    </button>
+                    <div class="custom-dropdown-menu">
+                        <div class="custom-dropdown-option {{ 'selected' if settings.card_style == 'strait-laced' else '' }}" 
+                             data-value="strait-laced" onclick="selectCardStyle(this)">
+                            <span class="card-style-preview card-style-preview-strait-laced"></span>Strait-Laced (White)
+                        </div>
+                        <div class="custom-dropdown-option {{ 'selected' if settings.card_style == 'garden-path' else '' }}" 
+                             data-value="garden-path" onclick="selectCardStyle(this)">
+                            <span class="card-style-preview card-style-preview-garden-path"></span>Garden Path (Green)
+                        </div>
+                        <div class="custom-dropdown-option {{ 'selected' if settings.card_style == 'ocean-breeze' else '' }}" 
+                             data-value="ocean-breeze" onclick="selectCardStyle(this)">
+                            <span class="card-style-preview card-style-preview-ocean-breeze"></span>Ocean Breeze (Blue)
+                        </div>
+                        <div class="custom-dropdown-option {{ 'selected' if settings.card_style == 'sunset-glow' else '' }}" 
+                             data-value="sunset-glow" onclick="selectCardStyle(this)">
+                            <span class="card-style-preview card-style-preview-sunset-glow"></span>Sunset Glow (Peach)
+                        </div>
+                        <div class="custom-dropdown-option {{ 'selected' if settings.card_style == 'tutti-frutti' or not settings.card_style else '' }}" 
+                             data-value="tutti-frutti" onclick="selectCardStyle(this)">
+                            <span class="card-style-preview card-style-preview-tutti-frutti"></span>Tutti-Frutti (Mixed)
+                        </div>
+                    </div>
+                </div>
             </div>
             
             <div class="form-group">

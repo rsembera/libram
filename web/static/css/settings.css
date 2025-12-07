@@ -223,6 +223,24 @@ details[open] .settings-section-header .arrow {
 .bg-preview-soft-cream { background: #F5F0E8; }
 .bg-preview-warm-stone { background: #E8E4E0; }
 
+/* Card style preview swatches */
+.card-style-preview {
+    display: inline-block;
+    width: 24px;
+    height: 24px;
+    border-radius: 4px;
+    margin-right: 0.75rem;
+    vertical-align: middle;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    flex-shrink: 0;
+}
+
+.card-style-preview-strait-laced { background: #FFFFFF; }
+.card-style-preview-garden-path { background: linear-gradient(135deg, #C8DCC8 0%, #B5C8B0 100%); }
+.card-style-preview-ocean-breeze { background: linear-gradient(135deg, #A8D0D8 0%, #95C4D1 100%); }
+.card-style-preview-sunset-glow { background: linear-gradient(135deg, #F5D8C0 0%, #E5CFBB 100%); }
+.card-style-preview-tutti-frutti { background: linear-gradient(135deg, #C8D8E0 0%, #DCD3E8 50%, #F5DEB0 100%); }
+
 .bg-preview-image {
     background-size: cover;
     background-position: center;
