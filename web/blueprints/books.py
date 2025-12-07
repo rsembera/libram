@@ -63,6 +63,7 @@ def index():
     return render_template('main_view.html',
                           year_groups=year_groups,
                           stats=stats,
+                          current_year=current_year,
                           current_time=current_time,
                           current_date=current_date,
                           view_mode=view_mode,
@@ -288,4 +289,11 @@ def books_per_month():
     """API endpoint returning books finished per month for chart."""
     db = current_app.get_db()
     data = db.get_books_per_month(12)
+    return jsonify(data)
+
+@books_bp.route('/api/pages-per-day-by-month')
+def pages_per_day_by_month():
+    """API endpoint returning average pages per day by month for chart."""
+    db = current_app.get_db()
+    data = db.get_avg_pages_per_day_by_month(12)
     return jsonify(data)

@@ -12,26 +12,28 @@
 
 {% block content %}
 
-<!-- Stats Cards - 6 cards in 2 rows of 3 -->
+<!-- Stats Cards - 3 cards -->
 <div class="stats-container" id="stats-container">
-    <div class="stat-card blue" draggable="true" data-card-id="total-books">
-        <div class="stat-number">{{ stats.total_books }}</div>
-        <div class="stat-label">Total Books</div>
-    </div>
-    <div class="stat-card purple" draggable="true" data-card-id="books-year">
-        <div class="stat-number">{{ stats.books_this_year }}</div>
-        <div class="stat-label">Books This Year</div>
-    </div>
-    <div class="stat-card coral" draggable="true" data-card-id="pages-year">
-        <div class="stat-number">{{ "{:,}".format(stats.pages_this_year) }}</div>
-        <div class="stat-label">Pages This Year</div>
-    </div>
-    <div class="stat-card mint" draggable="true" data-card-id="avg-days">
-        <div class="stat-number">{{ stats.avg_days_to_finish }}</div>
-        <div class="stat-label">Avg Days to Finish</div>
+    <div class="stat-card coral pages-card" draggable="true" data-card-id="pages">
+        <div class="pages-split">
+            <div class="pages-section">
+                <div class="stat-number">{{ "{:,}".format(stats.pages_this_year) }}</div>
+                <div class="stat-label">pages in {{ current_year }}</div>
+            </div>
+            <div class="pages-divider"></div>
+            <div class="pages-section">
+                <div class="stat-number">{{ "{:,}".format(stats.total_pages) }}</div>
+                <div class="stat-label">lifetime</div>
+            </div>
+        </div>
     </div>
     <div class="stat-card peach chart-card" draggable="true" data-card-id="reading-chart">
-        <div class="chart-title">Books Per Month</div>
+        <div class="chart-header">
+            <div class="chart-title" id="chart-title">Books Per Month</div>
+            <button type="button" class="chart-toggle" id="chart-toggle" onclick="toggleChartView()">
+                <i class="ph ph-arrows-left-right"></i>
+            </button>
+        </div>
         <div class="chart-container" id="books-chart"></div>
     </div>
     <div class="stat-card lavender nav-card" draggable="true" data-card-id="navigation">

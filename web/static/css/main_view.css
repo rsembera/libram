@@ -22,6 +22,8 @@
     transition: transform 0.2s, box-shadow 0.2s;
     cursor: grab;
     background: white;
+    height: 160px;
+    box-sizing: border-box;
 }
 
 .stat-card:hover {
@@ -44,6 +46,32 @@
     font-size: 1rem;
     color: #5B6571;
     font-weight: 600;
+}
+
+/* Pages card split layout */
+.pages-card {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.pages-split {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    gap: 1.25rem;
+}
+
+.pages-section {
+    flex: 1;
+    text-align: center;
+}
+
+.pages-divider {
+    width: 1px;
+    height: 60px;
+    background: rgba(0, 0, 0, 0.15);
 }
 
 /* Navigation card */
@@ -94,18 +122,41 @@
     flex-direction: column;
 }
 
+.chart-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
 .chart-title {
     font-size: 0.75rem;
     font-weight: 700;
     color: #6B7280;
     text-transform: uppercase;
     letter-spacing: 0.03em;
-    margin-bottom: 0.5rem;
+}
+
+.chart-toggle {
+    background: rgba(0, 0, 0, 0.08);
+    border: none;
+    border-radius: 4px;
+    padding: 0.25rem 0.5rem;
+    cursor: pointer;
+    color: #6B7280;
+    font-size: 1rem;
+    transition: all 0.2s;
+}
+
+.chart-toggle:hover {
+    background: rgba(0, 0, 0, 0.15);
+    color: #374151;
 }
 
 .chart-container {
     flex: 1;
     min-height: 80px;
+    overflow: hidden;
 }
 
 .books-chart-svg {
