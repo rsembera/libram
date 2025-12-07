@@ -6,7 +6,7 @@ Main book CRUD operations and views.
 import csv
 import io
 from datetime import datetime, date
-from flask import Blueprint, render_template, request, redirect, url_for, current_app, Response
+from flask import Blueprint, render_template, request, redirect, url_for, current_app, Response, jsonify
 
 books_bp = Blueprint('books', __name__)
 
@@ -281,3 +281,11 @@ def _parse_date_from_form(field_name: str) -> date:
 def _get_date_options() -> dict:
     """Get date options (kept for backward compatibility)."""
     return {}
+
+
+@books_bp.route('/api/books-per-month')
+def books_per_month():
+    """API endpoint returning books finished per month for chart."""
+    db = current_app.get_db()
+    data = db.get_books_per_month(12)
+    return jsonify(data)
