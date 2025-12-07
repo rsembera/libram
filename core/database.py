@@ -325,6 +325,13 @@ class Database:
         """, (year_start,))
         pages_this_year = cursor.fetchone()[0]
         
+        # Total pages all time
+        cursor.execute("""
+            SELECT COALESCE(SUM(pages), 0) FROM books 
+            WHERE did_not_finish = 0
+        """)
+        total_pages = cursor.fetchone()[0]
+        
         # Average days to finish (completed books only)
         cursor.execute("""
             SELECT AVG((date_finished - date_begun) / 86400.0 + 1)
@@ -345,6 +352,7 @@ class Database:
             'total_books': total_books,
             'books_this_year': books_this_year,
             'pages_this_year': pages_this_year,
+            'total_pages': total_pages,
             'avg_days_to_finish': avg_days,
             'currently_reading': currently_reading
         }
@@ -395,6 +403,60 @@ class Database:
                 'year': year,
                 'label': month_label,
                 'count': count
+            })
+        
+        return results
+    
+    def get_avg_pages_per_day_by_month(self, months: int = 12) -> list:
+        """
+        Get average pages per day for books finished in each of the last N months.
+        
+        Args:
+            months: Number of months to include (default 12)
+            
+        Returns:
+            List of dicts with 'month', 'year', 'label', and 'avg' keys,
+            ordered from oldest to newest.
+        """
+        cursor = self.conn.cursor()
+        now = datetime.now()
+        
+        results = []
+        for i in range(months - 1, -1, -1):
+            # Calculate month/year for this slot
+            month_offset = now.month - 1 - i
+            year = now.year + (month_offset // 12)
+            month = (month_offset % 12) + 1
+            
+            # Get timestamp range for this month
+            month_start = int(datetime(year, month, 1).timestamp())
+            if month == 12:
+                month_end = int(datetime(year + 1, 1, 1).timestamp())
+            else:
+                month_end = int(datetime(year, month + 1, 1).timestamp())
+            
+            # Calculate pages_per_day inline: pages / (total_days - days_paused)
+            # total_days = (date_finished - date_begun) / 86400 + 1
+            cursor.execute("""
+                SELECT AVG(
+                    CAST(pages AS REAL) / 
+                    NULLIF((date_finished - date_begun) / 86400.0 + 1 - COALESCE(days_paused, 0), 0)
+                ) FROM books 
+                WHERE date_finished >= ? AND date_finished < ?
+                AND date_finished IS NOT NULL
+                AND did_not_finish = 0
+            """, (month_start, month_end))
+            avg = cursor.fetchone()[0]
+            avg = round(avg, 1) if avg else 0
+            
+            # Create short month label
+            month_label = datetime(year, month, 1).strftime('%b')
+            
+            results.append({
+                'month': month,
+                'year': year,
+                'label': month_label,
+                'avg': avg
             })
         
         return results
