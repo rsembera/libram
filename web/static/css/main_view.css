@@ -70,9 +70,9 @@
 }
 
 .pages-divider {
-    width: 1px;
+    width: 2px;
     height: 60px;
-    background: var(--border-color);
+    background: var(--divider-color);
 }
 
 /* Navigation card */
