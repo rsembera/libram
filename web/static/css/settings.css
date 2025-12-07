@@ -5,7 +5,7 @@
 }
 
 .settings-section {
-    background: #F9FAFB;
+    background: var(--bg-card-alt);
     border-radius: 1rem;
     margin-bottom: 1rem;
     overflow: visible;
@@ -23,7 +23,7 @@
 }
 
 .settings-section-header:hover {
-    background: #F2F4F5;
+    background: var(--bg-card-hover);
 }
 
 .settings-section-header::-webkit-details-marker {
@@ -31,7 +31,7 @@
 }
 
 .settings-section-header .arrow {
-    color: #9CA3AF;
+    color: var(--text-muted);
     font-size: 0.75rem;
     transition: transform 0.2s;
     line-height: 1.5rem;
@@ -45,13 +45,13 @@ details[open] .settings-section-header .arrow {
     margin: 0;
     font-size: 1.125rem;
     font-weight: 600;
-    color: #1F2937;
+    color: var(--text-primary);
 }
 
 .settings-section-header p {
     margin: 0.25rem 0 0 0;
     font-size: 0.875rem;
-    color: #6B7280;
+    color: var(--text-secondary);
 }
 
 .settings-section-content {
@@ -68,7 +68,7 @@ details[open] .settings-section-header .arrow {
     text-align: center;
     padding: 2rem;
     margin-top: 2rem;
-    border-top: 1px solid #E5E7EB;
+    border-top: 1px solid var(--border-color);
 }
 
 .about-logo {
@@ -79,18 +79,18 @@ details[open] .settings-section-header .arrow {
 .about-section h3 {
     font-size: 1.5rem;
     font-weight: 700;
-    color: #1F2937;
+    color: var(--text-primary);
     margin-bottom: 0.25rem;
 }
 
 .about-section .version {
-    color: var(--color-primary);
+    color: var(--accent-primary);
     font-weight: 600;
     margin-bottom: 0.5rem;
 }
 
 .about-section .credits {
-    color: #6B7280;
+    color: var(--text-secondary);
     font-size: 0.875rem;
 }
 
@@ -108,28 +108,28 @@ details[open] .settings-section-header .arrow {
     justify-content: space-between;
     width: 100%;
     padding: 0.75rem 1rem;
-    border: 2px solid var(--color-border);
+    border: 2px solid var(--border-color);
     border-radius: 0.75rem;
     font-size: 0.9375rem;
     font-family: inherit;
-    color: var(--color-text);
-    background: white;
+    color: var(--text-primary);
+    background: var(--bg-card);
     cursor: pointer;
     transition: border-color 0.2s;
     text-align: left;
 }
 
 .custom-dropdown-trigger:hover {
-    border-color: #C0C5CC;
+    border-color: var(--accent-light);
 }
 
 .custom-dropdown-trigger:focus {
     outline: none;
-    border-color: var(--color-border-focus);
+    border-color: var(--accent-primary);
 }
 
 .custom-dropdown-trigger .dropdown-arrow {
-    color: #9CA3AF;
+    color: var(--text-muted);
     transition: transform 0.2s;
 }
 
@@ -142,10 +142,10 @@ details[open] .settings-section-header .arrow {
     top: calc(100% + 4px);
     left: 0;
     right: 0;
-    background: white;
-    border: 2px solid var(--color-border);
+    background: var(--bg-card);
+    border: 2px solid var(--border-color);
     border-radius: 0.75rem;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 12px var(--shadow-color);
     z-index: 100;
     opacity: 0;
     visibility: hidden;
@@ -163,6 +163,7 @@ details[open] .settings-section-header .arrow {
     padding: 0.75rem 1rem;
     cursor: pointer;
     transition: background 0.15s;
+    color: var(--text-primary);
 }
 
 .custom-dropdown-option:first-child {
@@ -174,12 +175,12 @@ details[open] .settings-section-header .arrow {
 }
 
 .custom-dropdown-option:hover {
-    background: #F3F4F6;
+    background: var(--bg-card-hover);
 }
 
 .custom-dropdown-option.selected {
-    background: #EEF2FF;
-    color: var(--color-primary);
+    background: var(--bg-card-alt);
+    color: var(--accent-primary);
     font-weight: 600;
 }
 
@@ -198,11 +199,11 @@ details[open] .settings-section-header .arrow {
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    color: #9CA3AF;
+    color: var(--text-muted);
 }
 
 .dropdown-group-label:not(:first-child) {
-    border-top: 1px solid #E5E7EB;
+    border-top: 1px solid var(--border-color);
     margin-top: 0.25rem;
     padding-top: 0.75rem;
 }
@@ -218,13 +219,9 @@ details[open] .settings-section-header .arrow {
     flex-shrink: 0;
 }
 
-.bg-preview-suit-grey { background: #EDF2F5; }
-.bg-preview-sage-mist { background: #E8F0E8; }
-.bg-preview-soft-cream { background: #F5F0E8; }
-.bg-preview-warm-stone { background: #E8E4E0; }
 
-/* Card style preview swatches */
-.card-style-preview {
+/* Theme preview swatches */
+.theme-preview {
     display: inline-block;
     width: 24px;
     height: 24px;
@@ -235,11 +232,18 @@ details[open] .settings-section-header .arrow {
     flex-shrink: 0;
 }
 
-.card-style-preview-strait-laced { background: #FFFFFF; }
-.card-style-preview-garden-path { background: linear-gradient(135deg, #C8DCC8 0%, #B5C8B0 100%); }
-.card-style-preview-ocean-breeze { background: linear-gradient(135deg, #A8D0D8 0%, #95C4D1 100%); }
-.card-style-preview-sunset-glow { background: linear-gradient(135deg, #F5D8C0 0%, #E5CFBB 100%); }
-.card-style-preview-tutti-frutti { background: linear-gradient(135deg, #C8D8E0 0%, #DCD3E8 50%, #F5DEB0 100%); }
+.theme-preview-quiet-sky { background: linear-gradient(135deg, #E8E4F0 0%, #9B9FD8 100%); }
+.theme-preview-gentle-dawn { background: linear-gradient(135deg, #F5E0E0 0%, #E8A5A5 100%); }
+.theme-preview-warm-ember { background: linear-gradient(135deg, #FAE8D0 0%, #F4A460 100%); }
+.theme-preview-garden-path { background: linear-gradient(135deg, #D8E8D8 0%, #88B894 100%); }
+.theme-preview-deep-water { background: linear-gradient(135deg, #D0E8E8 0%, #5FB3B3 100%); }
+.theme-preview-soft-earth { background: linear-gradient(135deg, #E8E0D8 0%, #A89586 100%); }
+.theme-preview-evening-ritual { background: linear-gradient(135deg, #2f3347 0%, #6B7AB8 100%); }
+
+.bg-preview-default { 
+    background: linear-gradient(135deg, #f0f0f0 25%, transparent 25%, transparent 75%, #f0f0f0 75%);
+    background-size: 8px 8px;
+}
 
 .bg-preview-image {
     background-size: cover;

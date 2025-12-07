@@ -17,28 +17,27 @@ def settings_page():
     
     # Load current settings
     settings = {
-        'card_style': db.get_setting('card_style', 'tutti-frutti'),
-        'background_style': db.get_setting('background_style', 'suit-grey'),
+        'theme': db.get_setting('theme', 'quiet-sky'),
+        'background_style': db.get_setting('background_style', ''),
         'font_style': db.get_setting('font_style', 'libre-baskerville'),
         'session_timeout': db.get_setting('session_timeout', '30'),
     }
     
-    # Card positions (6 cards)
-    card_order = db.get_setting('card_order', 
-        'total-books,books-year,pages-year,avg-days,currently-reading,navigation')
+    # Card positions (3 cards)
+    card_order = db.get_setting('card_order', 'pages-year,reading-chart,navigation')
     settings['card_positions'] = card_order.split(',')
     
     return render_template('settings.html', settings=settings)
 
 
-@settings_bp.route('/api/card-style', methods=['POST'])
-def save_card_style():
-    """Save card style preference."""
+@settings_bp.route('/api/theme', methods=['POST'])
+def save_theme():
+    """Save theme preference."""
     db = current_app.get_db()
     data = request.get_json()
     
-    style = data.get('style', 'tutti-frutti')
-    db.set_setting('card_style', style)
+    theme = data.get('theme', 'quiet-sky')
+    db.set_setting('theme', theme)
     
     return jsonify({'status': 'ok'})
 
@@ -98,15 +97,7 @@ def save_timeout():
 
 @settings_bp.route('/api/backgrounds')
 def list_backgrounds():
-    """Return list of available backgrounds (solid colors + user uploads)."""
-    # Solid color options
-    solid_colors = [
-        {'value': 'suit-grey', 'name': 'Suit Grey'},
-        {'value': 'sage-mist', 'name': 'Sage Mist'},
-        {'value': 'soft-cream', 'name': 'Soft Cream'},
-        {'value': 'warm-stone', 'name': 'Warm Stone'},
-    ]
-    
+    """Return list of user-uploaded backgrounds."""
     # User backgrounds (uploaded)
     user_dir = Path(__file__).parent.parent / 'static' / 'user_backgrounds'
     user_backgrounds = []
@@ -121,7 +112,6 @@ def list_backgrounds():
                 })
     
     return jsonify({
-        'solid': solid_colors,
         'user': sorted(user_backgrounds, key=lambda x: x['name'])
     })
 

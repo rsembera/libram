@@ -107,19 +107,12 @@
 }
 
 body {
-    color: var(--color-text);
+    color: var(--text-primary);
     line-height: 1.6;
     min-height: 100vh;
     padding: 2rem;
+    background: var(--bg-page);
 }
-
-/* ============================================
-   BACKGROUND STYLES
-   ============================================ */
-.bg-suit-grey { background: #EDF2F5; }
-.bg-sage-mist { background: #E8F0E8; }
-.bg-soft-cream { background: #F5F0E8; }
-.bg-warm-stone { background: #E8E4E0; }
 
 /* ============================================
    FONT STYLES
@@ -149,22 +142,23 @@ body {
 }
 
 .btn-primary {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
+    background: var(--btn-primary-bg);
+    color: var(--btn-primary-text);
 }
 
 .btn-primary:hover {
+    background: var(--accent-hover);
     transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    box-shadow: 0 4px 12px var(--shadow-color);
 }
 
 .btn-secondary {
-    background: #E5E7EB;
-    color: #4B5563;
+    background: var(--btn-secondary-bg);
+    color: var(--btn-secondary-text);
 }
 
 .btn-secondary:hover {
-    background: #D1D5DB;
+    background: var(--bg-card-hover);
 }
 
 .btn-danger {
@@ -207,7 +201,7 @@ body {
     display: block;
     margin-bottom: 0.5rem;
     font-weight: 600;
-    color: var(--color-text-heading);
+    color: var(--text-primary);
     font-size: 0.875rem;
 }
 
@@ -219,12 +213,12 @@ body {
 .form-group textarea {
     width: 100%;
     padding: 0.75rem 1rem;
-    border: 2px solid var(--color-border);
+    border: 2px solid var(--border-color);
     border-radius: 0.75rem;
     font-size: 0.9375rem;
     font-family: inherit;
-    color: var(--color-text);
-    background: white;
+    color: var(--text-primary);
+    background: var(--bg-card);
     transition: border-color 0.2s;
 }
 
@@ -232,7 +226,7 @@ body {
 .form-group select:focus,
 .form-group textarea:focus {
     outline: none;
-    border-color: var(--color-border-focus);
+    border-color: var(--accent-primary);
 }
 
 .form-group textarea {
@@ -242,7 +236,7 @@ body {
 
 .helper-text {
     font-size: 0.8125rem;
-    color: var(--color-text-muted);
+    color: var(--text-muted);
     margin-top: 0.375rem;
 }
 
@@ -293,7 +287,7 @@ body {
     align-items: center;
     margin-top: 2rem;
     padding-top: 1.5rem;
-    border-top: 1px solid var(--color-border);
+    border-top: 1px solid var(--border-color);
 }
 
 .actions-right {
@@ -307,10 +301,10 @@ body {
 .form-card,
 .settings-card,
 .backups-card {
-    background: white;
+    background: var(--bg-card);
     border-radius: 1.5rem;
     padding: 2rem;
-    box-shadow: var(--shadow-lg);
+    box-shadow: 0 8px 24px var(--shadow-color);
     max-width: 800px;
     margin: 0 auto;
 }
@@ -333,7 +327,7 @@ body {
 .backups-header h2 {
     font-size: 1.5rem;
     font-weight: 700;
-    color: var(--color-text-heading);
+    color: var(--text-primary);
     display: flex;
     align-items: center;
     gap: 0.5rem;
@@ -382,7 +376,7 @@ body {
 }
 
 .modal-content {
-    background: white;
+    background: var(--bg-card);
     padding: 2rem;
     border-radius: 1rem;
     max-width: 400px;
@@ -392,12 +386,12 @@ body {
 
 .modal-content h3 {
     margin-bottom: 1rem;
-    color: var(--color-text-heading);
+    color: var(--text-primary);
 }
 
 .modal-content p {
     margin-bottom: 1.5rem;
-    color: var(--color-text);
+    color: var(--text-secondary);
 }
 
 .modal-actions {
@@ -410,9 +404,8 @@ body {
    ICONS
    ============================================ */
 .page-icon {
-    width: 28px;
-    height: 28px;
-    color: var(--color-primary);
+    font-size: 1.5rem;
+    color: var(--accent-primary);
 }
 
 .icon-sm {
@@ -430,7 +423,7 @@ body {
 .empty-state {
     text-align: center;
     padding: 4rem 2rem;
-    color: var(--color-text-muted);
+    color: var(--text-muted);
 }
 
 .empty-state .empty-icon,
@@ -442,7 +435,7 @@ body {
 
 .empty-state h3 {
     margin-bottom: 0.5rem;
-    color: var(--color-text-heading);
+    color: var(--text-primary);
 }
 
 .empty-state p {
