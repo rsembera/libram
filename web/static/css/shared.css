@@ -198,10 +198,10 @@ body {
 .font-source-sans { font-family: var(--font-source-sans); }
 .font-literata { font-family: var(--font-literata); }
 
-/* Font sizes */
-.font-size-s { font-size: 16px; }
-.font-size-m { font-size: 18px; }
-.font-size-l { font-size: 20px; }
+/* Font sizes - applied to html element */
+html.font-size-s { font-size: 16px; }
+html.font-size-m { font-size: 18px; }
+html.font-size-l { font-size: 20px; }
 
 /* ============================================
    BUTTONS

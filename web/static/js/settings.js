@@ -118,8 +118,8 @@ function selectFontSize(size) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ size: size })
     }).then(() => {
-        // Update body class for immediate preview
-        document.body.className = document.body.className
+        // Update html element class for immediate preview
+        document.documentElement.className = document.documentElement.className
             .replace(/\bfont-size-\w+\b/g, '')
             .trim() + ' font-size-' + size;
     });

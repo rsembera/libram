@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="{{ theme or 'quiet-sky' }}">
+<html lang="en" data-theme="{{ theme or 'quiet-sky' }}" class="font-size-{{ font_size or 's' }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -22,7 +22,7 @@
     
     {% block extra_css %}{% endblock %}
 </head>
-<body class="font-{{ font_style or 'lexend' }} font-size-{{ font_size or 's' }}"{% if background_style and background_style.startswith('user:') %} style="background-image: url('/static/user_backgrounds/{{ background_style[5:] }}'); background-size: cover; background-position: center; background-attachment: fixed;"{% endif %}>
+<body class="font-{{ font_style or 'lexend' }}"{% if background_style and background_style.startswith('user:') %} style="background-image: url('/static/user_backgrounds/{{ background_style[5:] }}'); background-size: cover; background-position: center; background-attachment: fixed;"{% endif %}>
     
     {% block content %}{% endblock %}
     
