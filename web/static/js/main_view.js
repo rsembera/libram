@@ -10,6 +10,9 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize card drag and drop
     initCardDragDrop();
     
+    // Initialize books per month chart
+    initBooksChart();
+    
     // Start time update
     updateTime();
     setInterval(updateTime, 60000);
@@ -190,4 +193,83 @@ function getCookie(name) {
         const parts = v.split('=');
         return parts[0] === name ? decodeURIComponent(parts[1]) : r;
     }, '');
+}
+
+/* ============================================
+   BOOKS PER MONTH CHART
+   ============================================ */
+async function initBooksChart() {
+    const container = document.getElementById('books-chart');
+    if (!container) return;
+    
+    try {
+        const response = await fetch('/api/books-per-month');
+        const data = await response.json();
+        renderBooksChart(container, data);
+    } catch (error) {
+        console.error('Failed to load chart data:', error);
+        container.innerHTML = '<div class="chart-error">Unable to load chart</div>';
+    }
+}
+
+function renderBooksChart(container, data) {
+    // Chart dimensions
+    const width = container.clientWidth || 280;
+    const height = container.clientHeight || 100;
+    const padding = { top: 8, right: 8, bottom: 20, left: 24 };
+    
+    const chartWidth = width - padding.left - padding.right;
+    const chartHeight = height - padding.top - padding.bottom;
+    
+    // Find max value for scaling
+    const maxCount = Math.max(...data.map(d => d.count), 1);
+    const yMax = Math.ceil(maxCount * 1.1) || 5; // Add 10% headroom, minimum 5
+    
+    // Calculate bar dimensions
+    const barCount = data.length;
+    const barGap = 4;
+    const barWidth = (chartWidth - (barCount - 1) * barGap) / barCount;
+    
+    // Create SVG
+    let svg = `<svg width="${width}" height="${height}" class="books-chart-svg">`;
+    
+    // Y-axis gridlines and labels
+    const gridLines = 4;
+    for (let i = 0; i <= gridLines; i++) {
+        const y = padding.top + chartHeight - (i / gridLines) * chartHeight;
+        const value = Math.round((i / gridLines) * yMax);
+        
+        // Gridline
+        svg += `<line x1="${padding.left}" y1="${y}" x2="${width - padding.right}" y2="${y}" 
+                      stroke="#E5E7EB" stroke-width="1" />`;
+        
+        // Y-axis label (only show a few)
+        if (i === 0 || i === gridLines || i === gridLines / 2) {
+            svg += `<text x="${padding.left - 6}" y="${y + 3}" 
+                          text-anchor="end" font-size="9" fill="#4B5563">${value}</text>`;
+        }
+    }
+    
+    // Bars
+    data.forEach((d, i) => {
+        const x = padding.left + i * (barWidth + barGap);
+        const barHeight = (d.count / yMax) * chartHeight;
+        const y = padding.top + chartHeight - barHeight;
+        
+        // Bar
+        const barColor = d.count > 0 ? '#667eea' : '#E5E7EB';
+        svg += `<rect x="${x}" y="${y}" width="${barWidth}" height="${barHeight}" 
+                      fill="${barColor}" rx="2" class="chart-bar">
+                  <title>${d.label} ${d.year}: ${d.count} book${d.count !== 1 ? 's' : ''}</title>
+                </rect>`;
+        
+        // X-axis label (show every other month to avoid crowding)
+        if (i % 2 === 0 || barCount <= 6) {
+            svg += `<text x="${x + barWidth / 2}" y="${height - 4}" 
+                          text-anchor="middle" font-size="9" fill="#4B5563">${d.label}</text>`;
+        }
+    });
+    
+    svg += '</svg>';
+    container.innerHTML = svg;
 }

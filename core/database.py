@@ -349,6 +349,56 @@ class Database:
             'currently_reading': currently_reading
         }
     
+    def get_books_per_month(self, months: int = 12) -> list:
+        """
+        Get books finished per month for the last N months.
+        
+        Args:
+            months: Number of months to include (default 12)
+            
+        Returns:
+            List of dicts with 'month', 'year', 'label', and 'count' keys,
+            ordered from oldest to newest.
+        """
+        cursor = self.conn.cursor()
+        
+        # Calculate the start date (beginning of month, N months ago)
+        now = datetime.now()
+        
+        results = []
+        for i in range(months - 1, -1, -1):
+            # Calculate month/year for this slot
+            month_offset = now.month - 1 - i
+            year = now.year + (month_offset // 12)
+            month = (month_offset % 12) + 1
+            
+            # Get timestamp range for this month
+            month_start = int(datetime(year, month, 1).timestamp())
+            if month == 12:
+                month_end = int(datetime(year + 1, 1, 1).timestamp())
+            else:
+                month_end = int(datetime(year, month + 1, 1).timestamp())
+            
+            # Count books finished in this month
+            cursor.execute("""
+                SELECT COUNT(*) FROM books 
+                WHERE date_finished >= ? AND date_finished < ?
+                AND did_not_finish = 0
+            """, (month_start, month_end))
+            count = cursor.fetchone()[0]
+            
+            # Create short month label
+            month_label = datetime(year, month, 1).strftime('%b')
+            
+            results.append({
+                'month': month,
+                'year': year,
+                'label': month_label,
+                'count': count
+            })
+        
+        return results
+    
     # =========================================================================
     # HELPER METHODS
     # =========================================================================
