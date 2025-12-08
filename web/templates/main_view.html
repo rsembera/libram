@@ -148,8 +148,7 @@
                         <div class="compact-header">
                             <span class="book-number">#{{ book.all_time_number }} (Yr. #{{ book.yearly_number }})</span>
                         </div>
-                        <div class="book-rating">{{ book.rating|rating_star|safe }}</div>
-                        <div class="book-title">{{ book.title }}</div>
+                        <div class="book-title"><span class="book-rating">{{ book.rating|rating_star|safe }}</span> {{ book.title }}</div>
                         <div class="book-author">{{ book.author }}</div>
                         <div class="compact-meta">
                             <span>{{ book.pages }} pages</span>
