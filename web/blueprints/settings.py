@@ -22,6 +22,8 @@ def settings_page():
         'font_style': db.get_setting('font_style', 'lexend'),
         'font_size': db.get_setting('font_size', 's'),
         'session_timeout': db.get_setting('session_timeout', '30'),
+        'rating_5_color': db.get_setting('rating_5_color', '#10B981'),
+        'rating_1_color': db.get_setting('rating_1_color', '#1F2937'),
     }
     
     # Card positions (3 cards)
@@ -75,6 +77,23 @@ def save_font_size():
     
     size = data.get('size', 's')
     db.set_setting('font_size', size)
+    
+    return jsonify({'status': 'ok'})
+
+
+@settings_bp.route('/api/rating-color', methods=['POST'])
+def save_rating_color():
+    """Save rating color preference."""
+    db = current_app.get_db()
+    data = request.get_json()
+    
+    rating = data.get('rating')
+    color = data.get('color')
+    
+    if rating == 5:
+        db.set_setting('rating_5_color', color)
+    elif rating == 1:
+        db.set_setting('rating_1_color', color)
     
     return jsonify({'status': 'ok'})
 
