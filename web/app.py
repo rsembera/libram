@@ -88,21 +88,25 @@ def create_app():
     # Context processor to inject theme settings into all templates
     @app.context_processor
     def inject_theme_settings():
-        """Inject theme, background_style, font_style, and font_size into all templates."""
+        """Inject theme, background_style, font_style, font_size, and rating colors into all templates."""
         try:
             db = get_db()
             return {
                 'theme': db.get_setting('theme', 'quiet-sky'),
                 'background_style': db.get_setting('background_style', ''),
                 'font_style': db.get_setting('font_style', 'lexend'),
-                'font_size': db.get_setting('font_size', 's')
+                'font_size': db.get_setting('font_size', 's'),
+                'rating_5_color': db.get_setting('rating_5_color', ''),
+                'rating_1_color': db.get_setting('rating_1_color', '')
             }
         except:
             return {
                 'theme': 'quiet-sky',
                 'background_style': '',
                 'font_style': 'lexend',
-                'font_size': 's'
+                'font_size': 's',
+                'rating_5_color': '',
+                'rating_1_color': ''
             }
     
     # Register blueprints

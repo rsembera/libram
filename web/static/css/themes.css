@@ -52,6 +52,10 @@
     --book-row-odd: #f5f3fa;
     --book-row-hover: #eeeaf4;
     --year-header-bg: #E8E4F0;
+    
+    /* Rating colors (5-star and 1-star customizable) */
+    --rating-5-star: #10B981;
+    --rating-1-star: #1F2937;
 }
 
 /* Gentle Dawn - Pink/Rose tones */

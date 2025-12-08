@@ -406,6 +406,19 @@ document.addEventListener('click', function(e) {
     }
 });
 
+// Rating color picker
+function saveRatingColor(rating, color) {
+    fetch('/settings/api/rating-color', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ rating: rating, color: color })
+    }).then(() => {
+        // Update CSS variable for immediate preview
+        const varName = rating === 5 ? '--rating-5-star' : '--rating-1-star';
+        document.documentElement.style.setProperty(varName, color);
+    });
+}
+
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', function() {
     // Initialize theme dropdown

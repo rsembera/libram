@@ -137,6 +137,21 @@
                     </div>
                 </div>
             </div>
+            
+            <div class="form-group">
+                <label>Rating Colors</label>
+                <p class="form-hint">Gold, silver, and bronze are fixed.</p>
+                <div class="rating-color-pickers">
+                    <div class="color-picker-row">
+                        <span class="color-label">5-Star</span>
+                        <input type="color" id="rating-5-color" value="{{ settings.rating_5_color or '#10B981' }}" onchange="saveRatingColor(5, this.value)">
+                    </div>
+                    <div class="color-picker-row">
+                        <span class="color-label">1-Star</span>
+                        <input type="color" id="rating-1-color" value="{{ settings.rating_1_color or '#1F2937' }}" onchange="saveRatingColor(1, this.value)">
+                    </div>
+                </div>
+            </div>
         </div>
     </details>
     
