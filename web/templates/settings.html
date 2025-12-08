@@ -17,7 +17,7 @@
     </div>
     
     <!-- Appearance Section -->
-    <details class="settings-section" open>
+    <details class="settings-section">
         <summary class="settings-section-header">
             <span class="arrow">▶</span>
             <div>
@@ -137,19 +137,50 @@
                     </div>
                 </div>
             </div>
+        </div>
+    </details>
+    
+    <!-- Ratings Section -->
+    <details class="settings-section">
+        <summary class="settings-section-header">
+            <span class="arrow">▶</span>
+            <div>
+                <h3>Ratings</h3>
+                <p>Customize rating star colors</p>
+            </div>
+        </summary>
+        <div class="settings-section-content">
+            <p class="form-hint" style="margin-bottom: 1rem;">Gold, silver, and bronze are fixed.</p>
             
             <div class="form-group">
-                <label>Rating Colors</label>
-                <p class="form-hint">Gold, silver, and bronze are fixed.</p>
-                <div class="rating-color-pickers">
-                    <div class="color-picker-row">
-                        <span class="color-label">5-Star</span>
-                        <input type="color" id="rating-5-color" value="{{ settings.rating_5_color or '#10B981' }}" onchange="saveRatingColor(5, this.value)">
-                    </div>
-                    <div class="color-picker-row">
-                        <span class="color-label">1-Star</span>
-                        <input type="color" id="rating-1-color" value="{{ settings.rating_1_color or '#1F2937' }}" onchange="saveRatingColor(1, this.value)">
-                    </div>
+                <label>5-Star Color</label>
+                <div class="color-preset-picker" id="color-picker-5">
+                    <button type="button" class="color-preset {{ 'selected' if settings.rating_5_color == '#1F2937' else '' }}" data-color="#1F2937" data-name="Black" onclick="selectRatingColor(5, this)" style="background: #1F2937;"></button>
+                    <button type="button" class="color-preset {{ 'selected' if settings.rating_5_color == '#64748B' else '' }}" data-color="#64748B" data-name="Slate" onclick="selectRatingColor(5, this)" style="background: #64748B;"></button>
+                    <button type="button" class="color-preset {{ 'selected' if settings.rating_5_color == '#EF4444' else '' }}" data-color="#EF4444" data-name="Red" onclick="selectRatingColor(5, this)" style="background: #EF4444;"></button>
+                    <button type="button" class="color-preset {{ 'selected' if settings.rating_5_color == '#F97316' else '' }}" data-color="#F97316" data-name="Orange" onclick="selectRatingColor(5, this)" style="background: #F97316;"></button>
+                    <button type="button" class="color-preset {{ 'selected' if settings.rating_5_color == '#10B981' or not settings.rating_5_color else '' }}" data-color="#10B981" data-name="Green" onclick="selectRatingColor(5, this)" style="background: #10B981;"></button>
+                    <button type="button" class="color-preset {{ 'selected' if settings.rating_5_color == '#14B8A6' else '' }}" data-color="#14B8A6" data-name="Teal" onclick="selectRatingColor(5, this)" style="background: #14B8A6;"></button>
+                    <button type="button" class="color-preset {{ 'selected' if settings.rating_5_color == '#3B82F6' else '' }}" data-color="#3B82F6" data-name="Blue" onclick="selectRatingColor(5, this)" style="background: #3B82F6;"></button>
+                    <button type="button" class="color-preset {{ 'selected' if settings.rating_5_color == '#6366F1' else '' }}" data-color="#6366F1" data-name="Indigo" onclick="selectRatingColor(5, this)" style="background: #6366F1;"></button>
+                    <button type="button" class="color-preset {{ 'selected' if settings.rating_5_color == '#8B5CF6' else '' }}" data-color="#8B5CF6" data-name="Purple" onclick="selectRatingColor(5, this)" style="background: #8B5CF6;"></button>
+                    <button type="button" class="color-preset {{ 'selected' if settings.rating_5_color == '#EC4899' else '' }}" data-color="#EC4899" data-name="Pink" onclick="selectRatingColor(5, this)" style="background: #EC4899;"></button>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label>1-Star Color</label>
+                <div class="color-preset-picker" id="color-picker-1">
+                    <button type="button" class="color-preset {{ 'selected' if settings.rating_1_color == '#1F2937' or not settings.rating_1_color else '' }}" data-color="#1F2937" data-name="Black" onclick="selectRatingColor(1, this)" style="background: #1F2937;"></button>
+                    <button type="button" class="color-preset {{ 'selected' if settings.rating_1_color == '#64748B' else '' }}" data-color="#64748B" data-name="Slate" onclick="selectRatingColor(1, this)" style="background: #64748B;"></button>
+                    <button type="button" class="color-preset {{ 'selected' if settings.rating_1_color == '#EF4444' else '' }}" data-color="#EF4444" data-name="Red" onclick="selectRatingColor(1, this)" style="background: #EF4444;"></button>
+                    <button type="button" class="color-preset {{ 'selected' if settings.rating_1_color == '#F97316' else '' }}" data-color="#F97316" data-name="Orange" onclick="selectRatingColor(1, this)" style="background: #F97316;"></button>
+                    <button type="button" class="color-preset {{ 'selected' if settings.rating_1_color == '#10B981' else '' }}" data-color="#10B981" data-name="Green" onclick="selectRatingColor(1, this)" style="background: #10B981;"></button>
+                    <button type="button" class="color-preset {{ 'selected' if settings.rating_1_color == '#14B8A6' else '' }}" data-color="#14B8A6" data-name="Teal" onclick="selectRatingColor(1, this)" style="background: #14B8A6;"></button>
+                    <button type="button" class="color-preset {{ 'selected' if settings.rating_1_color == '#3B82F6' else '' }}" data-color="#3B82F6" data-name="Blue" onclick="selectRatingColor(1, this)" style="background: #3B82F6;"></button>
+                    <button type="button" class="color-preset {{ 'selected' if settings.rating_1_color == '#6366F1' else '' }}" data-color="#6366F1" data-name="Indigo" onclick="selectRatingColor(1, this)" style="background: #6366F1;"></button>
+                    <button type="button" class="color-preset {{ 'selected' if settings.rating_1_color == '#8B5CF6' else '' }}" data-color="#8B5CF6" data-name="Purple" onclick="selectRatingColor(1, this)" style="background: #8B5CF6;"></button>
+                    <button type="button" class="color-preset {{ 'selected' if settings.rating_1_color == '#EC4899' else '' }}" data-color="#EC4899" data-name="Pink" onclick="selectRatingColor(1, this)" style="background: #EC4899;"></button>
                 </div>
             </div>
         </div>

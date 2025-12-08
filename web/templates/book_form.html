@@ -96,11 +96,11 @@
                 <label for="rating">Rating</label>
                 <select id="rating" name="rating">
                     <option value="0" {{ 'selected' if not book or book.rating == 0 else '' }}>No rating</option>
-                    <option value="1" {{ 'selected' if book and book.rating == 1 else '' }}>★ Black</option>
+                    <option value="1" {{ 'selected' if book and book.rating == 1 else '' }}>★ {{ rating_1_name }}</option>
                     <option value="2" {{ 'selected' if book and book.rating == 2 else '' }}>★ Bronze</option>
                     <option value="3" {{ 'selected' if book and book.rating == 3 else '' }}>★ Silver</option>
                     <option value="4" {{ 'selected' if book and book.rating == 4 else '' }}>★ Gold</option>
-                    <option value="5" {{ 'selected' if book and book.rating == 5 else '' }}>★ Green</option>
+                    <option value="5" {{ 'selected' if book and book.rating == 5 else '' }}>★ {{ rating_5_name }}</option>
                 </select>
             </div>
         </div>

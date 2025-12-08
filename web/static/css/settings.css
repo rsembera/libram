@@ -338,39 +338,28 @@ details[open] .settings-section-header .arrow {
 }
 
 /* Rating color pickers */
-.rating-color-pickers {
+.color-preset-picker {
     display: flex;
-    gap: 1.5rem;
-}
-
-.color-picker-row {
-    display: flex;
-    align-items: center;
     gap: 0.5rem;
+    flex-wrap: wrap;
 }
 
-.color-label {
-    font-size: 0.875rem;
-    color: var(--text-secondary);
-}
-
-input[type="color"] {
-    width: 2.5rem;
+.color-preset {
+    width: 2rem;
     height: 2rem;
-    padding: 0;
-    border: 1px solid var(--border-color);
+    border: 2px solid transparent;
     border-radius: 0.375rem;
     cursor: pointer;
-    background: none;
+    transition: all 0.15s ease;
 }
 
-input[type="color"]::-webkit-color-swatch-wrapper {
-    padding: 2px;
+.color-preset:hover {
+    transform: scale(1.1);
 }
 
-input[type="color"]::-webkit-color-swatch {
-    border: none;
-    border-radius: 0.25rem;
+.color-preset.selected {
+    border-color: var(--text-primary);
+    box-shadow: 0 0 0 2px var(--bg-card);
 }
 
 /* Hidden utility */
