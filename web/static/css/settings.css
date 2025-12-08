@@ -358,8 +358,8 @@ details[open] .settings-section-header .arrow {
 }
 
 .color-preset.selected {
-    border-color: var(--text-primary);
-    box-shadow: 0 0 0 2px var(--bg-card);
+    border-color: #ffffff;
+    box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.5);
 }
 
 /* Hidden utility */
