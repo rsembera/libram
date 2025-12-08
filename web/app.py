@@ -97,7 +97,9 @@ def create_app():
                 'font_style': db.get_setting('font_style', 'lexend'),
                 'font_size': db.get_setting('font_size', 's'),
                 'rating_5_color': db.get_setting('rating_5_color', ''),
-                'rating_1_color': db.get_setting('rating_1_color', '')
+                'rating_1_color': db.get_setting('rating_1_color', ''),
+                'rating_5_name': db.get_setting('rating_5_name', 'Green'),
+                'rating_1_name': db.get_setting('rating_1_name', 'Black')
             }
         except:
             return {
@@ -106,7 +108,9 @@ def create_app():
                 'font_style': 'lexend',
                 'font_size': 's',
                 'rating_5_color': '',
-                'rating_1_color': ''
+                'rating_1_color': '',
+                'rating_5_name': 'Green',
+                'rating_1_name': 'Black'
             }
     
     # Register blueprints

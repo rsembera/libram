@@ -24,6 +24,8 @@ def settings_page():
         'session_timeout': db.get_setting('session_timeout', '30'),
         'rating_5_color': db.get_setting('rating_5_color', '#10B981'),
         'rating_1_color': db.get_setting('rating_1_color', '#1F2937'),
+        'rating_5_name': db.get_setting('rating_5_name', 'Green'),
+        'rating_1_name': db.get_setting('rating_1_name', 'Black'),
     }
     
     # Card positions (3 cards)
@@ -89,11 +91,14 @@ def save_rating_color():
     
     rating = data.get('rating')
     color = data.get('color')
+    name = data.get('name')
     
     if rating == 5:
         db.set_setting('rating_5_color', color)
+        db.set_setting('rating_5_name', name)
     elif rating == 1:
         db.set_setting('rating_1_color', color)
+        db.set_setting('rating_1_name', name)
     
     return jsonify({'status': 'ok'})
 

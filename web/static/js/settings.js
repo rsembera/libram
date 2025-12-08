@@ -406,12 +406,23 @@ document.addEventListener('click', function(e) {
     }
 });
 
-// Rating color picker
-function saveRatingColor(rating, color) {
+// Rating color preset picker
+function selectRatingColor(rating, element) {
+    const color = element.dataset.color;
+    const name = element.dataset.name;
+    const picker = document.getElementById('color-picker-' + rating);
+    
+    // Update selected state
+    picker.querySelectorAll('.color-preset').forEach(btn => {
+        btn.classList.remove('selected');
+    });
+    element.classList.add('selected');
+    
+    // Save to server (color and name)
     fetch('/settings/api/rating-color', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ rating: rating, color: color })
+        body: JSON.stringify({ rating: rating, color: color, name: name })
     }).then(() => {
         // Update CSS variable for immediate preview
         const varName = rating === 5 ? '--rating-5-star' : '--rating-1-star';
