@@ -93,15 +93,48 @@
         <!-- Rating -->
         <div class="form-row-half">
             <div class="form-group">
-                <label for="rating">Rating</label>
-                <select id="rating" name="rating">
-                    <option value="0" {{ 'selected' if not book or book.rating == 0 else '' }}>No rating</option>
-                    <option value="1" {{ 'selected' if book and book.rating == 1 else '' }}>★ {{ rating_1_name }}</option>
-                    <option value="2" {{ 'selected' if book and book.rating == 2 else '' }}>★ Bronze</option>
-                    <option value="3" {{ 'selected' if book and book.rating == 3 else '' }}>★ Silver</option>
-                    <option value="4" {{ 'selected' if book and book.rating == 4 else '' }}>★ Gold</option>
-                    <option value="5" {{ 'selected' if book and book.rating == 5 else '' }}>★ {{ rating_5_name }}</option>
-                </select>
+                <label>Rating</label>
+                <input type="hidden" id="rating" name="rating" value="{{ book.rating if book else 0 }}">
+                <div class="custom-dropdown" id="rating-dropdown">
+                    <button type="button" class="custom-dropdown-trigger" onclick="toggleRatingDropdown()">
+                        <span id="rating-selected-text">
+                            {% if book and book.rating == 5 %}
+                                <span class="rating-star rating-green">★</span> {{ rating_5_name }}
+                            {% elif book and book.rating == 4 %}
+                                <span class="rating-star rating-gold">★</span> Gold
+                            {% elif book and book.rating == 3 %}
+                                <span class="rating-star rating-silver">★</span> Silver
+                            {% elif book and book.rating == 2 %}
+                                <span class="rating-star rating-bronze">★</span> Bronze
+                            {% elif book and book.rating == 1 %}
+                                <span class="rating-star rating-black">★</span> {{ rating_1_name }}
+                            {% else %}
+                                <span class="rating-star rating-none">☆</span> No rating
+                            {% endif %}
+                        </span>
+                        <i class="ph ph-caret-down"></i>
+                    </button>
+                    <div class="custom-dropdown-menu">
+                        <div class="custom-dropdown-option" data-value="5" onclick="selectRating(this)">
+                            <span class="rating-star rating-green">★</span> {{ rating_5_name }}
+                        </div>
+                        <div class="custom-dropdown-option" data-value="4" onclick="selectRating(this)">
+                            <span class="rating-star rating-gold">★</span> Gold
+                        </div>
+                        <div class="custom-dropdown-option" data-value="3" onclick="selectRating(this)">
+                            <span class="rating-star rating-silver">★</span> Silver
+                        </div>
+                        <div class="custom-dropdown-option" data-value="2" onclick="selectRating(this)">
+                            <span class="rating-star rating-bronze">★</span> Bronze
+                        </div>
+                        <div class="custom-dropdown-option" data-value="1" onclick="selectRating(this)">
+                            <span class="rating-star rating-black">★</span> {{ rating_1_name }}
+                        </div>
+                        <div class="custom-dropdown-option" data-value="0" onclick="selectRating(this)">
+                            <span class="rating-star rating-none">☆</span> No rating
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
         
@@ -200,6 +233,32 @@ function closeDeleteModal() {
 document.getElementById('delete-modal')?.addEventListener('click', function(e) {
     if (e.target === this) {
         closeDeleteModal();
+    }
+});
+
+// Rating dropdown functions
+function toggleRatingDropdown() {
+    document.getElementById('rating-dropdown').classList.toggle('open');
+}
+
+function selectRating(element) {
+    const value = element.dataset.value;
+    
+    // Update hidden input
+    document.getElementById('rating').value = value;
+    
+    // Update displayed text
+    document.getElementById('rating-selected-text').innerHTML = element.innerHTML;
+    
+    // Close dropdown
+    document.getElementById('rating-dropdown').classList.remove('open');
+}
+
+// Close dropdown when clicking outside
+document.addEventListener('click', function(e) {
+    const dropdown = document.getElementById('rating-dropdown');
+    if (dropdown && !dropdown.contains(e.target)) {
+        dropdown.classList.remove('open');
     }
 });
 </script>
