@@ -3,3 +3,15 @@
 .form-card {
     max-width: 700px;
 }
+
+/* Rating stars */
+.rating-star {
+    font-size: 1rem;
+    margin-right: 0.25rem;
+}
+.rating-none { color: #D1D5DB; }
+.rating-black { color: var(--rating-1-star, #1F2937); }
+.rating-bronze { color: #B8860B; }
+.rating-silver { color: #9CA3AF; }
+.rating-gold { color: #F59E0B; }
+.rating-green { color: var(--rating-5-star, #10B981); }
