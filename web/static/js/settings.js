@@ -453,3 +453,22 @@ document.addEventListener('DOMContentLoaded', function() {
     loadBackgroundOptions();
     setupUploadHandler();
 });
+
+// About Modal functions
+function showAboutModal() {
+    const modal = document.getElementById('about-modal');
+    modal.style.display = 'flex';
+}
+
+function closeAboutModal() {
+    const modal = document.getElementById('about-modal');
+    modal.style.display = 'none';
+}
+
+// Close modal on backdrop click
+document.addEventListener('click', function(e) {
+    const modal = document.getElementById('about-modal');
+    if (e.target === modal) {
+        closeAboutModal();
+    }
+});
