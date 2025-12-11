@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+
+{% block title %}{{ 'Edit' if type else 'Add' }} Book Type - Libram{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/manage_types.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="card type-form-page">
+    <div class="header-row">
+        <h2><i class="ph ph-tag"></i> {{ 'Edit' if type else 'Add' }} Book Type</h2>
+    </div>
+    
+    {% if error %}
+    <div class="error-message">{{ error }}</div>
+    {% endif %}
+    
+    <form method="POST" class="type-form">
+        <div class="form-group">
+            <label for="name">Name (max 9 characters)</label>
+            <input type="text" id="name" name="name" maxlength="9" required
+                   value="{{ type.name if type else '' }}"
+                   placeholder="e.g. Fiction">
+            <span class="char-count"><span id="name-count">{{ type.name|length if type else 0 }}</span>/9</span>
+        </div>
+        
+        <div class="form-group">
+            <label>Color</label>
+            <div class="color-picker">
+                {% for color in colors %}
+                <label class="color-option">
+                    <input type="radio" name="color" value="{{ color.hex }}" 
+                           data-bubble="{{ color.bubble }}"
+                           {{ 'checked' if (type and type.color == color.hex) or (not type and loop.first) else '' }}>
+                    <span class="color-swatch" style="background-color: {{ color.hex }};"></span>
+                    <span class="color-name">{{ color.name }}</span>
+                </label>
+                {% endfor %}
+            </div>
+            <input type="hidden" name="bubble_color" id="bubble_color" 
+                   value="{{ type.bubble_color if type else colors[0].bubble }}">
+        </div>
+        
+        <div class="form-group">
+            <label>Preview</label>
+            <span class="type-badge preview-badge" id="preview-badge"
+                  style="background-color: {{ type.bubble_color if type else colors[0].bubble }}; color: {{ type.color if type else colors[0].hex }};">
+                {{ type.name if type else 'Preview' }}
+            </span>
+        </div>
+        
+        <div class="form-actions">
+            <a href="{{ url_for('types.manage_types') }}" class="btn">Cancel</a>
+            <button type="submit" class="btn btn-primary">{{ 'Save Changes' if type else 'Add Type' }}</button>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Update character count
+document.getElementById('name').addEventListener('input', function() {
+    document.getElementById('name-count').textContent = this.value.length;
+    updatePreview();
+});
+
+// Update preview when color changes
+document.querySelectorAll('input[name="color"]').forEach(function(radio) {
+    radio.addEventListener('change', function() {
+        document.getElementById('bubble_color').value = this.dataset.bubble;
+        updatePreview();
+    });
+});
+
+function updatePreview() {
+    const name = document.getElementById('name').value || 'Preview';
+    const selectedColor = document.querySelector('input[name="color"]:checked');
+    const color = selectedColor ? selectedColor.value : '#9FCFC0';
+    const bubble = selectedColor ? selectedColor.dataset.bubble : '#E0F2EE';
+    
+    const preview = document.getElementById('preview-badge');
+    preview.textContent = name;
+    preview.style.color = color;
+    preview.style.backgroundColor = bubble;
+}
+</script>
+{% endblock %}

@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Book Types - Libram{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/manage_types.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="card types-page">
+    <div class="header-row">
+        <div>
+            <h2><i class="ph ph-tag"></i> Manage Book Types</h2>
+            <p class="page-subtitle">Categorize your books by type</p>
+        </div>
+        <a href="{{ url_for('types.add_type') }}" class="btn btn-primary">Add Type</a>
+    </div>
+    
+    <table class="types-table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Color</th>
+                <th class="text-center">Books</th>
+                <th class="text-right">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for type in types %}
+            <tr>
+                <td>
+                    <span class="type-badge" style="background-color: {{ type.bubble_color }}; color: {{ type.color }};">
+                        {{ type.name }}
+                    </span>
+                </td>
+                <td>
+                    <span class="color-swatch" style="background-color: {{ type.color }};"></span>
+                </td>
+                <td class="text-center">{{ type.book_count }}</td>
+                <td class="text-right">
+                    <a href="{{ url_for('types.edit_type', type_id=type.id) }}" class="btn btn-sm">Edit</a>
+                    {% if type.book_count == 0 and types|length > 1 %}
+                    <button onclick="confirmDelete({{ type.id }}, '{{ type.name }}')" class="btn btn-sm btn-danger">Delete</button>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    
+    <div class="back-link">
+        <a href="{{ url_for('books.index') }}"><i class="ph ph-arrow-left"></i> Back to Books</a>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div id="delete-modal" class="modal-overlay" style="display: none;">
+    <div class="modal-content">
+        <h3>Delete Type</h3>
+        <p>Are you sure you want to delete "<span id="delete-type-name"></span>"?</p>
+        <div class="modal-buttons">
+            <button onclick="closeDeleteModal()" class="btn">Cancel</button>
+            <button onclick="doDelete()" class="btn btn-danger">Delete</button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+let deleteTypeId = null;
+
+function confirmDelete(typeId, typeName) {
+    deleteTypeId = typeId;
+    document.getElementById('delete-type-name').textContent = typeName;
+    document.getElementById('delete-modal').style.display = 'flex';
+}
+
+function closeDeleteModal() {
+    document.getElementById('delete-modal').style.display = 'none';
+    deleteTypeId = null;
+}
+
+async function doDelete() {
+    if (!deleteTypeId) return;
+    
+    try {
+        const response = await fetch(`/types/${deleteTypeId}/delete`, {
+            method: 'POST'
+        });
+        const data = await response.json();
+        
+        if (data.success) {
+            window.location.reload();
+        } else {
+            alert(data.error || 'Failed to delete type');
+            closeDeleteModal();
+        }
+    } catch (err) {
+        alert('Error deleting type');
+        closeDeleteModal();
+    }
+}
+
+// Close modal on backdrop click
+document.addEventListener('click', function(e) {
+    if (e.target.id === 'delete-modal') {
+        closeDeleteModal();
+    }
+});
+</script>
+{% endblock %}

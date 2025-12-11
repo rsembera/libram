@@ -119,6 +119,35 @@ class Database:
         if 'days_paused' not in columns:
             cursor.execute("ALTER TABLE books ADD COLUMN days_paused INTEGER DEFAULT 0")
         
+        # Book Types table
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS book_types (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                name TEXT UNIQUE NOT NULL,
+                color TEXT NOT NULL,
+                bubble_color TEXT NOT NULL,
+                created_at INTEGER NOT NULL,
+                modified_at INTEGER NOT NULL
+            )
+        """)
+        
+        # Migration: Add type_id column to books if it doesn't exist
+        if 'type_id' not in columns:
+            cursor.execute("ALTER TABLE books ADD COLUMN type_id INTEGER REFERENCES book_types(id)")
+        
+        # Seed default book types if none exist
+        cursor.execute("SELECT COUNT(*) FROM book_types")
+        if cursor.fetchone()[0] == 0:
+            now = int(time.time())
+            cursor.execute("""
+                INSERT INTO book_types (name, color, bubble_color, created_at, modified_at)
+                VALUES (?, ?, ?, ?, ?)
+            """, ('Fiction', '#D4C5E0', '#F3EDF7', now, now))
+            cursor.execute("""
+                INSERT INTO book_types (name, color, bubble_color, created_at, modified_at)
+                VALUES (?, ?, ?, ?, ?)
+            """, ('Non-Fict', '#9FCFC0', '#E0F2EE', now, now))
+        
         self.conn.commit()
         print("✓ Database initialized")
     
@@ -129,7 +158,8 @@ class Database:
     def add_book(self, title: str, author: str, pages: int, 
                  date_begun: date, date_finished: date = None,
                  days_paused: int = 0, rating: int = 0, 
-                 did_not_finish: bool = False, notes: str = '') -> int:
+                 did_not_finish: bool = False, notes: str = '',
+                 type_id: int = None) -> int:
         """
         Add a new book to the database.
         
@@ -154,13 +184,13 @@ class Database:
                 title, author, pages, date_begun, date_finished,
                 days_paused, rating, did_not_finish, notes,
                 all_time_number, yearly_number,
-                created_at, modified_at
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                type_id, created_at, modified_at
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """, (
             title, author, pages, begun_ts, finished_ts,
             days_paused, rating, 1 if did_not_finish else 0, notes,
             all_time_number, yearly_number,
-            now, now
+            type_id, now, now
         ))
         
         self.conn.commit()
@@ -180,8 +210,10 @@ class Database:
         """Get all books, ordered by date_begun descending."""
         cursor = self.conn.cursor()
         cursor.execute("""
-            SELECT * FROM books 
-            ORDER BY date_begun DESC, id DESC
+            SELECT b.*, bt.name as type_name, bt.color as type_color, bt.bubble_color as type_bubble
+            FROM books b
+            LEFT JOIN book_types bt ON b.type_id = bt.id
+            ORDER BY b.date_begun DESC, b.id DESC
         """)
         
         return [self._row_to_book(row, cursor.description) 
@@ -224,7 +256,7 @@ class Database:
         # Build UPDATE statement dynamically
         allowed_fields = {
             'title', 'author', 'pages', 'date_begun', 'date_finished',
-            'days_paused', 'rating', 'did_not_finish', 'notes'
+            'days_paused', 'rating', 'did_not_finish', 'notes', 'type_id'
         }
         
         updates = []
@@ -272,6 +304,86 @@ class Database:
         self.conn.commit()
         return cursor.rowcount > 0
     
+    # =========================================================================
+    # BOOK TYPE OPERATIONS
+    # =========================================================================
+    
+    def get_all_book_types(self) -> list:
+        """Get all book types."""
+        cursor = self.conn.cursor()
+        cursor.execute("SELECT * FROM book_types ORDER BY name")
+        rows = cursor.fetchall()
+        columns = [desc[0] for desc in cursor.description]
+        return [dict(zip(columns, row)) for row in rows]
+    
+    def get_book_type(self, type_id: int) -> dict:
+        """Get a single book type by ID."""
+        cursor = self.conn.cursor()
+        cursor.execute("SELECT * FROM book_types WHERE id = ?", (type_id,))
+        row = cursor.fetchone()
+        if row:
+            columns = [desc[0] for desc in cursor.description]
+            return dict(zip(columns, row))
+        return None
+    
+    def add_book_type(self, name: str, color: str, bubble_color: str) -> int:
+        """Add a new book type."""
+        cursor = self.conn.cursor()
+        now = int(time.time())
+        cursor.execute("""
+            INSERT INTO book_types (name, color, bubble_color, created_at, modified_at)
+            VALUES (?, ?, ?, ?, ?)
+        """, (name, color, bubble_color, now, now))
+        self.conn.commit()
+        return cursor.lastrowid
+    
+    def update_book_type(self, type_id: int, name: str = None, 
+                         color: str = None, bubble_color: str = None) -> bool:
+        """Update a book type."""
+        cursor = self.conn.cursor()
+        now = int(time.time())
+        
+        updates = ['modified_at = ?']
+        values = [now]
+        
+        if name is not None:
+            updates.append('name = ?')
+            values.append(name)
+        if color is not None:
+            updates.append('color = ?')
+            values.append(color)
+        if bubble_color is not None:
+            updates.append('bubble_color = ?')
+            values.append(bubble_color)
+        
+        values.append(type_id)
+        cursor.execute(f"""
+            UPDATE book_types SET {', '.join(updates)} WHERE id = ?
+        """, values)
+        self.conn.commit()
+        return cursor.rowcount > 0
+    
+    def delete_book_type(self, type_id: int) -> bool:
+        """Delete a book type (only if no books assigned)."""
+        cursor = self.conn.cursor()
+        # Check if any books use this type
+        cursor.execute("SELECT COUNT(*) FROM books WHERE type_id = ?", (type_id,))
+        if cursor.fetchone()[0] > 0:
+            return False
+        # Check if this is the last type
+        cursor.execute("SELECT COUNT(*) FROM book_types")
+        if cursor.fetchone()[0] <= 1:
+            return False
+        cursor.execute("DELETE FROM book_types WHERE id = ?", (type_id,))
+        self.conn.commit()
+        return cursor.rowcount > 0
+    
+    def get_books_count_by_type(self, type_id: int) -> int:
+        """Get number of books assigned to a type."""
+        cursor = self.conn.cursor()
+        cursor.execute("SELECT COUNT(*) FROM books WHERE type_id = ?", (type_id,))
+        return cursor.fetchone()[0]
+
     # =========================================================================
     # SETTINGS
     # =========================================================================
