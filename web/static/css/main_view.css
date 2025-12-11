@@ -351,10 +351,10 @@
     display: none;
 }
 
-.col-number { width: 45px; flex-shrink: 0; text-align: center; }
-.col-year-num { width: 65px; flex-shrink: 0; text-align: center; }
-.col-rating { width: 50px; flex-shrink: 0; text-align: center; }
-.col-type { width: 75px; flex-shrink: 0; text-align: center; }
+.col-number { width: 40px; flex-shrink: 0; text-align: center; }
+.col-year-num { width: 55px; flex-shrink: 0; text-align: center; }
+.col-rating { width: 40px; flex-shrink: 0; text-align: center; }
+.col-type { width: 65px; flex-shrink: 0; text-align: center; }
 .col-title { flex: 1.2; min-width: 120px; }
 .col-author { flex: 0.8; min-width: 80px; margin-left: 1.5rem; margin-right: 3.5rem; }
 .col-pages { width: 70px; flex-shrink: 0; text-align: center; }
@@ -451,7 +451,7 @@
 }
 
 .detailed-content .book-number {
-    width: 45px;
+    width: 40px;
     flex-shrink: 0;
     font-weight: 700;
     color: var(--text-muted);
@@ -460,7 +460,7 @@
 }
 
 .detailed-content .year-number {
-    width: 65px;
+    width: 55px;
     flex-shrink: 0;
     color: var(--text-muted);
     font-size: 0.875rem;
@@ -469,13 +469,13 @@
 }
 
 .detailed-content .book-rating {
-    width: 50px;
+    width: 40px;
     flex-shrink: 0;
     text-align: center;
 }
 
 .detailed-content .book-type {
-    width: 75px;
+    width: 65px;
     flex-shrink: 0;
     text-align: center;
 }
