@@ -384,6 +384,19 @@ class Database:
         cursor.execute("SELECT COUNT(*) FROM books WHERE type_id = ?", (type_id,))
         return cursor.fetchone()[0]
 
+    def get_books_by_type_stats(self, limit: int = 6) -> list:
+        """Get book counts by type for chart, ordered by count descending."""
+        cursor = self.conn.cursor()
+        cursor.execute("""
+            SELECT bt.name, bt.color, COUNT(b.id) as book_count
+            FROM book_types bt
+            LEFT JOIN books b ON b.type_id = bt.id
+            GROUP BY bt.id
+            ORDER BY book_count DESC
+            LIMIT ?
+        """, (limit,))
+        return [{'name': row[0], 'color': row[1], 'count': row[2]} for row in cursor.fetchall()]
+
     # =========================================================================
     # SETTINGS
     # =========================================================================

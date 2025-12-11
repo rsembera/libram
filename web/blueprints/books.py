@@ -320,3 +320,10 @@ def pages_per_day_by_month():
     db = current_app.get_db()
     data = db.get_avg_pages_per_day_by_month(12)
     return jsonify(data)
+
+@books_bp.route('/api/books-by-type')
+def books_by_type():
+    """API endpoint returning book counts by type for chart."""
+    db = current_app.get_db()
+    data = db.get_books_by_type_stats(6)
+    return jsonify(data)
