@@ -4,86 +4,175 @@
 
 {% block extra_css %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/manage_types.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/add_edit_type.css') }}">
 {% endblock %}
 
 {% block content %}
-<div class="card type-form-page">
-    <div class="header-row">
-        <h2><i class="ph ph-tag"></i> {{ 'Edit' if type else 'Add' }} Book Type</h2>
+<div class="form-card narrow">
+    <div class="form-header">
+        <div>
+            <h2>
+                <i class="ph ph-tag page-icon"></i>
+                {{ 'Edit' if type else 'Add' }} Book Type
+            </h2>
+            <p class="page-subtitle">Categorize your books by type</p>
+        </div>
+        <a href="{{ url_for('types.manage_types') }}" class="btn btn-secondary">
+            <i class="ph ph-arrow-left"></i> Back
+        </a>
     </div>
     
     {% if error %}
-    <div class="error-message">{{ error }}</div>
+    <div class="error-box">{{ error }}</div>
     {% endif %}
     
-    <form method="POST" class="type-form">
+    <form method="POST" id="type-form" data-type-id="{{ type.id if type else '' }}">
         <div class="form-group">
-            <label for="name">Name (max 9 characters)</label>
+            <label for="name">Type Name</label>
             <input type="text" id="name" name="name" maxlength="9" required
                    value="{{ type.name if type else '' }}"
-                   placeholder="e.g. Fiction">
-            <span class="char-count"><span id="name-count">{{ type.name|length if type else 0 }}</span>/9</span>
+                   placeholder="Max 9 characters">
+            <small class="helper-text">
+                Keep it short for clean badge display (e.g., "Fiction", "Non-Fict", "Memoir")
+            </small>
         </div>
         
         <div class="form-group">
-            <label>Color</label>
+            <label>Colour</label>
             <div class="color-picker">
                 {% for color in colors %}
-                <label class="color-option">
-                    <input type="radio" name="color" value="{{ color.hex }}" 
-                           data-bubble="{{ color.bubble }}"
-                           {{ 'checked' if (type and type.color == color.hex) or (not type and loop.first) else '' }}>
-                    <span class="color-swatch" style="background-color: {{ color.hex }};"></span>
-                    <span class="color-name">{{ color.name }}</span>
-                </label>
+                <div class="color-option {% if type and type.color == color.hex %}selected{% endif %}" 
+                     data-hex="{{ color.hex }}"
+                     data-name="{{ color.name }}"
+                     data-bubble="{{ color.bubble }}">
+                    <div class="color-swatch" style="background-color: {{ color.hex }}">
+                        {{ color.name }}
+                    </div>
+                    <div class="checkmark"><i class="ph ph-check"></i></div>
+                </div>
                 {% endfor %}
             </div>
-            <input type="hidden" name="bubble_color" id="bubble_color" 
-                   value="{{ type.bubble_color if type else colors[0].bubble }}">
-        </div>
-        
-        <div class="form-group">
-            <label>Preview</label>
-            <span class="type-badge preview-badge" id="preview-badge"
-                  style="background-color: {{ type.bubble_color if type else colors[0].bubble }}; color: {{ type.color if type else colors[0].hex }};">
-                {{ type.name if type else 'Preview' }}
-            </span>
+            <input type="hidden" id="color" name="color" value="{{ type.color if type else '#9FCFC0' }}">
+            <input type="hidden" id="bubble_color" name="bubble_color" value="{{ type.bubble_color if type else '#E0F2EE' }}">
         </div>
         
         <div class="form-actions">
-            <a href="{{ url_for('types.manage_types') }}" class="btn">Cancel</a>
-            <button type="submit" class="btn btn-primary">{{ 'Save Changes' if type else 'Add Type' }}</button>
+            <a href="{{ url_for('types.manage_types') }}" class="btn btn-secondary">Cancel</a>
+            
+            <div class="action-buttons">
+                {% if type and can_delete %}
+                <button type="button" class="btn btn-danger-light" id="delete-btn">Delete Type</button>
+                {% endif %}
+                <button type="submit" class="btn btn-primary">
+                    {{ 'Save Changes' if type else 'Add Type' }}
+                </button>
+            </div>
         </div>
     </form>
+</div>
+
+<!-- Delete confirmation modal -->
+<div id="deleteModal" class="modal-overlay" style="display: none;">
+    <div class="modal-content">
+        <h3>Delete Book Type?</h3>
+        <p>Are you sure you want to delete "<strong>{{ type.name if type else '' }}</strong>"? This action cannot be undone.</p>
+        <div class="modal-buttons">
+            <button type="button" class="btn btn-secondary" id="cancel-delete">Cancel</button>
+            <button type="button" class="btn btn-danger" id="confirm-delete">Delete Type</button>
+        </div>
+    </div>
+</div>
+
+<!-- Error Modal -->
+<div id="errorModal" class="modal-overlay" style="display: none;">
+    <div class="modal-content">
+        <h3>Cannot Delete Type</h3>
+        <p id="error-message"></p>
+        <div class="modal-buttons">
+            <button type="button" class="btn btn-primary btn-full-width" id="close-error">OK</button>
+        </div>
+    </div>
 </div>
 {% endblock %}
 
 {% block extra_js %}
 <script>
-// Update character count
-document.getElementById('name').addEventListener('input', function() {
-    document.getElementById('name-count').textContent = this.value.length;
-    updatePreview();
+// Color picker
+document.querySelectorAll('.color-option').forEach(option => {
+    option.addEventListener('click', function() {
+        // Remove selected from all
+        document.querySelectorAll('.color-option').forEach(o => o.classList.remove('selected'));
+        // Add selected to clicked
+        this.classList.add('selected');
+        // Update hidden inputs
+        document.getElementById('color').value = this.dataset.hex;
+        document.getElementById('bubble_color').value = this.dataset.bubble;
+    });
+    
+    // If no type yet, select the first one by default
+    {% if not type %}
+    if (!document.querySelector('.color-option.selected')) {
+        document.querySelector('.color-option').classList.add('selected');
+    }
+    {% endif %}
 });
 
-// Update preview when color changes
-document.querySelectorAll('input[name="color"]').forEach(function(radio) {
-    radio.addEventListener('change', function() {
-        document.getElementById('bubble_color').value = this.dataset.bubble;
-        updatePreview();
+// Delete functionality
+const deleteBtn = document.getElementById('delete-btn');
+const deleteModal = document.getElementById('deleteModal');
+const cancelDelete = document.getElementById('cancel-delete');
+const confirmDelete = document.getElementById('confirm-delete');
+const errorModal = document.getElementById('errorModal');
+const errorMessage = document.getElementById('error-message');
+const closeError = document.getElementById('close-error');
+
+if (deleteBtn) {
+    deleteBtn.addEventListener('click', function() {
+        deleteModal.style.display = 'flex';
+    });
+}
+
+if (cancelDelete) {
+    cancelDelete.addEventListener('click', function() {
+        deleteModal.style.display = 'none';
+    });
+}
+
+if (confirmDelete) {
+    confirmDelete.addEventListener('click', async function() {
+        const typeId = document.getElementById('type-form').dataset.typeId;
+        try {
+            const response = await fetch(`/types/${typeId}/delete`, { method: 'POST' });
+            const data = await response.json();
+            
+            if (data.success) {
+                window.location.href = '{{ url_for("types.manage_types") }}';
+            } else {
+                deleteModal.style.display = 'none';
+                errorMessage.textContent = data.error || 'Failed to delete type';
+                errorModal.style.display = 'flex';
+            }
+        } catch (err) {
+            deleteModal.style.display = 'none';
+            errorMessage.textContent = 'Error deleting type';
+            errorModal.style.display = 'flex';
+        }
+    });
+}
+
+if (closeError) {
+    closeError.addEventListener('click', function() {
+        errorModal.style.display = 'none';
+    });
+}
+
+// Close modals on backdrop click
+document.querySelectorAll('.modal-overlay').forEach(modal => {
+    modal.addEventListener('click', function(e) {
+        if (e.target === this) {
+            this.style.display = 'none';
+        }
     });
 });
-
-function updatePreview() {
-    const name = document.getElementById('name').value || 'Preview';
-    const selectedColor = document.querySelector('input[name="color"]:checked');
-    const color = selectedColor ? selectedColor.value : '#9FCFC0';
-    const bubble = selectedColor ? selectedColor.dataset.bubble : '#E0F2EE';
-    
-    const preview = document.getElementById('preview-badge');
-    preview.textContent = name;
-    preview.style.color = color;
-    preview.style.backgroundColor = bubble;
-}
 </script>
 {% endblock %}

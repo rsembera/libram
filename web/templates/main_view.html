@@ -138,7 +138,7 @@
                         <span class="book-number">{{ book.all_time_number }}</span>
                         <span class="year-number">{{ book.yearly_number }}</span>
                         <span class="book-rating">{{ book.rating|rating_star|safe }}</span>
-                        <span class="book-type">{% if book.type_name %}<span class="type-badge" style="background-color: {{ book.type_bubble }}; color: {{ book.type_color }};">{{ book.type_name }}</span>{% endif %}</span>
+                        <span class="book-type">{% if book.type_name %}<span class="type-badge" style="background-color: {{ book.type_color }};">{{ book.type_name }}</span>{% endif %}</span>
                         <span class="book-title">{{ book.title }}</span>
                         <span class="book-author">{{ book.author }}</span>
                         <span class="book-pages">{{ book.pages }}</span>
@@ -160,7 +160,7 @@
                         <div class="compact-header">
                             <span class="book-number">#{{ book.all_time_number }} (Yr. #{{ book.yearly_number }})</span>
                         </div>
-                        <div class="book-title"><span class="book-rating">{{ book.rating|rating_star|safe }}</span>{% if book.type_name %} <span class="type-badge" style="background-color: {{ book.type_bubble }}; color: {{ book.type_color }};">{{ book.type_name }}</span>{% endif %} {{ book.title }}</div>
+                        <div class="book-title"><span class="book-rating">{{ book.rating|rating_star|safe }}</span>{% if book.type_name %} <span class="type-badge" style="background-color: {{ book.type_color }};">{{ book.type_name }}</span>{% endif %} {{ book.title }}</div>
                         <div class="book-author">{{ book.author }}</div>
                         <div class="compact-meta">
                             <span>{{ book.pages }} pages</span>

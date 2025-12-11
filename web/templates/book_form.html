@@ -146,11 +146,11 @@
                             {% if book and book.type_id %}
                                 {% for t in book_types %}
                                     {% if t.id == book.type_id %}
-                                        <span class="type-badge" style="background-color: {{ t.bubble_color }}; color: {{ t.color }};">{{ t.name }}</span>
+                                        <span class="type-badge" style="background-color: {{ t.color }};">{{ t.name }}</span>
                                     {% endif %}
                                 {% endfor %}
                             {% elif book_types %}
-                                <span class="type-badge" style="background-color: {{ book_types[0].bubble_color }}; color: {{ book_types[0].color }};">{{ book_types[0].name }}</span>
+                                <span class="type-badge" style="background-color: {{ book_types[0].color }};">{{ book_types[0].name }}</span>
                             {% else %}
                                 No types
                             {% endif %}
@@ -160,7 +160,7 @@
                     <div class="custom-dropdown-menu">
                         {% for t in book_types %}
                         <div class="custom-dropdown-option" data-value="{{ t.id }}" data-color="{{ t.color }}" data-bubble="{{ t.bubble_color }}" onclick="selectType(this)">
-                            <span class="type-badge" style="background-color: {{ t.bubble_color }}; color: {{ t.color }};">{{ t.name }}</span>
+                            <span class="type-badge" style="background-color: {{ t.color }};">{{ t.name }}</span>
                         </div>
                         {% endfor %}
                     </div>

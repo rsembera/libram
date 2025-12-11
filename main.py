@@ -6,6 +6,7 @@ Entry point for the application.
 
 import os
 import sys
+import logging
 import webbrowser
 import time
 from pathlib import Path
@@ -16,9 +17,24 @@ sys.path.insert(0, str(PROJECT_ROOT))
 
 from web.app import create_app
 
+
+class FontRequestFilter(logging.Filter):
+    """Filter out noisy font and static file requests from logs."""
+    def filter(self, record):
+        msg = record.getMessage()
+        # Filter out font files and common static assets
+        if '/static/fonts/' in msg:
+            return False
+        return True
+
+
 def main():
     """Start the Libram application."""
     app = create_app()
+    
+    # Suppress noisy font request logs
+    log = logging.getLogger('werkzeug')
+    log.addFilter(FontRequestFilter())
     
     # Get port from environment or use default
     port = int(os.environ.get('LIBRAM_PORT', 8090))

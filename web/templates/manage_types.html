@@ -7,50 +7,62 @@
 {% endblock %}
 
 {% block content %}
-<div class="card types-page">
-    <div class="header-row">
+<div class="form-card types-page">
+    <div class="form-header">
         <div>
-            <h2><i class="ph ph-tag"></i> Manage Book Types</h2>
+            <h2>
+                <i class="ph ph-tag page-icon"></i>
+                Manage Book Types
+            </h2>
             <p class="page-subtitle">Categorize your books by type</p>
         </div>
-        <a href="{{ url_for('types.add_type') }}" class="btn btn-primary">Add Type</a>
+        <a href="{{ url_for('types.add_type') }}" class="btn btn-primary">
+            <i class="ph ph-plus"></i> Add Type
+        </a>
     </div>
     
+    <div class="section-header">Book Types</div>
     <table class="types-table">
         <thead>
             <tr>
                 <th>Name</th>
-                <th>Color</th>
-                <th class="text-center">Books</th>
-                <th class="text-right">Actions</th>
+                <th>Colour</th>
+                <th class="text-center">Status</th>
             </tr>
         </thead>
         <tbody>
             {% for type in types %}
-            <tr>
+            <tr onclick="window.location='{{ url_for('types.edit_type', type_id=type.id) }}'">
                 <td>
-                    <span class="type-badge" style="background-color: {{ type.bubble_color }}; color: {{ type.color }};">
-                        {{ type.name }}
+                    <strong>{{ type.name }}</strong>
+                </td>
+                <td>
+                    <span class="type-badge" style="background-color: {{ type.color }}">
+                        {{ type.color_name }}
                     </span>
                 </td>
-                <td>
-                    <span class="color-swatch" style="background-color: {{ type.color }};"></span>
-                </td>
-                <td class="text-center">{{ type.book_count }}</td>
-                <td class="text-right">
-                    <a href="{{ url_for('types.edit_type', type_id=type.id) }}" class="btn btn-sm">Edit</a>
+                <td class="text-center">
                     {% if type.book_count == 0 and types|length > 1 %}
-                    <button onclick="confirmDelete({{ type.id }}, '{{ type.name }}')" class="btn btn-sm btn-danger">Delete</button>
+                    <span class="deletable-indicator">
+                        <i class="ph ph-check"></i> EDITABLE
+                    </span>
+                    {% else %}
+                    <span class="editable-indicator">
+                        <i class="ph ph-check"></i> EDITABLE
+                    </span>
                     {% endif %}
                 </td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
+    <small class="helper-text">
+        Click any row to edit. Types can be renamed, recoloured, or deleted (if no books assigned).
+    </small>
     
-    <div class="back-link">
-        <a href="{{ url_for('books.index') }}"><i class="ph ph-arrow-left"></i> Back to Books</a>
-    </div>
+    <a href="{{ url_for('books.index') }}" class="btn btn-secondary back-btn">
+        <i class="ph ph-arrow-left"></i> Back
+    </a>
 </div>
 
 <!-- Delete Confirmation Modal -->
@@ -59,7 +71,7 @@
         <h3>Delete Type</h3>
         <p>Are you sure you want to delete "<span id="delete-type-name"></span>"?</p>
         <div class="modal-buttons">
-            <button onclick="closeDeleteModal()" class="btn">Cancel</button>
+            <button onclick="closeDeleteModal()" class="btn btn-secondary">Cancel</button>
             <button onclick="doDelete()" class="btn btn-danger">Delete</button>
         </div>
     </div>

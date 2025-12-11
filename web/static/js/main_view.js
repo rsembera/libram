@@ -196,10 +196,10 @@ function getCookie(name) {
 }
 
 /* ============================================
-   CHART (BOOKS PER MONTH / AVG PAGES PER DAY)
+   CHART (BOOKS PER MONTH / AVG PAGES PER DAY / BY TYPE)
    ============================================ */
-let currentChartView = 'books'; // 'books' or 'pages'
-let chartDataCache = { books: null, pages: null };
+let currentChartView = 'books'; // 'books', 'pages', or 'types'
+let chartDataCache = { books: null, pages: null, types: null };
 
 async function initBooksChart() {
     const container = document.getElementById('books-chart');
@@ -235,6 +235,21 @@ async function toggleChartView() {
             }
         }
         renderPagesChart(container, chartDataCache.pages);
+    } else if (currentChartView === 'pages') {
+        // Switch to by type
+        currentChartView = 'types';
+        titleEl.textContent = 'By Type';
+        
+        if (!chartDataCache.types) {
+            try {
+                const response = await fetch('/api/books-by-type');
+                chartDataCache.types = await response.json();
+            } catch (error) {
+                console.error('Failed to load types chart data:', error);
+                return;
+            }
+        }
+        renderTypesChart(container, chartDataCache.types);
     } else {
         // Switch to books per month
         currentChartView = 'books';
@@ -375,6 +390,61 @@ function renderPagesChart(container, data) {
             svg += `<text x="${x + barWidth / 2}" y="${height - 4}" 
                           text-anchor="middle" font-size="9" fill="${textColor}">${d.label}</text>`;
         }
+    });
+    
+    svg += '</svg>';
+    container.innerHTML = svg;
+}
+
+function renderTypesChart(container, data) {
+    // Get theme colors
+    const styles = getComputedStyle(document.documentElement);
+    const textColor = styles.getPropertyValue('--text-secondary').trim() || '#4B5563';
+    const textPrimary = styles.getPropertyValue('--text-primary').trim() || '#1F2937';
+    
+    // Chart dimensions
+    const width = container.clientWidth || 280;
+    const height = container.clientHeight || 100;
+    const padding = { top: 4, right: 8, bottom: 4, left: 8 };
+    
+    const chartWidth = width - padding.left - padding.right;
+    const chartHeight = height - padding.top - padding.bottom;
+    
+    // Find max count for scaling
+    const maxCount = Math.max(...data.map(d => d.count), 1);
+    
+    // Calculate bar dimensions
+    const barCount = data.length;
+    const barGap = 6;
+    const barHeight = Math.min(18, (chartHeight - (barCount - 1) * barGap) / barCount);
+    const labelWidth = 60; // Space for type name on left
+    const countWidth = 24; // Space for count on right
+    const barMaxWidth = chartWidth - labelWidth - countWidth - 8;
+    
+    // Create SVG
+    let svg = `<svg width="${width}" height="${height}" class="types-chart-svg">`;
+    
+    // Bars with labels
+    data.forEach((d, i) => {
+        const y = padding.top + i * (barHeight + barGap);
+        const barWidth = maxCount > 0 ? (d.count / maxCount) * barMaxWidth : 0;
+        
+        // Type name (left)
+        svg += `<text x="${padding.left}" y="${y + barHeight / 2 + 4}" 
+                      font-size="11" font-weight="500" fill="${textPrimary}">${d.name}</text>`;
+        
+        // Bar (use the type's own color)
+        if (barWidth > 0) {
+            svg += `<rect x="${padding.left + labelWidth}" y="${y}" 
+                          width="${barWidth}" height="${barHeight}" 
+                          fill="${d.color}" rx="3" class="chart-bar">
+                      <title>${d.name}: ${d.count} book${d.count !== 1 ? 's' : ''}</title>
+                    </rect>`;
+        }
+        
+        // Count (right of bar)
+        svg += `<text x="${padding.left + labelWidth + barWidth + 6}" y="${y + barHeight / 2 + 4}" 
+                      font-size="10" fill="${textColor}">${d.count}</text>`;
     });
     
     svg += '</svg>';

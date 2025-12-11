@@ -23,6 +23,13 @@ COLOR_PALETTE = [
     {'hex': '#E1BEE7', 'name': 'Orchid', 'bubble': '#F7EFF9'},
 ]
 
+# Helper to get color name from hex
+def get_color_name(hex_color):
+    for c in COLOR_PALETTE:
+        if c['hex'].upper() == hex_color.upper():
+            return c['name']
+    return hex_color
+
 
 @types_bp.route('/types')
 def manage_types():
@@ -30,9 +37,10 @@ def manage_types():
     db = current_app.get_db()
     all_types = db.get_all_book_types()
     
-    # Add book count to each type
+    # Add book count and color name to each type
     for t in all_types:
         t['book_count'] = db.get_books_count_by_type(t['id'])
+        t['color_name'] = get_color_name(t['color'])
     
     return render_template('manage_types.html', types=all_types)
 
@@ -66,6 +74,11 @@ def edit_type(type_id):
     if not type_obj:
         return redirect(url_for('types.manage_types'))
     
+    # Check if type can be deleted
+    book_count = db.get_books_count_by_type(type_id)
+    all_types = db.get_all_book_types()
+    can_delete = book_count == 0 and len(all_types) > 1
+    
     if request.method == 'POST':
         name = request.form.get('name', '').strip()[:9]
         color = request.form.get('color')
@@ -77,9 +90,11 @@ def edit_type(type_id):
                 return redirect(url_for('types.manage_types'))
             except Exception as e:
                 error = "A type with that name already exists." if "UNIQUE" in str(e) else str(e)
-                return render_template('add_edit_type.html', type=type_obj, colors=COLOR_PALETTE, error=error)
+                return render_template('add_edit_type.html', type=type_obj, colors=COLOR_PALETTE, 
+                                       can_delete=can_delete, book_count=book_count, error=error)
     
-    return render_template('add_edit_type.html', type=type_obj, colors=COLOR_PALETTE)
+    return render_template('add_edit_type.html', type=type_obj, colors=COLOR_PALETTE,
+                           can_delete=can_delete, book_count=book_count)
 
 
 @types_bp.route('/types/<int:type_id>/delete', methods=['POST'])
