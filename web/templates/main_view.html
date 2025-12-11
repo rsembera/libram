@@ -81,9 +81,19 @@
     </div>
     
     <div class="controls-right">
-        <a href="{{ url_for('books.add_book') }}" class="btn btn-primary">
-            <i class="ph ph-plus" class="icon-sm icon-inline"></i> Add Book
-        </a>
+        <div class="manage-dropdown">
+            <button type="button" class="btn btn-primary" onclick="toggleManageDropdown()">
+                <i class="ph ph-gear"></i> Manage <i class="ph ph-caret-down"></i>
+            </button>
+            <div class="manage-dropdown-menu" id="manage-dropdown-menu">
+                <a href="{{ url_for('books.add_book') }}" class="manage-dropdown-option">
+                    <i class="ph ph-plus"></i> Add Book
+                </a>
+                <a href="{{ url_for('types.manage_types') }}" class="manage-dropdown-option">
+                    <i class="ph ph-tag"></i> Edit Types
+                </a>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -94,6 +104,7 @@
         <div class="col-number">#</div>
         <div class="col-year-num">Yr. #</div>
         <div class="col-rating">Rating</div>
+        <div class="col-type">Type</div>
         <div class="col-title">Title</div>
         <div class="col-author">Author</div>
         <div class="col-pages">Pages</div>
@@ -127,6 +138,7 @@
                         <span class="book-number">{{ book.all_time_number }}</span>
                         <span class="year-number">{{ book.yearly_number }}</span>
                         <span class="book-rating">{{ book.rating|rating_star|safe }}</span>
+                        <span class="book-type">{% if book.type_name %}<span class="type-badge" style="background-color: {{ book.type_bubble }}; color: {{ book.type_color }};">{{ book.type_name }}</span>{% endif %}</span>
                         <span class="book-title">{{ book.title }}</span>
                         <span class="book-author">{{ book.author }}</span>
                         <span class="book-pages">{{ book.pages }}</span>
@@ -148,7 +160,7 @@
                         <div class="compact-header">
                             <span class="book-number">#{{ book.all_time_number }} (Yr. #{{ book.yearly_number }})</span>
                         </div>
-                        <div class="book-title"><span class="book-rating">{{ book.rating|rating_star|safe }}</span> {{ book.title }}</div>
+                        <div class="book-title"><span class="book-rating">{{ book.rating|rating_star|safe }}</span>{% if book.type_name %} <span class="type-badge" style="background-color: {{ book.type_bubble }}; color: {{ book.type_color }};">{{ book.type_name }}</span>{% endif %} {{ book.title }}</div>
                         <div class="book-author">{{ book.author }}</div>
                         <div class="compact-meta">
                             <span>{{ book.pages }} pages</span>

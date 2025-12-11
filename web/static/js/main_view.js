@@ -380,3 +380,17 @@ function renderPagesChart(container, data) {
     svg += '</svg>';
     container.innerHTML = svg;
 }
+
+
+// Manage dropdown
+function toggleManageDropdown() {
+    document.getElementById('manage-dropdown-menu').classList.toggle('open');
+}
+
+// Close dropdown when clicking outside
+document.addEventListener('click', function(e) {
+    const dropdown = document.querySelector('.manage-dropdown');
+    if (dropdown && !dropdown.contains(e.target)) {
+        document.getElementById('manage-dropdown-menu')?.classList.remove('open');
+    }
+});

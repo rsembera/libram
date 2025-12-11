@@ -118,10 +118,12 @@ def create_app():
     from web.blueprints.books import books_bp
     from web.blueprints.settings import settings_bp
     from web.blueprints.backups import backups_bp
+    from web.blueprints.types import types_bp
     
     app.register_blueprint(auth_bp)
     app.register_blueprint(books_bp)
     app.register_blueprint(settings_bp, url_prefix='/settings')
     app.register_blueprint(backups_bp, url_prefix='/backups')
+    app.register_blueprint(types_bp)
     
     return app

@@ -90,7 +90,7 @@
             </div>
         </div>
         
-        <!-- Rating -->
+        <!-- Rating and Type -->
         <div class="form-row-half">
             <div class="form-group">
                 <label>Rating</label>
@@ -133,6 +133,36 @@
                         <div class="custom-dropdown-option" data-value="0" onclick="selectRating(this)">
                             <span class="rating-star rating-none">☆</span> No rating
                         </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label>Type</label>
+                <input type="hidden" id="type_id" name="type_id" value="{{ book.type_id if book and book.type_id else (book_types[0].id if book_types else '') }}">
+                <div class="custom-dropdown" id="type-dropdown">
+                    <button type="button" class="custom-dropdown-trigger" onclick="toggleTypeDropdown()">
+                        <span id="type-selected-text">
+                            {% if book and book.type_id %}
+                                {% for t in book_types %}
+                                    {% if t.id == book.type_id %}
+                                        <span class="type-badge" style="background-color: {{ t.bubble_color }}; color: {{ t.color }};">{{ t.name }}</span>
+                                    {% endif %}
+                                {% endfor %}
+                            {% elif book_types %}
+                                <span class="type-badge" style="background-color: {{ book_types[0].bubble_color }}; color: {{ book_types[0].color }};">{{ book_types[0].name }}</span>
+                            {% else %}
+                                No types
+                            {% endif %}
+                        </span>
+                        <i class="ph ph-caret-down"></i>
+                    </button>
+                    <div class="custom-dropdown-menu">
+                        {% for t in book_types %}
+                        <div class="custom-dropdown-option" data-value="{{ t.id }}" data-color="{{ t.color }}" data-bubble="{{ t.bubble_color }}" onclick="selectType(this)">
+                            <span class="type-badge" style="background-color: {{ t.bubble_color }}; color: {{ t.color }};">{{ t.name }}</span>
+                        </div>
+                        {% endfor %}
                     </div>
                 </div>
             </div>
@@ -239,6 +269,7 @@ document.getElementById('delete-modal')?.addEventListener('click', function(e) {
 // Rating dropdown functions
 function toggleRatingDropdown() {
     document.getElementById('rating-dropdown').classList.toggle('open');
+    document.getElementById('type-dropdown')?.classList.remove('open');
 }
 
 function selectRating(element) {
@@ -254,11 +285,34 @@ function selectRating(element) {
     document.getElementById('rating-dropdown').classList.remove('open');
 }
 
+// Type dropdown functions
+function toggleTypeDropdown() {
+    document.getElementById('type-dropdown').classList.toggle('open');
+    document.getElementById('rating-dropdown')?.classList.remove('open');
+}
+
+function selectType(element) {
+    const value = element.dataset.value;
+    
+    // Update hidden input
+    document.getElementById('type_id').value = value;
+    
+    // Update displayed text
+    document.getElementById('type-selected-text').innerHTML = element.innerHTML;
+    
+    // Close dropdown
+    document.getElementById('type-dropdown').classList.remove('open');
+}
+
 // Close dropdown when clicking outside
 document.addEventListener('click', function(e) {
-    const dropdown = document.getElementById('rating-dropdown');
-    if (dropdown && !dropdown.contains(e.target)) {
-        dropdown.classList.remove('open');
+    const ratingDropdown = document.getElementById('rating-dropdown');
+    if (ratingDropdown && !ratingDropdown.contains(e.target)) {
+        ratingDropdown.classList.remove('open');
+    }
+    const typeDropdown = document.getElementById('type-dropdown');
+    if (typeDropdown && !typeDropdown.contains(e.target)) {
+        typeDropdown.classList.remove('open');
     }
 });
 </script>

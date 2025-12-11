@@ -96,6 +96,8 @@ def add_book():
         days_paused = int(days_paused) if days_paused.isdigit() else 0
         did_not_finish = request.form.get('did_not_finish') == '1'
         notes = request.form.get('notes', '').strip()
+        type_id = request.form.get('type_id', '')
+        type_id = int(type_id) if type_id.isdigit() else None
         
         # Validation
         errors = []
@@ -113,7 +115,8 @@ def add_book():
                                   mode='add',
                                   errors=errors,
                                   book=request.form,
-                                  **_get_date_options())
+                                  **_get_date_options(),
+                                  **_get_form_context())
         
         # Create book
         book_id = db.add_book(
@@ -125,7 +128,8 @@ def add_book():
             days_paused=days_paused,
             rating=rating,
             did_not_finish=did_not_finish,
-            notes=notes
+            notes=notes,
+            type_id=type_id
         )
         
         return redirect(url_for('books.index'))
@@ -134,7 +138,8 @@ def add_book():
     return render_template('book_form.html',
                           mode='add',
                           book=None,
-                          **_get_date_options())
+                          **_get_date_options(),
+                          **_get_form_context())
 
 
 @books_bp.route('/book/<int:book_id>', methods=['GET', 'POST'])
@@ -166,6 +171,8 @@ def edit_book(book_id):
         days_paused = int(days_paused) if days_paused.isdigit() else 0
         did_not_finish = request.form.get('did_not_finish') == '1'
         notes = request.form.get('notes', '').strip()
+        type_id = request.form.get('type_id', '')
+        type_id = int(type_id) if type_id.isdigit() else None
         
         # Validation
         errors = []
@@ -184,7 +191,8 @@ def edit_book(book_id):
                                   errors=errors,
                                   book=request.form,
                                   book_id=book_id,
-                                  **_get_date_options())
+                                  **_get_date_options(),
+                                  **_get_form_context())
         
         # Update book
         db.update_book(book_id,
@@ -196,7 +204,8 @@ def edit_book(book_id):
             days_paused=days_paused,
             rating=rating,
             did_not_finish=did_not_finish,
-            notes=notes
+            notes=notes,
+            type_id=type_id
         )
         
         return redirect(url_for('books.index'))
@@ -206,7 +215,8 @@ def edit_book(book_id):
                           mode='edit',
                           book=book,
                           book_id=book_id,
-                          **_get_date_options())
+                          **_get_date_options(),
+                          **_get_form_context())
 
 
 @books_bp.route('/export/csv')
@@ -282,6 +292,19 @@ def _parse_date_from_form(field_name: str) -> date:
 def _get_date_options() -> dict:
     """Get date options (kept for backward compatibility)."""
     return {}
+
+
+def _get_form_context() -> dict:
+    """Get common context for book forms including book types and rating names."""
+    db = current_app.get_db()
+    book_types = db.get_all_book_types()
+    rating_5_name = db.get_setting('rating_5_name', 'Green')
+    rating_1_name = db.get_setting('rating_1_name', 'Black')
+    return {
+        'book_types': book_types,
+        'rating_5_name': rating_5_name,
+        'rating_1_name': rating_1_name
+    }
 
 
 @books_bp.route('/api/books-per-month')

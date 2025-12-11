@@ -599,6 +599,18 @@ html.font-size-l { font-size: 20px; }
 }
 
 /* ============================================
+   TYPE BADGE
+   ============================================ */
+.type-badge {
+    display: inline-block;
+    padding: 0.125rem 0.5rem;
+    border-radius: 0.25rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+/* ============================================
    RESPONSIVE
    ============================================ */
 @media (max-width: 768px) {
