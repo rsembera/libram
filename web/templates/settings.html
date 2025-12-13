@@ -88,8 +88,8 @@
                 <label>Upload Background Image</label>
                 <input type="file" id="background-upload" accept="image/*" style="display: none;">
                 <div class="upload-row">
-                    <button type="button" onclick="document.getElementById('background-upload').click()" class="btn btn-sm">
-                        <i class="ph ph-image" class="icon-sm icon-inline"></i> Choose Image
+                    <button type="button" onclick="document.getElementById('background-upload').click()" class="btn btn-sm btn-secondary">
+                        <i class="ph ph-image"></i> Choose Image
                     </button>
                     <span id="upload-filename" class="text-muted text-sm"></span>
                     <button type="button" onclick="uploadBackground()" id="upload-button" class="btn btn-sm btn-primary hidden">
@@ -198,8 +198,8 @@
         <div class="settings-section-content">
             <div class="form-group">
                 <label>Password</label>
-                <a href="{{ url_for('auth.change_password') }}" class="btn btn-sm">
-                    <i class="ph ph-key" class="icon-sm icon-inline"></i>
+                <a href="{{ url_for('auth.change_password') }}" class="btn btn-sm btn-secondary">
+                    <i class="ph ph-key"></i>
                     Change Password
                 </a>
             </div>
