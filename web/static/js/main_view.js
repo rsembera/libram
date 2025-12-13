@@ -1,6 +1,6 @@
 /* Libram - Main View JavaScript */
 
-document.addEventListener('DOMContentLoaded', function() {
+function init() {
     // Initialize view mode
     initViewMode();
     
@@ -16,7 +16,14 @@ document.addEventListener('DOMContentLoaded', function() {
     // Start time update
     updateTime();
     setInterval(updateTime, 60000);
-});
+}
+
+// Run init when DOM is ready (or immediately if already loaded)
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+} else {
+    init();
+}
 
 /* ============================================
    VIEW MODE
@@ -76,20 +83,74 @@ function toggleYear(yearId) {
 function initSearch() {
     const searchInput = document.querySelector('.search-box input[name="search"]');
     const clearBtn = document.querySelector('.clear-search');
+    const form = document.querySelector('.search-box');
     
     if (searchInput && clearBtn) {
-        // Show/hide clear button
+        // Prevent form submission - we're doing client-side filtering
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+        });
+        
+        // Filter as you type
         searchInput.addEventListener('input', function() {
-            clearBtn.style.display = this.value ? 'block' : 'none';
+            const query = this.value.toLowerCase().trim();
+            clearBtn.style.display = query ? 'block' : 'none';
+            filterBooks(query);
         });
         
         // Clear search
         clearBtn.addEventListener('click', function() {
             searchInput.value = '';
             clearBtn.style.display = 'none';
-            searchInput.form.submit();
+            filterBooks('');
+            searchInput.focus();
         });
     }
+}
+
+function filterBooks(query) {
+    const yearSections = document.querySelectorAll('.year-section');
+    
+    yearSections.forEach(section => {
+        const bookCards = section.querySelectorAll('.book-card');
+        let visibleCount = 0;
+        
+        bookCards.forEach(card => {
+            const title = card.dataset.title || '';
+            const author = card.dataset.author || '';
+            const matches = !query || title.includes(query) || author.includes(query);
+            
+            card.style.display = matches ? '' : 'none';
+            if (matches) visibleCount++;
+        });
+        
+        // Update year header count and visibility
+        const header = section.querySelector('.year-header');
+        const countSpan = section.querySelector('.entry-count');
+        const content = section.querySelector('.year-content');
+        
+        if (query) {
+            // When searching, show sections with matches, hide empty ones
+            section.style.display = visibleCount > 0 ? '' : 'none';
+            if (countSpan) {
+                countSpan.textContent = `${visibleCount} Book${visibleCount !== 1 ? 's' : ''}`;
+            }
+            // Expand sections with matches
+            if (visibleCount > 0 && content) {
+                content.classList.add('expanded');
+                const icon = section.querySelector('[id$="-icon"]');
+                if (icon) icon.textContent = '▼';
+            }
+        } else {
+            // When not searching, show all sections
+            section.style.display = '';
+            // Reset count from original
+            const originalCount = bookCards.length;
+            if (countSpan) {
+                countSpan.textContent = `${originalCount} Book${originalCount !== 1 ? 's' : ''}`;
+            }
+        }
+    });
 }
 
 /* ============================================

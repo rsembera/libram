@@ -131,6 +131,8 @@
                 
                 {% for book in year_group.books %}
                 <div class="book-card {% if book.did_not_finish %}did-not-finish{% endif %}"
+                     data-title="{{ book.title|lower }}"
+                     data-author="{{ book.author|lower }}"
                      onclick="window.location='{{ url_for('books.edit_book', book_id=book.id) }}'">
                     
                     <!-- Detailed View Content -->
