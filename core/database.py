@@ -1,52 +1,38 @@
 """
 Libram Database Module
-SQLCipher encrypted database for book tracking.
+SQLite database for book tracking.
 """
 
 import os
 import time
 import hashlib
+import sqlite3
 from pathlib import Path
 from datetime import datetime, date
 
-# Try to import sqlcipher3, fall back to sqlite3 for development
-try:
-    import sqlcipher3 as sqlite3
-    SQLCIPHER_AVAILABLE = True
-except ImportError:
-    import sqlite3
-    SQLCIPHER_AVAILABLE = False
-    print("⚠️  SQLCipher not available, using unencrypted SQLite")
-
 
 class Database:
-    """Encrypted SQLite database for Libram."""
+    """SQLite database for Libram."""
     
-    def __init__(self, db_path: str = None, password: str = None):
+    def __init__(self, db_path: str = None):
         """
         Initialize database connection.
         
         Args:
             db_path: Path to database file. Defaults to ~/libram/data/libram.db
-            password: Encryption password. Required for new databases.
         """
         if db_path is None:
             db_path = os.path.expanduser('~/libram/data/libram.db')
         
         self.db_path = db_path
-        self.password = password
         self.conn = None
         
         # Ensure data directory exists
         os.makedirs(os.path.dirname(db_path), exist_ok=True)
     
     def connect(self):
-        """Open database connection with encryption."""
+        """Open database connection."""
         self.conn = sqlite3.connect(self.db_path)
-        
-        # Enable SQLCipher encryption if available and password provided
-        if SQLCIPHER_AVAILABLE and self.password:
-            self.conn.execute(f"PRAGMA key = '{self.password}'")
         
         # Enable foreign keys
         self.conn.execute("PRAGMA foreign_keys = ON")
