@@ -11,6 +11,7 @@ env/
 # Database
 data/*.db
 data/backups/
+backups/
 
 # IDE
 .idea/
