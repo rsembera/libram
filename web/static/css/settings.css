@@ -63,6 +63,34 @@ details[open] .settings-section-header .arrow {
     max-width: 350px;
 }
 
+/* Native select styling to match custom dropdowns */
+.settings-section-content select {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 2px solid var(--border-color);
+    border-radius: 0.75rem;
+    font-size: 0.9375rem;
+    font-family: inherit;
+    color: var(--text-primary);
+    background: var(--bg-card);
+    cursor: pointer;
+    transition: border-color 0.2s;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 256 256'%3E%3Cpath fill='%236B7280' d='M213.66 101.66l-80 80a8 8 0 0 1-11.32 0l-80-80a8 8 0 0 1 11.32-11.32L128 164.69l74.34-74.35a8 8 0 0 1 11.32 11.32z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.75rem center;
+    padding-right: 2.5rem;
+}
+
+.settings-section-content select:hover {
+    border-color: var(--accent-light);
+}
+
+.settings-section-content select:focus {
+    outline: none;
+    border-color: var(--accent-primary);
+}
+
 /* About section */
 .about-section {
     text-align: center;

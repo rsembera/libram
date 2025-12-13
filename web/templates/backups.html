@@ -37,10 +37,10 @@
             </div>
             <div class="backup-actions">
                 <a href="{{ url_for('backups.download_backup', filename=backup.filename) }}" 
-                   class="btn btn-sm btn-icon" title="Download">
+                   class="btn btn-sm btn-icon btn-secondary" title="Download">
                     <i class="ph ph-download-simple"></i>
                 </a>
-                <button class="btn btn-sm btn-icon" 
+                <button class="btn btn-sm btn-icon btn-secondary" 
                         onclick="confirmRestore('{{ backup.filename }}')" 
                         title="Restore">
                     <i class="ph ph-arrow-counter-clockwise"></i>
