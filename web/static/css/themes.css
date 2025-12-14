@@ -1,311 +1,317 @@
 /* ============================================
    LIBRAM THEME SYSTEM
-   Adapted from Mirror's color palettes
+   Seven distinct reading atmospheres
    ============================================ */
 
 /* Default Theme - Quiet Sky (purple/lavender) */
 :root {
-    /* Page backgrounds - darker for contrast */
-    --bg-page: #d8d4e8;
-    --bg-page-alt: #e0dce8;
+    /* Page backgrounds - rich purple-grey */
+    --bg-page: #c5c0d8;
+    --bg-page-alt: #cdc8de;
     
-    /* Card backgrounds */
-    --bg-card: #ffffff;
-    --bg-card-alt: #f4f2f8;
-    --bg-card-hover: #eeeaF4;
+    /* Card backgrounds - warm cream with lavender tint */
+    --bg-card: #f8f6fc;
+    --bg-card-alt: #f0eef6;
+    --bg-card-hover: #e8e4f2;
     
-    /* Info card accent colors (for the 3 stat cards) */
-    --bg-card-1: #E8E4F0;
-    --bg-card-2: #DCD8E8;
-    --bg-card-3: #D0CCE0;
+    /* Info card accent colors */
+    --bg-card-1: #e8e0f4;
+    --bg-card-2: #dcd4ec;
+    --bg-card-3: #d0c8e4;
     
     /* Text colors */
-    --text-primary: #3a3545;
-    --text-secondary: #6a6575;
-    --text-muted: #8a8595;
+    --text-primary: #2d2640;
+    --text-secondary: #5a5070;
+    --text-muted: #7a7090;
     --text-on-accent: #ffffff;
     
-    /* Accent colors */
-    --accent-primary: #9B9FD8;
-    --accent-hover: #7b80c0;
-    --accent-light: #c5c8e8;
+    /* Accent colors - richer purple */
+    --accent-primary: #7c6fb0;
+    --accent-hover: #6558a0;
+    --accent-light: #b8b0d8;
     
-    /* Borders, dividers, and shadows */
-    --border-color: #c8c4d8;
-    --divider-color: #9B9FD8;
-    --chart-grid: #c8c4d8;
-    --shadow-color: rgba(155,159,216,0.2);
+    /* Borders, dividers */
+    --border-color: #b0a8c8;
+    --divider-color: #8878b0;
+    --chart-grid: #c0b8d0;
+    --shadow-color: rgba(100,80,140,0.15);
     
     /* Button colors */
-    --btn-primary-bg: #9B9FD8;
+    --btn-primary-bg: #7c6fb0;
     --btn-primary-text: #ffffff;
-    --btn-secondary-bg: #E8E4F0;
-    --btn-secondary-text: #3a3545;
+    --btn-secondary-bg: #e0dae8;
+    --btn-secondary-text: #2d2640;
     
     /* Chart colors */
-    --chart-bar: #9B9FD8;
-    --chart-bar-alt: #7bc88f;
-    --chart-empty: #E5E7EB;
+    --chart-bar: #7c6fb0;
+    --chart-bar-alt: #5bb87a;
+    --chart-empty: #ddd8e8;
     
     /* Book list */
-    --book-row-even: #ffffff;
-    --book-row-odd: #f5f3fa;
-    --book-row-hover: #eeeaf4;
-    --year-header-bg: #E8E4F0;
+    --book-row-even: #f8f6fc;
+    --book-row-odd: #f0edf8;
+    --book-row-hover: #e6e0f0;
+    --year-header-bg: #ddd6ec;
     
-    /* Rating colors (5-star and 1-star customizable) */
+    /* Rating colors */
     --rating-5-star: #10B981;
     --rating-1-star: #1F2937;
 }
 
-/* Gentle Dawn - Pink/Rose tones */
+/* Gentle Dawn - Pink/Rose - like early morning light */
 [data-theme="gentle-dawn"] {
-    --bg-page: #e8d0d0;
-    --bg-page-alt: #f0d8d8;
+    --bg-page: #dcc0c8;
+    --bg-page-alt: #e4c8d0;
     
-    --bg-card: #ffffff;
-    --bg-card-alt: #faf0f0;
-    --bg-card-hover: #f8e8e8;
+    --bg-card: #fdf8f8;
+    --bg-card-alt: #f8f0f2;
+    --bg-card-hover: #f4e8ec;
     
-    --bg-card-1: #F5E0E0;
-    --bg-card-2: #F0D5D5;
-    --bg-card-3: #E8C8C8;
+    --bg-card-1: #f8e0e4;
+    --bg-card-2: #f0d4da;
+    --bg-card-3: #e8c8d0;
     
-    --text-primary: #4a3535;
-    --text-secondary: #8a6565;
-    --text-muted: #a88585;
+    --text-primary: #402830;
+    --text-secondary: #704858;
+    --text-muted: #906878;
     --text-on-accent: #ffffff;
     
-    --accent-primary: #E8A5A5;
-    --accent-hover: #d88585;
-    --accent-light: #f5d0d0;
+    /* Richer rose accent */
+    --accent-primary: #c46b80;
+    --accent-hover: #b05570;
+    --accent-light: #e8b0c0;
     
-    --border-color: #e0c0c0;
-    --divider-color: #E8A5A5;
-    --chart-grid: #e0c0c0;
-    --shadow-color: rgba(232,165,165,0.2);
+    --border-color: #d0b0b8;
+    --divider-color: #c46b80;
+    --chart-grid: #d8c0c8;
+    --shadow-color: rgba(160,80,100,0.12);
     
-    --btn-primary-bg: #E8A5A5;
+    --btn-primary-bg: #c46b80;
     --btn-primary-text: #ffffff;
-    --btn-secondary-bg: #F5E0E0;
-    --btn-secondary-text: #4a3535;
+    --btn-secondary-bg: #f0dce0;
+    --btn-secondary-text: #402830;
     
-    --chart-bar: #E8A5A5;
-    --chart-bar-alt: #7bc88f;
-    --chart-empty: #F0E5E5;
+    --chart-bar: #c46b80;
+    --chart-bar-alt: #5bb87a;
+    --chart-empty: #e8d8dc;
     
-    --book-row-even: #ffffff;
-    --book-row-odd: #fdf6f6;
-    --book-row-hover: #faeaea;
-    --year-header-bg: #F5E0E0;
+    --book-row-even: #fdf8f8;
+    --book-row-odd: #f8f2f4;
+    --book-row-hover: #f2e8ec;
+    --year-header-bg: #f0d8e0;
 }
 
-/* Warm Ember - Amber/Orange tones */
+/* Warm Ember - Amber/Orange - cozy firelight */
 [data-theme="warm-ember"] {
-    --bg-page: #e8d8c0;
-    --bg-page-alt: #f0e0c8;
+    --bg-page: #d8c4a8;
+    --bg-page-alt: #e0ccb0;
     
-    --bg-card: #ffffff;
-    --bg-card-alt: #fdf6ee;
-    --bg-card-hover: #faf0e0;
+    --bg-card: #fefcf6;
+    --bg-card-alt: #faf6ee;
+    --bg-card-hover: #f6f0e4;
     
-    --bg-card-1: #FAE8D0;
-    --bg-card-2: #F5E0C0;
-    --bg-card-3: #F0D8B0;
+    --bg-card-1: #f8e8d0;
+    --bg-card-2: #f4e0c0;
+    --bg-card-3: #f0d8b0;
     
-    --text-primary: #4a3a2a;
-    --text-secondary: #8a6a4a;
-    --text-muted: #a88a6a;
+    --text-primary: #3d3020;
+    --text-secondary: #685840;
+    --text-muted: #887860;
     --text-on-accent: #ffffff;
     
-    --accent-primary: #F4A460;
-    --accent-hover: #e08d45;
-    --accent-light: #fad4a8;
+    /* Rich amber accent */
+    --accent-primary: #d08030;
+    --accent-hover: #b86a20;
+    --accent-light: #f0c080;
     
-    --border-color: #e0d0b8;
-    --divider-color: #F4A460;
-    --chart-grid: #e0d0b8;
-    --shadow-color: rgba(244,164,96,0.2);
+    --border-color: #d0c0a0;
+    --divider-color: #d08030;
+    --chart-grid: #d8c8b0;
+    --shadow-color: rgba(180,100,30,0.12);
     
-    --btn-primary-bg: #F4A460;
+    --btn-primary-bg: #d08030;
     --btn-primary-text: #ffffff;
-    --btn-secondary-bg: #FAE8D0;
-    --btn-secondary-text: #4a3a2a;
+    --btn-secondary-bg: #f0e4d0;
+    --btn-secondary-text: #3d3020;
     
-    --chart-bar: #F4A460;
-    --chart-bar-alt: #7bc88f;
-    --chart-empty: #F5EDE0;
+    --chart-bar: #d08030;
+    --chart-bar-alt: #5bb87a;
+    --chart-empty: #e8dcc8;
     
-    --book-row-even: #ffffff;
-    --book-row-odd: #fdf9f4;
-    --book-row-hover: #faf3e8;
-    --year-header-bg: #FAE8D0;
+    --book-row-even: #fefcf6;
+    --book-row-odd: #faf6ed;
+    --book-row-hover: #f4eee0;
+    --year-header-bg: #f4e4cc;
 }
 
-/* Garden Path - Green/Sage tones */
+/* Garden Path - Green/Sage - lush and natural */
 [data-theme="garden-path"] {
-    --bg-page: #c0d8c0;
-    --bg-page-alt: #c8e0c8;
+    --bg-page: #a8c8a8;
+    --bg-page-alt: #b0d0b0;
     
-    --bg-card: #ffffff;
-    --bg-card-alt: #f0f7f2;
-    --bg-card-hover: #e8f2ea;
+    --bg-card: #f8fcf8;
+    --bg-card-alt: #f0f6f0;
+    --bg-card-hover: #e4f0e4;
     
-    --bg-card-1: #D8E8D8;
-    --bg-card-2: #C8DCC8;
-    --bg-card-3: #B8D0B8;
+    --bg-card-1: #d8ecd8;
+    --bg-card-2: #c8e0c8;
+    --bg-card-3: #b8d4b8;
     
-    --text-primary: #2d3f2d;
-    --text-secondary: #5d6f5d;
-    --text-muted: #7d8f7d;
+    --text-primary: #1e3020;
+    --text-secondary: #3d5840;
+    --text-muted: #5d7860;
     --text-on-accent: #ffffff;
     
-    --accent-primary: #88B894;
-    --accent-hover: #6fa07b;
-    --accent-light: #c0dcc8;
+    /* Forest green accent */
+    --accent-primary: #4a9058;
+    --accent-hover: #3a7848;
+    --accent-light: #90c8a0;
     
-    --border-color: #b0d0b0;
-    --divider-color: #88B894;
-    --chart-grid: #b0d0b0;
-    --shadow-color: rgba(136,184,148,0.2);
+    --border-color: #98c0a0;
+    --divider-color: #4a9058;
+    --chart-grid: #b0c8b0;
+    --shadow-color: rgba(60,120,70,0.12);
     
-    --btn-primary-bg: #88B894;
+    --btn-primary-bg: #4a9058;
     --btn-primary-text: #ffffff;
-    --btn-secondary-bg: #D8E8D8;
-    --btn-secondary-text: #2d3f2d;
+    --btn-secondary-bg: #d0e4d0;
+    --btn-secondary-text: #1e3020;
     
-    --chart-bar: #88B894;
-    --chart-bar-alt: #5FB3B3;
-    --chart-empty: #E0E8E0;
+    --chart-bar: #4a9058;
+    --chart-bar-alt: #4898a0;
+    --chart-empty: #d0dcd0;
     
-    --book-row-even: #ffffff;
-    --book-row-odd: #f6faf6;
-    --book-row-hover: #eef5ee;
-    --year-header-bg: #D8E8D8;
+    --book-row-even: #f8fcf8;
+    --book-row-odd: #f2f8f2;
+    --book-row-hover: #e8f2e8;
+    --year-header-bg: #cce4cc;
 }
 
-/* Deep Water - Teal/Cyan tones */
+/* Deep Water - Teal/Cyan - oceanic depth */
 [data-theme="deep-water"] {
-    --bg-page: #b8d8d8;
-    --bg-page-alt: #c0e0e0;
+    --bg-page: #98c0c8;
+    --bg-page-alt: #a0c8d0;
     
-    --bg-card: #ffffff;
-    --bg-card-alt: #eff7f7;
-    --bg-card-hover: #e5f0f0;
+    --bg-card: #f6fbfc;
+    --bg-card-alt: #eff6f8;
+    --bg-card-hover: #e4f0f4;
     
-    --bg-card-1: #D0E8E8;
-    --bg-card-2: #C0E0E0;
-    --bg-card-3: #B0D8D8;
+    --bg-card-1: #d0e8ec;
+    --bg-card-2: #c0dce4;
+    --bg-card-3: #b0d0dc;
     
-    --text-primary: #2a3f3f;
-    --text-secondary: #5a6f6f;
-    --text-muted: #7a8f8f;
+    --text-primary: #183038;
+    --text-secondary: #385058;
+    --text-muted: #587078;
     --text-on-accent: #ffffff;
     
-    --accent-primary: #5FB3B3;
-    --accent-hover: #4a9999;
-    --accent-light: #a0d8d8;
+    /* Ocean teal accent */
+    --accent-primary: #2890a0;
+    --accent-hover: #1c7888;
+    --accent-light: #78c8d8;
     
-    --border-color: #a0d0d0;
-    --divider-color: #5FB3B3;
-    --chart-grid: #a0d0d0;
-    --shadow-color: rgba(95,179,179,0.2);
+    --border-color: #90b8c0;
+    --divider-color: #2890a0;
+    --chart-grid: #a8c8d0;
+    --shadow-color: rgba(30,120,140,0.12);
     
-    --btn-primary-bg: #5FB3B3;
+    --btn-primary-bg: #2890a0;
     --btn-primary-text: #ffffff;
-    --btn-secondary-bg: #D0E8E8;
-    --btn-secondary-text: #2a3f3f;
+    --btn-secondary-bg: #cce0e8;
+    --btn-secondary-text: #183038;
     
-    --chart-bar: #5FB3B3;
-    --chart-bar-alt: #88B894;
-    --chart-empty: #E0E8E8;
+    --chart-bar: #2890a0;
+    --chart-bar-alt: #4a9058;
+    --chart-empty: #c8d8e0;
     
-    --book-row-even: #ffffff;
-    --book-row-odd: #f4fafa;
-    --book-row-hover: #eaf5f5;
-    --year-header-bg: #D0E8E8;
+    --book-row-even: #f6fbfc;
+    --book-row-odd: #f0f7f8;
+    --book-row-hover: #e6f2f4;
+    --year-header-bg: #c8e0e8;
 }
 
-/* Soft Earth - Brown/Tan tones */
+/* Soft Earth - Brown/Tan - rich leather and wood */
 [data-theme="soft-earth"] {
-    --bg-page: #d8d0c0;
-    --bg-page-alt: #e0d8c8;
+    --bg-page: #c8b8a0;
+    --bg-page-alt: #d0c0a8;
     
-    --bg-card: #ffffff;
-    --bg-card-alt: #f7f4f0;
-    --bg-card-hover: #f0ece5;
+    --bg-card: #fcfaf6;
+    --bg-card-alt: #f6f4ee;
+    --bg-card-hover: #f0ece4;
     
-    --bg-card-1: #E8E0D8;
-    --bg-card-2: #E0D8D0;
-    --bg-card-3: #D8D0C8;
+    --bg-card-1: #ece4d8;
+    --bg-card-2: #e4dcd0;
+    --bg-card-3: #dcd4c8;
     
-    --text-primary: #3f3630;
-    --text-secondary: #6f6660;
-    --text-muted: #8f8680;
+    --text-primary: #302820;
+    --text-secondary: #584838;
+    --text-muted: #786858;
     --text-on-accent: #ffffff;
     
-    --accent-primary: #A89586;
-    --accent-hover: #8f7d6e;
-    --accent-light: #d0c8c0;
+    /* Rich saddle brown accent */
+    --accent-primary: #987050;
+    --accent-hover: #805838;
+    --accent-light: #c8a888;
     
-    --border-color: #c8c0b0;
-    --divider-color: #A89586;
-    --chart-grid: #c8c0b0;
-    --shadow-color: rgba(168,149,134,0.2);
+    --border-color: #c0b098;
+    --divider-color: #987050;
+    --chart-grid: #c8b8a8;
+    --shadow-color: rgba(120,80,50,0.12);
     
-    --btn-primary-bg: #A89586;
+    --btn-primary-bg: #987050;
     --btn-primary-text: #ffffff;
-    --btn-secondary-bg: #E8E0D8;
-    --btn-secondary-text: #3f3630;
+    --btn-secondary-bg: #e4dcd0;
+    --btn-secondary-text: #302820;
     
-    --chart-bar: #A89586;
-    --chart-bar-alt: #88B894;
-    --chart-empty: #E8E0D8;
+    --chart-bar: #987050;
+    --chart-bar-alt: #4a9058;
+    --chart-empty: #dcd4c8;
     
-    --book-row-even: #ffffff;
-    --book-row-odd: #f9f7f4;
-    --book-row-hover: #f3f0ea;
-    --year-header-bg: #E8E0D8;
+    --book-row-even: #fcfaf6;
+    --book-row-odd: #f7f4ee;
+    --book-row-hover: #f0ebe0;
+    --year-header-bg: #e4dac8;
 }
 
-/* Evening Ritual - Dark Mode */
+/* Evening Ritual - Dark Mode - moody and atmospheric */
 [data-theme="evening-ritual"] {
-    --bg-page: #12141f;
-    --bg-page-alt: #181a28;
+    --bg-page: #0e1018;
+    --bg-page-alt: #141620;
     
-    --bg-card: #252837;
-    --bg-card-alt: #2a2d3f;
-    --bg-card-hover: #32354a;
+    --bg-card: #1c1e2a;
+    --bg-card-alt: #22243a;
+    --bg-card-hover: #2a2c44;
     
-    --bg-card-1: #2f3347;
-    --bg-card-2: #353950;
-    --bg-card-3: #3b3f58;
+    --bg-card-1: #242640;
+    --bg-card-2: #282a48;
+    --bg-card-3: #2c2e50;
     
     --text-primary: #e8e6f0;
-    --text-secondary: #a8a6b0;
-    --text-muted: #787680;
+    --text-secondary: #a8a4b8;
+    --text-muted: #707088;
     --text-on-accent: #ffffff;
     
-    --accent-primary: #6B7AB8;
-    --accent-hover: #8590c8;
-    --accent-light: #4a5280;
+    /* Richer indigo accent */
+    --accent-primary: #7080c0;
+    --accent-hover: #8898d8;
+    --accent-light: #4a5080;
     
-    --border-color: #4a4f68;
-    --divider-color: #6B7AB8;
-    --chart-grid: #4a4f68;
-    --shadow-color: rgba(0,0,0,0.4);
+    --border-color: #3a3c58;
+    --divider-color: #6070a8;
+    --chart-grid: #383a50;
+    --shadow-color: rgba(0,0,0,0.5);
     
-    --btn-primary-bg: #6B7AB8;
+    --btn-primary-bg: #7080c0;
     --btn-primary-text: #ffffff;
-    --btn-secondary-bg: #3a3f58;
+    --btn-secondary-bg: #2c2e48;
     --btn-secondary-text: #e8e6f0;
     
-    --chart-bar: #6B7AB8;
-    --chart-bar-alt: #5FB3B3;
-    --chart-empty: #3a3f58;
+    --chart-bar: #7080c0;
+    --chart-bar-alt: #50a898;
+    --chart-empty: #2a2c44;
     
-    --book-row-even: #252837;
-    --book-row-odd: #2a2d3f;
-    --book-row-hover: #32354a;
-    --year-header-bg: #2f3347;
+    --book-row-even: #1c1e2a;
+    --book-row-odd: #202234;
+    --book-row-hover: #282a40;
+    --year-header-bg: #242640;
 }
