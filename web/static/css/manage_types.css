@@ -22,7 +22,7 @@
 
 /* Section Headers */
 .section-header {
-    background: var(--bg-section, #E3E9EE);
+    background: var(--year-header-bg);
     padding: 0.75rem 1rem;
     font-weight: 600;
     color: var(--text-muted);

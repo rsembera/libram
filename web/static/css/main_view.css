@@ -425,7 +425,7 @@
     margin-bottom: 0.75rem;
     cursor: pointer;
     transition: all 0.2s;
-    border: 1px solid var(--card-border);
+    border: 2px solid var(--card-border);
 }
 
 .book-card:hover {
