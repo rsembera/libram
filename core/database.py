@@ -121,6 +121,10 @@ class Database:
         if 'type_id' not in columns:
             cursor.execute("ALTER TABLE books ADD COLUMN type_id INTEGER REFERENCES book_types(id)")
         
+        # Migration: Add pages_completed column for DNF books
+        if 'pages_completed' not in columns:
+            cursor.execute("ALTER TABLE books ADD COLUMN pages_completed INTEGER")
+        
         # Seed default book types if none exist
         cursor.execute("SELECT COUNT(*) FROM book_types")
         if cursor.fetchone()[0] == 0:
@@ -145,7 +149,7 @@ class Database:
                  date_begun: date, date_finished: date = None,
                  days_paused: int = 0, rating: int = 0, 
                  did_not_finish: bool = False, notes: str = '',
-                 type_id: int = None) -> int:
+                 type_id: int = None, pages_completed: int = None) -> int:
         """
         Add a new book to the database.
         
@@ -170,13 +174,13 @@ class Database:
                 title, author, pages, date_begun, date_finished,
                 days_paused, rating, did_not_finish, notes,
                 all_time_number, yearly_number,
-                type_id, created_at, modified_at
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                type_id, pages_completed, created_at, modified_at
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """, (
             title, author, pages, begun_ts, finished_ts,
             days_paused, rating, 1 if did_not_finish else 0, notes,
             all_time_number, yearly_number,
-            type_id, now, now
+            type_id, pages_completed, now, now
         ))
         
         self.conn.commit()
@@ -242,7 +246,8 @@ class Database:
         # Build UPDATE statement dynamically
         allowed_fields = {
             'title', 'author', 'pages', 'date_begun', 'date_finished',
-            'days_paused', 'rating', 'did_not_finish', 'notes', 'type_id'
+            'days_paused', 'rating', 'did_not_finish', 'notes', 'type_id',
+            'pages_completed'
         }
         
         updates = []
@@ -429,17 +434,29 @@ class Database:
         """, (year_start,))
         books_this_year = cursor.fetchone()[0]
         
-        # Total pages this year
+        # Total pages this year (only count completed books or DNF books)
+        # In-progress books (no date_finished, not DNF) are not counted
         cursor.execute("""
-            SELECT COALESCE(SUM(pages), 0) FROM books 
-            WHERE date_begun >= ? AND did_not_finish = 0
+            SELECT COALESCE(SUM(
+                CASE 
+                    WHEN did_not_finish = 1 THEN COALESCE(pages_completed, 0)
+                    WHEN date_finished IS NOT NULL THEN pages
+                    ELSE 0 
+                END
+            ), 0) FROM books 
+            WHERE date_begun >= ?
         """, (year_start,))
         pages_this_year = cursor.fetchone()[0]
         
-        # Total pages all time
+        # Total pages all time (only count completed books or DNF books)
         cursor.execute("""
-            SELECT COALESCE(SUM(pages), 0) FROM books 
-            WHERE did_not_finish = 0
+            SELECT COALESCE(SUM(
+                CASE 
+                    WHEN did_not_finish = 1 THEN COALESCE(pages_completed, 0)
+                    WHEN date_finished IS NOT NULL THEN pages
+                    ELSE 0 
+                END
+            ), 0) FROM books
         """)
         total_pages = cursor.fetchone()[0]
         
@@ -623,7 +640,9 @@ class Database:
             days_paused = book.get('days_paused', 0) or 0
             active_days = max(1, days - days_paused)
             book['active_days'] = active_days
-            book['pages_per_day'] = book['pages'] // active_days if active_days > 0 else 0
+            # For DNF books, use pages_completed; otherwise use pages
+            pages_read = book.get('pages_completed') if book['did_not_finish'] and book.get('pages_completed') else book['pages']
+            book['pages_per_day'] = pages_read // active_days if active_days > 0 else 0
         else:
             book['total_days'] = None
             book['active_days'] = None

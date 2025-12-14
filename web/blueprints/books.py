@@ -95,6 +95,8 @@ def add_book():
         days_paused = request.form.get('days_paused', '')
         days_paused = int(days_paused) if days_paused.isdigit() else 0
         did_not_finish = request.form.get('did_not_finish') == '1'
+        pages_completed_str = request.form.get('pages_completed', '')
+        pages_completed = int(pages_completed_str) if pages_completed_str.isdigit() else None
         notes = request.form.get('notes', '').strip()
         type_id = request.form.get('type_id', '')
         type_id = int(type_id) if type_id.isdigit() else None
@@ -129,7 +131,8 @@ def add_book():
             rating=rating,
             did_not_finish=did_not_finish,
             notes=notes,
-            type_id=type_id
+            type_id=type_id,
+            pages_completed=pages_completed
         )
         
         return redirect(url_for('books.index'))
@@ -170,6 +173,8 @@ def edit_book(book_id):
         days_paused = request.form.get('days_paused', '')
         days_paused = int(days_paused) if days_paused.isdigit() else 0
         did_not_finish = request.form.get('did_not_finish') == '1'
+        pages_completed_str = request.form.get('pages_completed', '')
+        pages_completed = int(pages_completed_str) if pages_completed_str.isdigit() else None
         notes = request.form.get('notes', '').strip()
         type_id = request.form.get('type_id', '')
         type_id = int(type_id) if type_id.isdigit() else None
@@ -205,7 +210,8 @@ def edit_book(book_id):
             rating=rating,
             did_not_finish=did_not_finish,
             notes=notes,
-            type_id=type_id
+            type_id=type_id,
+            pages_completed=pages_completed
         )
         
         return redirect(url_for('books.index'))
@@ -233,7 +239,7 @@ def export_csv():
     writer.writerow([
         'All-Time #', 'Year #', 'Title', 'Author', 'Pages',
         'Date Begun', 'Date Finished', 'Days', 'Days Paused', 'Pages/Day',
-        'Rating', 'Did Not Finish', 'Notes'
+        'Rating', 'Did Not Finish', 'Pages Completed', 'Notes'
     ])
     
     # Rating labels
@@ -254,6 +260,7 @@ def export_csv():
             book['pages_per_day'] or '',
             rating_labels.get(book['rating'], ''),
             'Yes' if book['did_not_finish'] else '',
+            book.get('pages_completed', '') or '',
             book['notes']
         ])
     
