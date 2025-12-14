@@ -620,7 +620,7 @@
     font-size: 1.25rem;
 }
 
-.rating-none { color: #D1D5DB; }
+.rating-none { color: #9CA3AF; }
 .rating-black { color: var(--rating-1-star, #1F2937); }
 .rating-bronze { color: #B8860B; }
 .rating-silver { color: #9CA3AF; }
