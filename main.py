@@ -18,12 +18,12 @@ sys.path.insert(0, str(PROJECT_ROOT))
 from web.app import create_app
 
 
-class FontRequestFilter(logging.Filter):
-    """Filter out noisy font and static file requests from logs."""
+class QuietRequestFilter(logging.Filter):
+    """Filter out noisy static file requests from logs."""
     def filter(self, record):
         msg = record.getMessage()
-        # Filter out font files and common static assets
-        if '/static/fonts/' in msg:
+        # Filter out static files (fonts, css, js, images)
+        if '/static/' in msg:
             return False
         return True
 
@@ -32,9 +32,9 @@ def main():
     """Start the Libram application."""
     app = create_app()
     
-    # Suppress noisy font request logs
+    # Suppress noisy static file request logs
     log = logging.getLogger('werkzeug')
-    log.addFilter(FontRequestFilter())
+    log.addFilter(QuietRequestFilter())
     
     # Get port from environment or use default
     port = int(os.environ.get('LIBRAM_PORT', 8090))
