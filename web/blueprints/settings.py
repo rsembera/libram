@@ -21,6 +21,7 @@ def settings_page():
         'background_style': db.get_setting('background_style', ''),
         'font_style': db.get_setting('font_style', 'lexend'),
         'font_size': db.get_setting('font_size', 's'),
+        'border_style': db.get_setting('border_style', 'accent'),
         'session_timeout': db.get_setting('session_timeout', '30'),
         'rating_5_color': db.get_setting('rating_5_color', '#10B981'),
         'rating_1_color': db.get_setting('rating_1_color', '#1F2937'),
@@ -79,6 +80,18 @@ def save_font_size():
     
     size = data.get('size', 's')
     db.set_setting('font_size', size)
+    
+    return jsonify({'status': 'ok'})
+
+
+@settings_bp.route('/api/border-style', methods=['POST'])
+def save_border_style():
+    """Save border style preference (accent or vibrant)."""
+    db = current_app.get_db()
+    data = request.get_json()
+    
+    style = data.get('style', 'accent')
+    db.set_setting('border_style', style)
     
     return jsonify({'status': 'ok'})
 

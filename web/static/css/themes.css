@@ -5,8 +5,8 @@
 
 /* Default Theme - Grimoire (purple/lavender - fantasy/magic) */
 :root {
-    /* Page background gradient */
-    --bg-gradient: linear-gradient(145deg, #d8d0e8 0%, #b8b0d0 50%, #c8c0d8 100%);
+    /* Page background */
+    --bg-page: #c8c0d8;
     
     /* Card backgrounds - warm cream with lavender tint */
     --bg-card: #f8f6fc;
@@ -32,6 +32,7 @@
     /* Borders, dividers */
     --border-color: #b0a8c8;
     --card-border: #5a4a90;
+    --card-border-vibrant: #c9a227;
     --divider-color: #8878b0;
     --chart-grid: #c0b8d0;
     --shadow-color: rgba(100,80,140,0.15);
@@ -60,7 +61,7 @@
 
 /* Crimson Veil - Pink/Rose - dark romance/gothic */
 [data-theme="crimson-veil"] {
-    --bg-gradient: linear-gradient(145deg, #e8d0d8 0%, #d0b0c0 50%, #dcc0c8 100%);
+    --bg-page: #d8c0c8;
     
     --bg-card: #fdf8f8;
     --bg-card-alt: #f8f0f2;
@@ -81,6 +82,7 @@
     
     --border-color: #d0b0b8;
     --card-border: #a05068;
+    --card-border-vibrant: #2a9a8a;
     --divider-color: #c46b80;
     --chart-grid: #d8c0c8;
     --shadow-color: rgba(160,80,100,0.12);
@@ -102,7 +104,7 @@
 
 /* Wasteland - Amber/Orange - post-apocalyptic/dystopian */
 [data-theme="wasteland"] {
-    --bg-gradient: linear-gradient(145deg, #e0d0b8 0%, #c8b090 50%, #d8c4a8 100%);
+    --bg-page: #d8c8a8;
     
     --bg-card: #fefcf6;
     --bg-card-alt: #faf6ee;
@@ -123,6 +125,7 @@
     
     --border-color: #d0c0a0;
     --card-border: #b87020;
+    --card-border-vibrant: #2070b8;
     --divider-color: #d08030;
     --chart-grid: #d8c8b0;
     --shadow-color: rgba(180,100,30,0.12);
@@ -144,7 +147,7 @@
 
 /* Lost World - Green/Sage - adventure/expedition */
 [data-theme="lost-world"] {
-    --bg-gradient: linear-gradient(145deg, #b8d8b8 0%, #90c0a0 50%, #a8c8a8 100%);
+    --bg-page: #a8d0a8;
     
     --bg-card: #e8f4e8;
     --bg-card-alt: #dceede;
@@ -165,6 +168,7 @@
     
     --border-color: #98c0a0;
     --card-border: #4a8055;
+    --card-border-vibrant: #a04a80;
     --divider-color: #4a9058;
     --chart-grid: #b0c8b0;
     --shadow-color: rgba(60,120,70,0.12);
@@ -186,7 +190,7 @@
 
 /* Terminal - Teal/Cyan - cyberpunk/sci-fi */
 [data-theme="terminal"] {
-    --bg-gradient: linear-gradient(145deg, #a8d0d8 0%, #80b8c8 50%, #98c0c8 100%);
+    --bg-page: #98c8d8;
     
     --bg-card: #e0f2f4;
     --bg-card-alt: #d4eaee;
@@ -207,6 +211,7 @@
     
     --border-color: #90b8c0;
     --card-border: #2a8090;
+    --card-border-vibrant: #c06040;
     --divider-color: #2890a0;
     --chart-grid: #a8c8d0;
     --shadow-color: rgba(30,120,140,0.12);
@@ -228,7 +233,7 @@
 
 /* Hardboiled - Brown/Tan - noir/detective */
 [data-theme="hardboiled"] {
-    --bg-gradient: linear-gradient(145deg, #d8c8b0 0%, #b8a888 50%, #c8b8a0 100%);
+    --bg-page: #c8b8a0;
     
     --bg-card: #fcfaf6;
     --bg-card-alt: #f6f4ee;
@@ -249,6 +254,7 @@
     
     --border-color: #c0b098;
     --card-border: #7a5838;
+    --card-border-vibrant: #3868a0;
     --divider-color: #987050;
     --chart-grid: #c8b8a8;
     --shadow-color: rgba(120,80,50,0.12);
@@ -270,7 +276,7 @@
 
 /* The Witching Hour - Dark Mode - horror/gothic */
 [data-theme="witching-hour"] {
-    --bg-gradient: linear-gradient(145deg, #181a28 0%, #0a0c14 50%, #101220 100%);
+    --bg-page: #101220;
     
     --bg-card: #1c1e2a;
     --bg-card-alt: #22243a;
@@ -291,6 +297,7 @@
     
     --border-color: #3a3c58;
     --card-border: #6878b0;
+    --card-border-vibrant: #c0a040;
     --divider-color: #6070a8;
     --chart-grid: #383a50;
     --shadow-color: rgba(0,0,0,0.5);
@@ -308,4 +315,13 @@
     --book-row-odd: #202234;
     --book-row-hover: #282a40;
     --year-header-bg: #242640;
+}
+
+
+/* ============================================
+   VIBRANT BORDER STYLE
+   Complementary colors for borders when enabled
+   ============================================ */
+[data-border-style="vibrant"] {
+    --card-border: var(--card-border-vibrant);
 }

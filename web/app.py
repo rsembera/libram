@@ -88,7 +88,7 @@ def create_app():
     # Context processor to inject theme settings into all templates
     @app.context_processor
     def inject_theme_settings():
-        """Inject theme, background_style, font_style, font_size, and rating colors into all templates."""
+        """Inject theme, background_style, font_style, font_size, border_style, and rating colors into all templates."""
         try:
             db = get_db()
             return {
@@ -96,6 +96,7 @@ def create_app():
                 'background_style': db.get_setting('background_style', ''),
                 'font_style': db.get_setting('font_style', 'lexend'),
                 'font_size': db.get_setting('font_size', 's'),
+                'border_style': db.get_setting('border_style', 'accent'),
                 'rating_5_color': db.get_setting('rating_5_color', ''),
                 'rating_1_color': db.get_setting('rating_1_color', ''),
                 'rating_5_name': db.get_setting('rating_5_name', 'Green'),
@@ -107,6 +108,7 @@ def create_app():
                 'background_style': '',
                 'font_style': 'lexend',
                 'font_size': 's',
+                'border_style': 'accent',
                 'rating_5_color': '',
                 'rating_1_color': '',
                 'rating_5_name': 'Green',
