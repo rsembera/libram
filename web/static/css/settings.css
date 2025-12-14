@@ -304,13 +304,13 @@ details[open] .settings-section-header .arrow {
     flex-shrink: 0;
 }
 
-.theme-preview-quiet-sky { background: linear-gradient(135deg, #E8E4F0 0%, #9B9FD8 100%); }
-.theme-preview-gentle-dawn { background: linear-gradient(135deg, #F5E0E0 0%, #E8A5A5 100%); }
-.theme-preview-warm-ember { background: linear-gradient(135deg, #FAE8D0 0%, #F4A460 100%); }
-.theme-preview-garden-path { background: linear-gradient(135deg, #D8E8D8 0%, #88B894 100%); }
-.theme-preview-deep-water { background: linear-gradient(135deg, #D0E8E8 0%, #5FB3B3 100%); }
-.theme-preview-soft-earth { background: linear-gradient(135deg, #E8E0D8 0%, #A89586 100%); }
-.theme-preview-evening-ritual { background: linear-gradient(135deg, #2f3347 0%, #6B7AB8 100%); }
+.theme-preview-grimoire { background: linear-gradient(135deg, #E8E4F0 0%, #7c6fb0 100%); }
+.theme-preview-crimson-veil { background: linear-gradient(135deg, #F5E0E0 0%, #c46b80 100%); }
+.theme-preview-wasteland { background: linear-gradient(135deg, #FAE8D0 0%, #d08030 100%); }
+.theme-preview-lost-world { background: linear-gradient(135deg, #D8E8D8 0%, #4a9058 100%); }
+.theme-preview-terminal { background: linear-gradient(135deg, #D0E8E8 0%, #2890a0 100%); }
+.theme-preview-hardboiled { background: linear-gradient(135deg, #E8E0D8 0%, #987050 100%); }
+.theme-preview-witching-hour { background: linear-gradient(135deg, #2f3347 0%, #7080c0 100%); }
 
 .bg-preview-default { 
     background: linear-gradient(135deg, #f0f0f0 25%, transparent 25%, transparent 75%, #f0f0f0 75%);
