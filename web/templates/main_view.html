@@ -143,7 +143,7 @@
                         <span class="book-type">{% if book.type_name %}<span class="type-badge" style="background-color: {{ book.type_color }};">{{ book.type_name }}</span>{% endif %}</span>
                         <span class="book-title">{{ book.title }}</span>
                         <span class="book-author">{{ book.author }}</span>
-                        <span class="book-pages">{{ book.pages }}</span>
+                        <span class="book-pages">{% if book.did_not_finish and book.pages_completed %}{{ book.pages_completed }}/{{ book.pages }}{% else %}{{ book.pages }}{% endif %}</span>
                         <span class="book-dates">
                             {{ book.date_begun|timestamp_to_short_date if book.date_begun else '-' }}
                             <span class="date-sep">/</span>
@@ -165,7 +165,7 @@
                         <div class="book-title"><span class="book-rating">{{ book.rating|rating_star|safe }}</span>{% if book.type_name %} <span class="type-badge" style="background-color: {{ book.type_color }};">{{ book.type_name }}</span>{% endif %} {{ book.title }}</div>
                         <div class="book-author">{{ book.author }}</div>
                         <div class="compact-meta">
-                            <span>{{ book.pages }} pages</span>
+                            <span>{% if book.did_not_finish and book.pages_completed %}{{ book.pages_completed }}/{{ book.pages }}{% else %}{{ book.pages }}{% endif %} pages</span>
                             <span class="meta-sep">•</span>
                             <span>{{ book.total_days or '?' }} days{% if book.days_paused %} ({{ book.days_paused }} paused){% endif %}</span>
                             {% if book.pages_per_day %}

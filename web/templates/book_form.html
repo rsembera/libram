@@ -171,10 +171,22 @@
         <!-- Did Not Finish -->
         <div class="form-group">
             <label class="checkbox-label">
-                <input type="checkbox" name="did_not_finish" value="1"
-                       {{ 'checked' if book and book.did_not_finish else '' }}>
+                <input type="checkbox" id="did_not_finish" name="did_not_finish" value="1"
+                       {{ 'checked' if book and book.did_not_finish else '' }}
+                       onchange="handleDnfChange(this)">
                 <span>Did not finish</span>
             </label>
+        </div>
+        
+        <!-- Pages Completed (shown only when DNF is checked) -->
+        <div class="form-row-half" id="pages-completed-group" style="{{ '' if book and book.did_not_finish else 'display: none;' }}">
+            <div class="form-group">
+                <label for="pages_completed">Pages Read</label>
+                <input type="number" id="pages_completed" name="pages_completed" 
+                       value="{{ book.pages_completed if book and book.pages_completed else '' }}"
+                       placeholder="How many pages did you read?"
+                       min="0">
+            </div>
         </div>
         
         <!-- Notes -->
@@ -284,6 +296,50 @@ function selectRating(element) {
     // Close dropdown
     document.getElementById('rating-dropdown').classList.remove('open');
 }
+
+// Did Not Finish checkbox handler
+function handleDnfChange(checkbox) {
+    const pagesCompletedGroup = document.getElementById('pages-completed-group');
+    const ratingDropdown = document.getElementById('rating-dropdown');
+    const ratingTrigger = ratingDropdown.querySelector('.custom-dropdown-trigger');
+    const dateFinishedPicker = getPicker('date-finished-picker');
+    
+    if (checkbox.checked) {
+        // Show pages completed field
+        pagesCompletedGroup.style.display = '';
+        
+        // Set rating to "No rating" (0) and disable dropdown
+        document.getElementById('rating').value = 0;
+        document.getElementById('rating-selected-text').innerHTML = '<span class="rating-star rating-none">☆</span> No rating';
+        ratingDropdown.classList.add('disabled');
+        ratingTrigger.disabled = true;
+        
+        // Set date finished to today if not already set
+        if (dateFinishedPicker && !dateFinishedPicker.getDate()) {
+            dateFinishedPicker.setDate(new Date());
+        }
+    } else {
+        // Hide pages completed field
+        pagesCompletedGroup.style.display = 'none';
+        
+        // Re-enable rating dropdown
+        ratingDropdown.classList.remove('disabled');
+        ratingTrigger.disabled = false;
+        
+        // Clear date finished (back to "still reading")
+        if (dateFinishedPicker) {
+            dateFinishedPicker.setDate(null);
+        }
+    }
+}
+
+// Initialize DNF state on page load
+document.addEventListener('DOMContentLoaded', function() {
+    const dnfCheckbox = document.getElementById('did_not_finish');
+    if (dnfCheckbox && dnfCheckbox.checked) {
+        handleDnfChange(dnfCheckbox);
+    }
+});
 
 // Type dropdown functions
 function toggleTypeDropdown() {
