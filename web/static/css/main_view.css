@@ -525,7 +525,7 @@
 .detailed-content .book-title-wrap {
     flex: 1.2;
     min-width: 120px;
-    min-height: 2.4rem;
+    height: 2.4rem;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -538,27 +538,28 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    line-height: 1.2;
 }
 
 .detailed-content .book-subtitle {
-    font-size: 0.8rem;
+    font-size: 0.75rem;
     color: var(--text-muted);
     font-style: italic;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    margin-top: 0.1rem;
+    line-height: 1.1;
 }
 
 .detailed-content .book-author {
-    flex: 0.8;
-    min-width: 80px;
+    flex: 1;
+    min-width: 120px;
     color: var(--text-secondary);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
     margin-left: 1.5rem;
-    margin-right: 3.5rem;
+    margin-right: 1.5rem;
 }
 
 .detailed-content .book-pages {
