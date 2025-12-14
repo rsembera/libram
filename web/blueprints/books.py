@@ -6,7 +6,8 @@ Main book CRUD operations and views.
 import csv
 import io
 from datetime import datetime, date
-from flask import Blueprint, render_template, request, redirect, url_for, current_app, Response, jsonify
+from flask import Blueprint, render_template, request, redirect, url_for, current_app, Response, jsonify, session
+from core.fortunes import get_fortune
 
 books_bp = Blueprint('books', __name__)
 
@@ -25,7 +26,10 @@ def index():
     # Get current time for display
     now = datetime.now()
     current_time = now.strftime('%I:%M %p').lstrip('0')
-    current_date = now.strftime('%A, %B %d')
+    current_date = now.strftime('%A, %B %d, %Y')
+    
+    # Get fortune from session (set at login)
+    fortune = session.get('fortune') or get_fortune()
     
     # Get view mode from query string or cookie
     view_mode = request.args.get('view', request.cookies.get('libram_view', 'detailed'))
@@ -66,6 +70,7 @@ def index():
                           current_year=current_year,
                           current_time=current_time,
                           current_date=current_date,
+                          fortune=fortune,
                           view_mode=view_mode,
                           search=search,
                           card_style=card_style,

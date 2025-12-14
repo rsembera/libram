@@ -5,6 +5,7 @@ Login, logout, and session management.
 
 import time
 from flask import Blueprint, render_template, request, redirect, url_for, session, make_response, current_app
+from core.fortunes import get_fortune
 
 auth_bp = Blueprint('auth', __name__)
 
@@ -31,6 +32,7 @@ def login():
             # Set fresh session with last_activity immediately
             session['logged_in'] = True
             session['last_activity'] = time.time()
+            session['fortune'] = get_fortune()
             
             # Use make_response for explicit cookie handling
             response = make_response(redirect(url_for('books.index')))
@@ -67,6 +69,7 @@ def setup():
             session.clear()
             session['logged_in'] = True
             session['last_activity'] = time.time()
+            session['fortune'] = get_fortune()
             
             return redirect(url_for('books.index'))
     
