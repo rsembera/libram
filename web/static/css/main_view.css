@@ -186,6 +186,44 @@
 }
 
 /* ============================================
+   FORTUNE BAR
+   ============================================ */
+.fortune-bar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    background: var(--bg-card-alt);
+    border-radius: 1rem;
+    padding: 0.75rem 1.5rem;
+    margin-bottom: 1.5rem;
+    max-width: 1400px;
+    margin-left: auto;
+    margin-right: auto;
+    box-shadow: 0 2px 8px var(--shadow-color);
+    border: 1px solid var(--card-border);
+}
+
+.fortune-date {
+    font-weight: 600;
+    color: var(--text-primary);
+    white-space: nowrap;
+}
+
+.fortune-divider {
+    color: var(--text-muted);
+}
+
+.fortune-text {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+.fortune-text em {
+    color: var(--text-muted);
+}
+
+/* ============================================
    CONTROLS BAR
    ============================================ */
 .controls-bar {
