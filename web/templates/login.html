@@ -31,44 +31,88 @@
         
         body {
             font-family: 'Libre Baskerville', Georgia, serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: #0a0a0f;
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
             padding: 1rem;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        /* Ambient background glow */
+        body::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: 
+                radial-gradient(ellipse at 20% 20%, rgba(88, 28, 135, 0.15) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 80%, rgba(6, 182, 212, 0.1) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 50%, rgba(219, 39, 119, 0.08) 0%, transparent 40%);
+            animation: ambientShift 20s ease-in-out infinite;
+        }
+        
+        @keyframes ambientShift {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            33% { transform: translate(2%, -2%) rotate(1deg); }
+            66% { transform: translate(-2%, 2%) rotate(-1deg); }
         }
         
         .login-card {
-            background: white;
+            background: rgba(15, 15, 25, 0.8);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
             border-radius: 1.5rem;
             padding: 3rem;
             width: 100%;
             max-width: 400px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            box-shadow: 
+                0 25px 50px rgba(0, 0, 0, 0.5),
+                0 0 100px rgba(139, 92, 246, 0.1),
+                inset 0 1px 0 rgba(255, 255, 255, 0.05);
+            position: relative;
+            z-index: 1;
+            animation: cardFloat 1s ease-out;
+        }
+        
+        @keyframes cardFloat {
+            0% {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
         
         .logo {
             text-align: center;
-            margin-bottom: 2rem;
+            margin-bottom: 2.5rem;
         }
         
-        .logo-icon {
-            font-size: 80px !important;
-            color: #667eea;
-            margin-bottom: 0.5rem;
+        .logo-image {
+            width: 100%;
+            max-width: 280px;
+            height: auto;
+            margin-bottom: 1rem;
+            filter: drop-shadow(0 0 30px rgba(139, 92, 246, 0.3));
         }
         
-        .logo h1 {
-            font-size: 2.5rem;
-            font-weight: 700;
-            color: #1F2937;
-            margin-bottom: 0.5rem;
-        }
-        
-        .logo p {
-            color: #6B7280;
-            font-size: 0.9375rem;
+        .tagline {
+            font-size: 0.875rem;
+            font-weight: 400;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            background: linear-gradient(90deg, #06b6d4, #a855f7, #db2777);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
         
         .form-group {
@@ -78,9 +122,11 @@
         .form-group label {
             display: block;
             margin-bottom: 0.5rem;
-            font-weight: 700;
-            color: #374151;
-            font-size: 0.875rem;
+            font-weight: 400;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.8125rem;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
         }
         
         .password-wrapper {
@@ -89,17 +135,27 @@
         
         .password-wrapper input {
             width: 100%;
-            padding: 0.875rem 3rem 0.875rem 1rem;
-            border: 2px solid #E5E7EB;
+            padding: 1rem 3rem 1rem 1.25rem;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 0.75rem;
             font-size: 1rem;
             font-family: 'Libre Baskerville', Georgia, serif;
-            transition: border-color 0.2s;
+            color: #fff;
+            transition: all 0.3s ease;
+        }
+        
+        .password-wrapper input::placeholder {
+            color: rgba(255, 255, 255, 0.25);
         }
         
         .password-wrapper input:focus {
             outline: none;
-            border-color: #667eea;
+            border-color: rgba(168, 85, 247, 0.5);
+            background: rgba(255, 255, 255, 0.05);
+            box-shadow: 
+                0 0 0 3px rgba(168, 85, 247, 0.1),
+                0 0 20px rgba(168, 85, 247, 0.15);
         }
         
         .toggle-password {
@@ -110,33 +166,34 @@
             background: none;
             border: none;
             cursor: pointer;
-            color: #9CA3AF;
+            color: rgba(255, 255, 255, 0.3);
             padding: 0.25rem;
             display: flex;
             align-items: center;
             justify-content: center;
+            transition: color 0.2s;
         }
         
         .toggle-password:hover {
-            color: #667eea;
+            color: rgba(168, 85, 247, 0.8);
         }
         
         .error-message {
-            background: #FEE2E2;
-            border: 1px solid #FECACA;
-            color: #DC2626;
-            padding: 0.75rem 1rem;
-            border-radius: 0.5rem;
+            background: rgba(220, 38, 38, 0.15);
+            border: 1px solid rgba(220, 38, 38, 0.3);
+            color: #fca5a5;
+            padding: 0.875rem 1rem;
+            border-radius: 0.75rem;
             margin-bottom: 1.5rem;
             font-size: 0.875rem;
         }
         
         .timeout-message {
-            background: #FEF3C7;
-            border: 1px solid #FDE68A;
-            color: #92400E;
-            padding: 0.75rem 1rem;
-            border-radius: 0.5rem;
+            background: rgba(234, 179, 8, 0.1);
+            border: 1px solid rgba(234, 179, 8, 0.25);
+            color: #fcd34d;
+            padding: 0.875rem 1rem;
+            border-radius: 0.75rem;
             margin-bottom: 1.5rem;
             font-size: 0.875rem;
         }
@@ -144,33 +201,57 @@
         .btn-login {
             width: 100%;
             padding: 1rem;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #06b6d4 0%, #8b5cf6 50%, #db2777 100%);
             color: white;
             border: none;
             border-radius: 0.75rem;
-            font-size: 1rem;
+            font-size: 0.9375rem;
             font-weight: 700;
             font-family: 'Libre Baskerville', Georgia, serif;
             cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s;
+            transition: all 0.3s ease;
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn-login::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s ease;
         }
         
         .btn-login:hover {
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+            box-shadow: 
+                0 10px 40px rgba(139, 92, 246, 0.4),
+                0 0 60px rgba(219, 39, 119, 0.2);
+        }
+        
+        .btn-login:hover::before {
+            left: 100%;
+        }
+        
+        .btn-login:active {
+            transform: translateY(0);
         }
     </style>
 </head>
 <body>
     <div class="login-card">
         <div class="logo">
-            <i class="ph ph-book-open logo-icon"></i>
-            <h1>Libram</h1>
-            <p>Personal Reading Tracker</p>
+            <img src="/static/img/login-logo.png" alt="Libram" class="logo-image">
+            <p class="tagline">Personal Reading Tracker</p>
         </div>
         
         {% if timeout %}
@@ -198,15 +279,15 @@
                            autofocus
                            required>
                     <button type="button" class="toggle-password" onclick="togglePassword('password', this)">
-                        <i class="ph ph-eye" class="icon-show"></i>
-                        <i class="ph ph-eye-slash" class="icon-hide" style="display: none;"></i>
+                        <i class="ph ph-eye icon-show"></i>
+                        <i class="ph ph-eye-slash icon-hide" style="display: none;"></i>
                     </button>
                 </div>
             </div>
             
             <button type="submit" class="btn-login">
                 <i class="ph ph-sign-in" style="width: 20px; height: 20px;"></i>
-                Log In
+                Enter
             </button>
         </form>
     </div>
