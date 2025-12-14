@@ -143,7 +143,6 @@ class Database:
             """, ('Non-Fict', '#9FCFC0', '#E0F2EE', now, now))
         
         self.conn.commit()
-        print("✓ Database initialized")
     
     # =========================================================================
     # BOOK CRUD OPERATIONS
