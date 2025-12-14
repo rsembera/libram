@@ -34,6 +34,8 @@ function toggleThemeDropdown() {
     // Close other dropdowns
     document.getElementById('background-dropdown').classList.remove('open');
     document.getElementById('font-dropdown').classList.remove('open');
+    const borderDropdown = document.getElementById('border-style-dropdown');
+    if (borderDropdown) borderDropdown.classList.remove('open');
 }
 
 function selectTheme(element) {
@@ -73,6 +75,8 @@ function toggleFontDropdown() {
     // Close other dropdowns
     document.getElementById('background-dropdown').classList.remove('open');
     document.getElementById('theme-dropdown').classList.remove('open');
+    const borderDropdown = document.getElementById('border-style-dropdown');
+    if (borderDropdown) borderDropdown.classList.remove('open');
 }
 
 function selectFont(element) {
@@ -122,6 +126,46 @@ function selectFontSize(size) {
         document.documentElement.className = document.documentElement.className
             .replace(/\bfont-size-\w+\b/g, '')
             .trim() + ' font-size-' + size;
+    });
+}
+
+// ============================================================================
+// BORDER STYLE DROPDOWN
+// ============================================================================
+
+function toggleBorderStyleDropdown() {
+    const dropdown = document.getElementById('border-style-dropdown');
+    dropdown.classList.toggle('open');
+    // Close other dropdowns
+    document.getElementById('background-dropdown').classList.remove('open');
+    document.getElementById('theme-dropdown').classList.remove('open');
+    document.getElementById('font-dropdown').classList.remove('open');
+}
+
+function selectBorderStyle(element) {
+    const value = element.dataset.value;
+    const text = element.textContent.trim();
+    
+    // Update selected text
+    document.getElementById('border-style-selected-text').textContent = text;
+    
+    // Update selected state
+    document.querySelectorAll('#border-style-dropdown .custom-dropdown-option').forEach(opt => {
+        opt.classList.remove('selected');
+    });
+    element.classList.add('selected');
+    
+    // Close dropdown
+    document.getElementById('border-style-dropdown').classList.remove('open');
+    
+    // Save to server
+    fetch('/settings/api/border-style', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ style: value })
+    }).then(() => {
+        // Update html element attribute for immediate preview
+        document.documentElement.dataset.borderStyle = value;
     });
 }
 
@@ -188,6 +232,8 @@ function toggleBackgroundDropdown() {
     // Close other dropdowns
     document.getElementById('font-dropdown').classList.remove('open');
     document.getElementById('theme-dropdown').classList.remove('open');
+    const borderDropdown = document.getElementById('border-style-dropdown');
+    if (borderDropdown) borderDropdown.classList.remove('open');
 }
 
 function selectBackground(element) {
