@@ -84,6 +84,7 @@ def add_book():
     if request.method == 'POST':
         # Parse form data
         title = request.form.get('title', '').strip()
+        subtitle = request.form.get('subtitle', '').strip()
         author = request.form.get('author', '').strip()
         pages = request.form.get('pages', '')
         
@@ -123,6 +124,7 @@ def add_book():
         # Create book
         book_id = db.add_book(
             title=title,
+            subtitle=subtitle,
             author=author,
             pages=int(pages),
             date_begun=date_begun,
@@ -162,6 +164,7 @@ def edit_book(book_id):
         
         # Parse form data
         title = request.form.get('title', '').strip()
+        subtitle = request.form.get('subtitle', '').strip()
         author = request.form.get('author', '').strip()
         pages = request.form.get('pages', '')
         
@@ -202,6 +205,7 @@ def edit_book(book_id):
         # Update book
         db.update_book(book_id,
             title=title,
+            subtitle=subtitle,
             author=author,
             pages=int(pages),
             date_begun=date_begun,
@@ -237,7 +241,7 @@ def export_csv():
     
     # Header row
     writer.writerow([
-        'All-Time #', 'Year #', 'Title', 'Author', 'Pages',
+        'All-Time #', 'Year #', 'Title', 'Subtitle', 'Author', 'Pages',
         'Date Begun', 'Date Finished', 'Days', 'Days Paused', 'Pages/Day',
         'Rating', 'Did Not Finish', 'Pages Completed', 'Notes'
     ])
@@ -251,6 +255,7 @@ def export_csv():
             book['all_time_number'],
             book['yearly_number'],
             book['title'],
+            book.get('subtitle', '') or '',
             book['author'],
             book['pages'],
             book['date_begun_date'].strftime('%Y-%m-%d') if book['date_begun_date'] else '',

@@ -484,14 +484,32 @@
     text-align: center;
 }
 
-.detailed-content .book-title {
+.detailed-content .book-title-wrap {
     flex: 1.2;
     min-width: 120px;
+    min-height: 2.4rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.detailed-content .book-title {
     font-weight: 600;
     color: var(--text-primary);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+}
+
+.detailed-content .book-subtitle {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    font-style: italic;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-top: 0.1rem;
 }
 
 .detailed-content .book-author {
@@ -570,6 +588,13 @@
     font-size: 1.125rem;
     font-weight: 600;
     color: var(--text-primary);
+    margin-bottom: 0.25rem;
+}
+
+.compact-content .book-subtitle {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    font-style: italic;
     margin-bottom: 0.25rem;
 }
 

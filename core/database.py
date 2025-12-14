@@ -125,6 +125,10 @@ class Database:
         if 'pages_completed' not in columns:
             cursor.execute("ALTER TABLE books ADD COLUMN pages_completed INTEGER")
         
+        # Migration: Add subtitle column
+        if 'subtitle' not in columns:
+            cursor.execute("ALTER TABLE books ADD COLUMN subtitle TEXT DEFAULT ''")
+        
         # Seed default book types if none exist
         cursor.execute("SELECT COUNT(*) FROM book_types")
         if cursor.fetchone()[0] == 0:
@@ -149,7 +153,8 @@ class Database:
                  date_begun: date, date_finished: date = None,
                  days_paused: int = 0, rating: int = 0, 
                  did_not_finish: bool = False, notes: str = '',
-                 type_id: int = None, pages_completed: int = None) -> int:
+                 type_id: int = None, pages_completed: int = None,
+                 subtitle: str = '') -> int:
         """
         Add a new book to the database.
         
@@ -171,13 +176,13 @@ class Database:
         
         cursor.execute("""
             INSERT INTO books (
-                title, author, pages, date_begun, date_finished,
+                title, subtitle, author, pages, date_begun, date_finished,
                 days_paused, rating, did_not_finish, notes,
                 all_time_number, yearly_number,
                 type_id, pages_completed, created_at, modified_at
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """, (
-            title, author, pages, begun_ts, finished_ts,
+            title, subtitle, author, pages, begun_ts, finished_ts,
             days_paused, rating, 1 if did_not_finish else 0, notes,
             all_time_number, yearly_number,
             type_id, pages_completed, now, now
@@ -245,7 +250,7 @@ class Database:
         
         # Build UPDATE statement dynamically
         allowed_fields = {
-            'title', 'author', 'pages', 'date_begun', 'date_finished',
+            'title', 'subtitle', 'author', 'pages', 'date_begun', 'date_finished',
             'days_paused', 'rating', 'did_not_finish', 'notes', 'type_id',
             'pages_completed'
         }
