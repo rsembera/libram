@@ -3,7 +3,7 @@
    Seven distinct reading atmospheres
    ============================================ */
 
-/* Default Theme - Quiet Sky (purple/lavender) */
+/* Default Theme - Grimoire (purple/lavender - fantasy/magic) */
 :root {
     /* Page backgrounds - rich purple-grey */
     --bg-page: #c5c0d8;
@@ -58,8 +58,8 @@
     --rating-1-star: #1F2937;
 }
 
-/* Gentle Dawn - Pink/Rose - like early morning light */
-[data-theme="gentle-dawn"] {
+/* Crimson Veil - Pink/Rose - dark romance/gothic */
+[data-theme="crimson-veil"] {
     --bg-page: #dcc0c8;
     --bg-page-alt: #e4c8d0;
     
@@ -101,8 +101,8 @@
     --year-header-bg: #f0d8e0;
 }
 
-/* Warm Ember - Amber/Orange - cozy firelight */
-[data-theme="warm-ember"] {
+/* Wasteland - Amber/Orange - post-apocalyptic/dystopian */
+[data-theme="wasteland"] {
     --bg-page: #d8c4a8;
     --bg-page-alt: #e0ccb0;
     
@@ -144,8 +144,8 @@
     --year-header-bg: #f4e4cc;
 }
 
-/* Garden Path - Green/Sage - lush and natural */
-[data-theme="garden-path"] {
+/* Lost World - Green/Sage - adventure/expedition */
+[data-theme="lost-world"] {
     --bg-page: #a8c8a8;
     --bg-page-alt: #b0d0b0;
     
@@ -187,8 +187,8 @@
     --year-header-bg: #cce4cc;
 }
 
-/* Deep Water - Teal/Cyan - oceanic depth */
-[data-theme="deep-water"] {
+/* Terminal - Teal/Cyan - cyberpunk/sci-fi */
+[data-theme="terminal"] {
     --bg-page: #98c0c8;
     --bg-page-alt: #a0c8d0;
     
@@ -230,8 +230,8 @@
     --year-header-bg: #c8e0e8;
 }
 
-/* Soft Earth - Brown/Tan - rich leather and wood */
-[data-theme="soft-earth"] {
+/* Hardboiled - Brown/Tan - noir/detective */
+[data-theme="hardboiled"] {
     --bg-page: #c8b8a0;
     --bg-page-alt: #d0c0a8;
     
@@ -273,8 +273,8 @@
     --year-header-bg: #e4dac8;
 }
 
-/* Evening Ritual - Dark Mode - moody and atmospheric */
-[data-theme="evening-ritual"] {
+/* The Witching Hour - Dark Mode - horror/gothic */
+[data-theme="witching-hour"] {
     --bg-page: #0e1018;
     --bg-page-alt: #141620;
     

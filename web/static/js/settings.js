@@ -19,13 +19,13 @@ function saveTimeout() {
 // ============================================================================
 
 const themeNames = {
-    'quiet-sky': 'Quiet Sky',
-    'gentle-dawn': 'Gentle Dawn',
-    'warm-ember': 'Warm Ember',
-    'garden-path': 'Garden Path',
-    'deep-water': 'Deep Water',
-    'soft-earth': 'Soft Earth',
-    'evening-ritual': 'Evening Ritual (Dark)'
+    'grimoire': 'Grimoire',
+    'crimson-veil': 'Crimson Veil',
+    'wasteland': 'Wasteland',
+    'lost-world': 'Lost World',
+    'terminal': 'Terminal',
+    'hardboiled': 'Hardboiled',
+    'witching-hour': 'The Witching Hour'
 };
 
 function toggleThemeDropdown() {

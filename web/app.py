@@ -92,7 +92,7 @@ def create_app():
         try:
             db = get_db()
             return {
-                'theme': db.get_setting('theme', 'quiet-sky'),
+                'theme': db.get_setting('theme', 'grimoire'),
                 'background_style': db.get_setting('background_style', ''),
                 'font_style': db.get_setting('font_style', 'lexend'),
                 'font_size': db.get_setting('font_size', 's'),
@@ -103,7 +103,7 @@ def create_app():
             }
         except:
             return {
-                'theme': 'quiet-sky',
+                'theme': 'grimoire',
                 'background_style': '',
                 'font_style': 'lexend',
                 'font_size': 's',
