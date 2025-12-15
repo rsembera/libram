@@ -137,3 +137,15 @@ def check_session():
     
     # Update last activity
     session['last_activity'] = time.time()
+
+
+@auth_bp.after_app_request
+def add_no_cache_headers(response):
+    """Prevent browser from caching authenticated pages."""
+    # Only add no-cache for HTML responses on authenticated routes
+    if request.endpoint and request.endpoint not in ('static', 'auth.login', 'auth.setup'):
+        if response.content_type and 'text/html' in response.content_type:
+            response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+            response.headers['Pragma'] = 'no-cache'
+            response.headers['Expires'] = '0'
+    return response
