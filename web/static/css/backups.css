@@ -14,10 +14,73 @@
     margin-bottom: 2rem;
 }
 
+/* Section headers */
+.backups-card > h3 {
+    margin: 0 0 0.75rem 0;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+/* Auto-backup settings */
+.backup-settings {
+    background: var(--bg-secondary);
+    border-radius: 0.75rem;
+    padding: 1.25rem;
+    margin-bottom: 1.5rem;
+}
+
+.settings-row {
+    display: flex;
+    gap: 1.5rem;
+}
+
+.backup-settings .form-group {
+    flex: 1;
+}
+
+.backup-settings .form-group label {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+}
+
+.backup-settings .form-group select {
+    width: 100%;
+    padding: 0.625rem 0.875rem;
+    border: 1px solid var(--border-color);
+    border-radius: 0.5rem;
+    background: var(--bg-card);
+    color: var(--text-primary);
+    font-size: 0.875rem;
+    font-family: inherit;
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%236B7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.75rem center;
+    padding-right: 2.5rem;
+}
+
+.backup-settings .form-group select:focus {
+    outline: none;
+    border-color: var(--accent-primary);
+}
+
+.last-backup-info {
+    margin: 1rem 0 0 0;
+    font-size: 0.8125rem;
+    color: var(--text-muted);
+}
+
 .backups-list {
     display: flex;
     flex-direction: column;
     gap: 0.75rem;
+    max-height: 400px;
+    overflow-y: auto;
 }
 
 .backup-item {
