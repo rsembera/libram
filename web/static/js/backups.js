@@ -2,6 +2,29 @@
 
 let pendingFilename = null;
 
+function saveBackupSettings() {
+    const frequency = document.getElementById('frequency').value;
+    const retention = document.getElementById('retention').value;
+    
+    const formData = new FormData();
+    formData.append('frequency', frequency);
+    formData.append('retention', retention);
+    
+    fetch('/backups/settings', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status !== 'ok') {
+            alert('Error saving settings: ' + (data.message || 'Unknown error'));
+        }
+    })
+    .catch(err => {
+        alert('Error saving settings');
+    });
+}
+
 function createBackup() {
     const btn = event.target.closest('button');
     const originalText = btn.innerHTML;

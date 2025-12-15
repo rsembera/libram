@@ -137,6 +137,13 @@ def check_session():
     
     # Update last activity
     session['last_activity'] = time.time()
+    
+    # Check auto-backup (only once per session, or every hour)
+    last_backup_check = session.get('last_backup_check', 0)
+    if time.time() - last_backup_check > 3600:  # Check at most once per hour
+        session['last_backup_check'] = time.time()
+        from web.blueprints.backups import check_auto_backup
+        check_auto_backup(current_app)
 
 
 @auth_bp.after_app_request
