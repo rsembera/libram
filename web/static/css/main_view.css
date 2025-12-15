@@ -325,6 +325,9 @@
     top: 50%;
     transform: translateY(-50%);
     color: var(--text-muted);
+    font-size: 0.875rem;
+    display: flex;
+    align-items: center;
 }
 
 .clear-search {
