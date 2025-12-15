@@ -102,7 +102,8 @@ def add_book():
         days_paused = int(days_paused) if days_paused.isdigit() else 0
         did_not_finish = request.form.get('did_not_finish') == '1'
         pages_completed_str = request.form.get('pages_completed', '')
-        pages_completed = int(pages_completed_str) if pages_completed_str.isdigit() else None
+        # Only keep pages_completed if DNF is checked
+        pages_completed = int(pages_completed_str) if (did_not_finish and pages_completed_str.isdigit()) else None
         notes = request.form.get('notes', '').strip()
         type_id = request.form.get('type_id', '')
         type_id = int(type_id) if type_id.isdigit() else None
@@ -182,7 +183,8 @@ def edit_book(book_id):
         days_paused = int(days_paused) if days_paused.isdigit() else 0
         did_not_finish = request.form.get('did_not_finish') == '1'
         pages_completed_str = request.form.get('pages_completed', '')
-        pages_completed = int(pages_completed_str) if pages_completed_str.isdigit() else None
+        # Only keep pages_completed if DNF is checked
+        pages_completed = int(pages_completed_str) if (did_not_finish and pages_completed_str.isdigit()) else None
         notes = request.form.get('notes', '').strip()
         type_id = request.form.get('type_id', '')
         type_id = int(type_id) if type_id.isdigit() else None

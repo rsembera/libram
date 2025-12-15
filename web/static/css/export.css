@@ -1,0 +1,171 @@
+/* Export page styles */
+
+.export-container {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+}
+
+.export-card {
+    background: var(--bg-card);
+    border-radius: 1rem;
+    padding: 2rem;
+    box-shadow: 0 4px 12px var(--shadow-color);
+    border: 1px solid var(--card-border);
+}
+
+.export-card h1 {
+    margin: 0 0 0.25rem 0;
+    color: var(--text-primary);
+    font-size: 1.5rem;
+}
+
+.export-subtitle {
+    color: var(--text-muted);
+    margin: 0 0 2rem 0;
+}
+
+.form-section {
+    margin-bottom: 2rem;
+}
+
+.form-section h2 {
+    font-size: 1rem;
+    color: var(--text-primary);
+    margin: 0 0 0.25rem 0;
+}
+
+.section-help {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    margin: 0 0 1rem 0;
+}
+
+.date-range-row {
+    display: flex;
+    align-items: flex-end;
+    gap: 1rem;
+}
+
+.date-range-row .form-group {
+    flex: 1;
+}
+
+.date-range-row .form-group label {
+    display: block;
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    margin-bottom: 0.5rem;
+}
+
+.date-range-sep {
+    color: var(--text-muted);
+    padding-bottom: 0.75rem;
+}
+
+/* Format selection */
+.format-options {
+    display: flex;
+    gap: 1rem;
+}
+
+.format-option {
+    flex: 1;
+    cursor: pointer;
+}
+
+.format-option input {
+    display: none;
+}
+
+.format-card {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    border: 2px solid transparent;
+    border-radius: 0.75rem;
+    background: var(--bg-card-alt);
+    transition: all 0.2s;
+    cursor: pointer;
+    opacity: 0.6;
+}
+
+.format-card:hover {
+    opacity: 0.8;
+}
+
+.format-card.selected {
+    border-color: var(--accent-primary);
+    background: var(--bg-card);
+    opacity: 1;
+}
+
+.format-card i {
+    font-size: 1.5rem;
+    color: var(--text-muted);
+}
+
+.format-card.selected i {
+    color: var(--accent-primary);
+}
+
+.format-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.format-name {
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.format-desc {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}
+
+/* Actions */
+.export-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border-color);
+}
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: none;
+    font-family: inherit;
+}
+
+.btn-primary {
+    background: var(--accent-primary);
+    color: white;
+}
+
+.btn-primary:hover {
+    opacity: 0.9;
+}
+
+.btn-secondary {
+    background: var(--bg-card-alt);
+    color: var(--text-secondary);
+    text-decoration: none;
+    border: 1px solid var(--border-color);
+}
+
+.btn-secondary:hover {
+    background: var(--bg-card);
+}

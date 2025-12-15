@@ -1,0 +1,140 @@
+{% extends "base.html" %}
+
+{% block title %}Export - Libram{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/pickers.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/export.css') }}">
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/pickers.js') }}"></script>
+{% endblock %}
+
+{% block content %}
+
+<div class="export-container">
+    <div class="export-card">
+        <h1>Export Books</h1>
+        <p class="export-subtitle">Download your reading history</p>
+        
+        <form method="post" action="{{ url_for('exports.download') }}" class="export-form">
+            
+            <!-- Date Range -->
+            <div class="form-section">
+                <h2>Date Range</h2>
+                <p class="section-help">Leave blank to export all books</p>
+                
+                <div class="date-range-row">
+                    <div class="form-group">
+                        <label>From</label>
+                        <div id="date-from-picker"></div>
+                        <input type="hidden" name="date_from" id="date-from-value">
+                    </div>
+                    <span class="date-range-sep">to</span>
+                    <div class="form-group">
+                        <label>To</label>
+                        <div id="date-to-picker"></div>
+                        <input type="hidden" name="date_to" id="date-to-value">
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Format -->
+            <div class="form-section">
+                <h2>Format</h2>
+                <input type="hidden" name="format" id="format-value" value="csv">
+                
+                <div class="format-options">
+                    <div class="format-card selected" data-format="csv" onclick="selectFormat('csv')">
+                        <i class="ph ph-file-csv"></i>
+                        <div class="format-info">
+                            <span class="format-name">CSV</span>
+                            <span class="format-desc">Spreadsheet compatible</span>
+                        </div>
+                    </div>
+                    
+                    <div class="format-card" data-format="markdown" onclick="selectFormat('markdown')">
+                        <i class="ph ph-file-text"></i>
+                        <div class="format-info">
+                            <span class="format-name">Markdown</span>
+                            <span class="format-desc">Readable, shareable</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Order -->
+            <div class="form-section">
+                <h2>Order</h2>
+                <input type="hidden" name="order" id="order-value" value="newest">
+                
+                <div class="format-options">
+                    <div class="format-card selected" data-order="newest" onclick="selectOrder('newest')">
+                        <i class="ph ph-sort-descending"></i>
+                        <div class="format-info">
+                            <span class="format-name">Newest First</span>
+                            <span class="format-desc">Reverse chronological</span>
+                        </div>
+                    </div>
+                    
+                    <div class="format-card" data-order="oldest" onclick="selectOrder('oldest')">
+                        <i class="ph ph-sort-ascending"></i>
+                        <div class="format-info">
+                            <span class="format-name">Oldest First</span>
+                            <span class="format-desc">Chronological</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Actions -->
+            <div class="export-actions">
+                <a href="{{ url_for('books.index') }}" class="btn btn-secondary">Cancel</a>
+                <button type="submit" class="btn btn-primary">
+                    <i class="ph ph-download-simple"></i>
+                    Export
+                </button>
+            </div>
+            
+        </form>
+    </div>
+</div>
+
+<script>
+function selectFormat(value) {
+    document.getElementById('format-value').value = value;
+    document.querySelectorAll('[data-format]').forEach(function(card) {
+        card.classList.toggle('selected', card.dataset.format === value);
+    });
+}
+
+function selectOrder(value) {
+    document.getElementById('order-value').value = value;
+    document.querySelectorAll('[data-order]').forEach(function(card) {
+        card.classList.toggle('selected', card.dataset.order === value);
+    });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    // From date picker
+    initDatePicker('date-from-picker', {
+        placeholder: 'All time',
+        allowClear: true,
+        onSelect: function(date) {
+            document.getElementById('date-from-value').value = date ? formatDateForServer(date) : '';
+        }
+    });
+    
+    // To date picker
+    initDatePicker('date-to-picker', {
+        placeholder: 'Present',
+        allowClear: true,
+        onSelect: function(date) {
+            document.getElementById('date-to-value').value = date ? formatDateForServer(date) : '';
+        }
+    });
+});
+</script>
+
+{% endblock %}
