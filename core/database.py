@@ -7,7 +7,6 @@ import os
 import time
 import hashlib
 import sqlite3
-from pathlib import Path
 from datetime import datetime, date
 
 
@@ -412,7 +411,6 @@ class Database:
     def get_stats(self) -> dict:
         """Get reading statistics for the dashboard."""
         cursor = self.conn.cursor()
-        now = int(time.time())
         current_year = datetime.now().year
         
         # Total books

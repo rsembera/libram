@@ -6,8 +6,7 @@ Database backup and restore functionality.
 import os
 import shutil
 from datetime import datetime, timedelta
-from pathlib import Path
-from flask import Blueprint, render_template, request, redirect, url_for, current_app, jsonify, send_file
+from flask import Blueprint, render_template, request, current_app, jsonify, send_file
 
 backups_bp = Blueprint('backups', __name__)
 

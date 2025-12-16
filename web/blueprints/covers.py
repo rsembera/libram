@@ -6,7 +6,7 @@ Book cover upload, search, and serving.
 import os
 import uuid
 import requests
-from flask import Blueprint, request, jsonify, send_file, current_app
+from flask import Blueprint, request, jsonify, send_file
 
 covers_bp = Blueprint('covers', __name__, url_prefix='/covers')
 

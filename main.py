@@ -15,7 +15,7 @@ from pathlib import Path
 PROJECT_ROOT = Path(__file__).parent
 sys.path.insert(0, str(PROJECT_ROOT))
 
-from web.app import create_app
+from web.app import create_app  # noqa: E402
 
 
 class QuietRequestFilter(logging.Filter):

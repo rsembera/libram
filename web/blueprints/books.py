@@ -111,10 +111,6 @@ def add_book():
     """Add a new book."""
     db = current_app.get_db()
     
-    # Get theme settings
-    card_style = db.get_setting('card_style', 'tutti-frutti')
-    background_style = db.get_setting('background_style', 'suit-grey')
-    
     if request.method == 'POST':
         # Parse form data
         title = request.form.get('title', '').strip()
@@ -159,7 +155,7 @@ def add_book():
                                   **_get_form_context())
         
         # Create book
-        book_id = db.add_book(
+        db.add_book(
             title=title,
             subtitle=subtitle,
             author=author,

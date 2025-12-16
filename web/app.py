@@ -39,7 +39,7 @@ def create_app():
         try:
             dt = datetime.fromtimestamp(timestamp)
             return dt.strftime('%b %d, %Y')
-        except:
+        except (ValueError, TypeError, OSError):
             return ''
     
     @app.template_filter('timestamp_to_short_date')
@@ -50,7 +50,7 @@ def create_app():
         try:
             dt = datetime.fromtimestamp(timestamp)
             return dt.strftime('%b %d')
-        except:
+        except (ValueError, TypeError, OSError):
             return ''
     
     @app.template_filter('rating_star')
@@ -102,7 +102,7 @@ def create_app():
                 'rating_5_name': db.get_setting('rating_5_name', 'Green'),
                 'rating_1_name': db.get_setting('rating_1_name', 'Black')
             }
-        except:
+        except Exception:
             return {
                 'theme': 'grimoire',
                 'background_style': '',
