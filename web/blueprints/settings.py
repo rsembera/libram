@@ -3,6 +3,8 @@ Libram Settings Blueprint
 Application configuration and preferences.
 """
 
+from __future__ import annotations
+
 from pathlib import Path
 from flask import Blueprint, render_template, request, current_app, jsonify
 from werkzeug.utils import secure_filename

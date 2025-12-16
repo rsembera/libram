@@ -3,10 +3,13 @@ Libram Export Blueprint
 Export books to various formats.
 """
 
-from datetime import datetime, date
-from flask import Blueprint, render_template, request, Response, current_app
+from __future__ import annotations
+
 import csv
 import io
+from datetime import datetime, date
+from typing import Optional
+from flask import Blueprint, render_template, request, Response, current_app
 
 exports_bp = Blueprint('exports', __name__, url_prefix='/export')
 

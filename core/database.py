@@ -3,17 +3,20 @@ Libram Database Module
 SQLite database for book tracking.
 """
 
+from __future__ import annotations
+
 import os
 import time
 import hashlib
 import sqlite3
 from datetime import datetime, date
+from typing import Optional
 
 
 class Database:
     """SQLite database for Libram."""
     
-    def __init__(self, db_path: str = None):
+    def __init__(self, db_path: Optional[str] = None) -> None:
         """
         Initialize database connection.
         
@@ -29,7 +32,7 @@ class Database:
         # Ensure data directory exists
         os.makedirs(os.path.dirname(db_path), exist_ok=True)
     
-    def connect(self):
+    def connect(self) -> Database:
         """Open database connection."""
         self.conn = sqlite3.connect(self.db_path)
         
@@ -41,20 +44,20 @@ class Database:
         
         return self
     
-    def close(self):
+    def close(self) -> None:
         """Close database connection."""
         if self.conn:
             self.conn.close()
             self.conn = None
     
-    def __enter__(self):
+    def __enter__(self) -> Database:
         self.connect()
         return self
     
-    def __exit__(self, exc_type, exc_val, exc_tb):
+    def __exit__(self, exc_type, exc_val, exc_tb) -> None:
         self.close()
     
-    def _run_migrations(self):
+    def _run_migrations(self) -> None:
         """Create tables if they don't exist."""
         cursor = self.conn.cursor()
         
@@ -135,12 +138,12 @@ class Database:
     # =========================================================================
     
     def add_book(self, title: str, author: str, pages: int, 
-                 date_begun: date, date_finished: date = None,
+                 date_begun: date, date_finished: Optional[date] = None,
                  days_paused: int = 0, rating: int = 0, 
                  did_not_finish: bool = False, notes: str = '',
-                 type_id: int = None, pages_completed: int = None,
-                 subtitle: str = '', isbn: str = None,
-                 cover_filename: str = None) -> int:
+                 type_id: Optional[int] = None, pages_completed: Optional[int] = None,
+                 subtitle: str = '', isbn: Optional[str] = None,
+                 cover_filename: Optional[str] = None) -> int:
         """
         Add a new book to the database.
         
@@ -178,7 +181,7 @@ class Database:
         self.conn.commit()
         return cursor.lastrowid
     
-    def get_book(self, book_id: int) -> dict:
+    def get_book(self, book_id: int) -> Optional[dict]:
         """Get a single book by ID."""
         cursor = self.conn.cursor()
         cursor.execute("SELECT * FROM books WHERE id = ?", (book_id,))
@@ -188,7 +191,7 @@ class Database:
             return self._row_to_book(row, cursor.description)
         return None
     
-    def get_all_books(self) -> list:
+    def get_all_books(self) -> list[dict]:
         """Get all books, ordered by date_begun descending."""
         cursor = self.conn.cursor()
         cursor.execute("""
@@ -201,7 +204,7 @@ class Database:
         return [self._row_to_book(row, cursor.description) 
                 for row in cursor.fetchall()]
     
-    def get_books_by_year(self) -> dict:
+    def get_books_by_year(self) -> dict[int, list[dict]]:
         """
         Get all books grouped by year (based on date_begun).
         
@@ -291,7 +294,7 @@ class Database:
     # BOOK TYPE OPERATIONS
     # =========================================================================
     
-    def get_all_book_types(self) -> list:
+    def get_all_book_types(self) -> list[dict]:
         """Get all book types."""
         cursor = self.conn.cursor()
         cursor.execute("SELECT * FROM book_types ORDER BY name")
@@ -299,7 +302,7 @@ class Database:
         columns = [desc[0] for desc in cursor.description]
         return [dict(zip(columns, row)) for row in rows]
     
-    def get_book_type(self, type_id: int) -> dict:
+    def get_book_type(self, type_id: int) -> Optional[dict]:
         """Get a single book type by ID."""
         cursor = self.conn.cursor()
         cursor.execute("SELECT * FROM book_types WHERE id = ?", (type_id,))
@@ -320,8 +323,8 @@ class Database:
         self.conn.commit()
         return cursor.lastrowid
     
-    def update_book_type(self, type_id: int, name: str = None, 
-                         color: str = None, bubble_color: str = None) -> bool:
+    def update_book_type(self, type_id: int, name: Optional[str] = None, 
+                         color: Optional[str] = None, bubble_color: Optional[str] = None) -> bool:
         """Update a book type."""
         cursor = self.conn.cursor()
         now = int(time.time())
@@ -367,7 +370,7 @@ class Database:
         cursor.execute("SELECT COUNT(*) FROM books WHERE type_id = ?", (type_id,))
         return cursor.fetchone()[0]
 
-    def get_books_by_type_stats(self, limit: int = 6) -> list:
+    def get_books_by_type_stats(self, limit: int = 6) -> list[dict]:
         """Get book counts by type for chart, ordered by count descending."""
         cursor = self.conn.cursor()
         cursor.execute("""
@@ -384,14 +387,14 @@ class Database:
     # SETTINGS
     # =========================================================================
     
-    def get_setting(self, key: str, default: str = None) -> str:
+    def get_setting(self, key: str, default: Optional[str] = None) -> Optional[str]:
         """Get a setting value."""
         cursor = self.conn.cursor()
         cursor.execute("SELECT value FROM settings WHERE key = ?", (key,))
         row = cursor.fetchone()
         return row[0] if row else default
     
-    def set_setting(self, key: str, value: str):
+    def set_setting(self, key: str, value: str) -> None:
         """Set a setting value."""
         cursor = self.conn.cursor()
         now = int(time.time())
@@ -476,7 +479,7 @@ class Database:
             'currently_reading': currently_reading
         }
     
-    def get_books_per_month(self, months: int = 12) -> list:
+    def get_books_per_month(self, months: int = 12) -> list[dict]:
         """
         Get books finished per month for the last N months.
         
@@ -526,7 +529,7 @@ class Database:
         
         return results
     
-    def get_avg_pages_per_day_by_month(self, months: int = 12) -> list:
+    def get_avg_pages_per_day_by_month(self, months: int = 12) -> list[dict]:
         """
         Get average pages per day for books finished in each of the last N months.
         
@@ -658,7 +661,7 @@ class Database:
         test_hash = hashlib.sha256(password.encode()).hexdigest()
         return test_hash == stored_hash
     
-    def set_password(self, password: str):
+    def set_password(self, password: str) -> None:
         """Set or change the master password."""
         password_hash = hashlib.sha256(password.encode()).hexdigest()
         self.set_setting('password_hash', password_hash)
