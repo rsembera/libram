@@ -223,6 +223,16 @@
     color: var(--text-muted);
 }
 
+.fortune-astrology {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+.astro-symbol {
+    font-size: 1.3rem;
+    vertical-align: middle;
+}
+
 /* ============================================
    CONTROLS BAR
    ============================================ */

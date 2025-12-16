@@ -58,7 +58,9 @@
 <div class="fortune-bar">
     <span class="fortune-date">{{ current_date }}</span>
     <span class="fortune-divider">•</span>
-    <span class="fortune-text"><em>Your fortune:</em> {{ fortune }}</span>
+    <span class="fortune-astrology"><span class="astro-symbol">☉</span> in <span class="astro-symbol">{{ astrology.sun }}</span>, <span class="astro-symbol">☽</span> in <span class="astro-symbol">{{ astrology.moon }}</span></span>
+    <span class="fortune-divider">•</span>
+    <span class="fortune-text">{{ fortune }}</span>
 </div>
 
 <!-- Controls Bar -->
