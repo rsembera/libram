@@ -3,10 +3,13 @@ Libram Books Blueprint
 Main book CRUD operations and views.
 """
 
+from __future__ import annotations
+
 import csv
 import io
 import os
 from datetime import datetime, date
+from typing import Optional
 from flask import Blueprint, render_template, request, redirect, url_for, current_app, Response, jsonify, session
 from core.fortunes import get_fortune
 from core.astrology import get_astrology_line
@@ -16,7 +19,7 @@ books_bp = Blueprint('books', __name__)
 COVERS_DIR = os.path.expanduser('~/libram/covers')
 
 
-def _delete_cover_file(filename):
+def _delete_cover_file(filename: Optional[str]) -> None:
     """Delete a cover file if it exists."""
     if not filename:
         return
@@ -332,7 +335,7 @@ def export_csv():
 # HELPER FUNCTIONS
 # =============================================================================
 
-def _parse_date_from_form(field_name: str) -> date:
+def _parse_date_from_form(field_name: str) -> Optional[date]:
     """Parse date from hidden field (YYYY-MM-DD format)."""
     date_str = request.form.get(field_name, '').strip()
     

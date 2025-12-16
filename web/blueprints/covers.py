@@ -6,7 +6,7 @@ Book cover upload, search, and serving.
 import os
 import uuid
 import requests
-from flask import Blueprint, request, jsonify, send_file
+from flask import Blueprint, request, jsonify, send_file, Response
 
 covers_bp = Blueprint('covers', __name__, url_prefix='/covers')
 
@@ -17,7 +17,7 @@ os.makedirs(COVERS_DIR, exist_ok=True)
 
 
 @covers_bp.route('/<filename>')
-def serve_cover(filename):
+def serve_cover(filename: str) -> Response | tuple[str, int]:
     """Serve a cover image."""
     # Handle None/empty filenames gracefully
     if not filename or filename == 'None':
@@ -36,7 +36,7 @@ def serve_cover(filename):
 
 
 @covers_bp.route('/upload', methods=['POST'])
-def upload_cover():
+def upload_cover() -> tuple[Response, int] | Response:
     """Upload a cover image."""
     if 'cover' not in request.files:
         return jsonify({'status': 'error', 'message': 'No file provided'}), 400
@@ -65,7 +65,7 @@ def upload_cover():
 
 
 @covers_bp.route('/search', methods=['POST'])
-def search_cover():
+def search_cover() -> tuple[Response, int] | Response:
     """Search for a cover on Open Library by ISBN."""
     isbn = request.form.get('isbn', '').strip()
     
@@ -113,7 +113,7 @@ def search_cover():
 
 
 @covers_bp.route('/delete/<filename>', methods=['POST'])
-def delete_cover(filename):
+def delete_cover(filename: str) -> tuple[Response, int] | Response:
     """Delete a cover image."""
     # Security: prevent path traversal
     if '..' in filename or '/' in filename:

@@ -4,14 +4,14 @@ Libram Book Types Blueprint
 Handles book type management (CRUD operations)
 """
 
-from flask import Blueprint, render_template, request, redirect, url_for, jsonify, current_app
+from flask import Blueprint, render_template, request, redirect, url_for, jsonify, current_app, Response
 
 # Initialize blueprint
 types_bp = Blueprint('types', __name__)
 
 
 # Color palette for book types
-COLOR_PALETTE = [
+COLOR_PALETTE: list[dict[str, str]] = [
     {'hex': '#9FCFC0', 'name': 'Seafoam', 'bubble': '#E0F2EE'},
     {'hex': '#B8D4E8', 'name': 'Sky', 'bubble': '#EBF3FA'},
     {'hex': '#D4C5E0', 'name': 'Wisteria', 'bubble': '#F3EDF7'},
@@ -24,7 +24,7 @@ COLOR_PALETTE = [
 ]
 
 # Helper to get color name from hex
-def get_color_name(hex_color):
+def get_color_name(hex_color: str) -> str:
     for c in COLOR_PALETTE:
         if c['hex'].upper() == hex_color.upper():
             return c['name']
@@ -32,7 +32,7 @@ def get_color_name(hex_color):
 
 
 @types_bp.route('/types')
-def manage_types():
+def manage_types() -> str:
     """Display book types management page."""
     db = current_app.get_db()
     all_types = db.get_all_book_types()
@@ -46,7 +46,7 @@ def manage_types():
 
 
 @types_bp.route('/types/add', methods=['GET', 'POST'])
-def add_type():
+def add_type() -> str | Response:
     """Add a new book type."""
     db = current_app.get_db()
     if request.method == 'POST':

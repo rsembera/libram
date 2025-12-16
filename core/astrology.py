@@ -3,12 +3,16 @@ Libram Astrology Module
 Sun and Moon sign calculations.
 """
 
+from __future__ import annotations
+
+import math
 import ephem
 from datetime import datetime, timezone
+from typing import Optional
 
 
 # Zodiac signs with symbols (using text variant selector U+FE0E)
-ZODIAC = [
+ZODIAC: list[tuple[str, str]] = [
     ('Aries', '♈︎'),
     ('Taurus', '♉︎'),
     ('Gemini', '♊︎'),
@@ -24,15 +28,14 @@ ZODIAC = [
 ]
 
 
-def _ecliptic_longitude_to_sign(longitude_rad):
+def _ecliptic_longitude_to_sign(longitude_rad: float) -> tuple[str, str]:
     """Convert ecliptic longitude (radians) to zodiac sign."""
-    import math
     degrees = math.degrees(longitude_rad) % 360
     sign_index = int(degrees / 30)
     return ZODIAC[sign_index]
 
 
-def get_sun_sign(dt=None):
+def get_sun_sign(dt: Optional[datetime] = None) -> tuple[str, str]:
     """Get the current sun sign."""
     if dt is None:
         dt = datetime.now(timezone.utc)
@@ -42,7 +45,7 @@ def get_sun_sign(dt=None):
     return name, symbol
 
 
-def get_moon_sign(dt=None):
+def get_moon_sign(dt: Optional[datetime] = None) -> tuple[str, str]:
     """Get the current moon sign."""
     if dt is None:
         dt = datetime.now(timezone.utc)
@@ -52,7 +55,7 @@ def get_moon_sign(dt=None):
     return name, symbol
 
 
-def get_astrology_line(dt=None):
+def get_astrology_line(dt: Optional[datetime] = None) -> dict[str, str]:
     """Get formatted astrology line for display."""
     sun_name, sun_symbol = get_sun_sign(dt)
     moon_name, moon_symbol = get_moon_sign(dt)

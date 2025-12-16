@@ -3,10 +3,13 @@ Libram Backups Blueprint
 Database backup and restore functionality.
 """
 
+from __future__ import annotations
+
 import os
 import shutil
 from datetime import datetime, timedelta
-from flask import Blueprint, render_template, request, current_app, jsonify, send_file
+from typing import Optional
+from flask import Blueprint, render_template, request, current_app, jsonify, send_file, Flask
 
 backups_bp = Blueprint('backups', __name__)
 
@@ -94,7 +97,7 @@ def save_settings():
     return jsonify({'status': 'ok'})
 
 
-def check_auto_backup(app):
+def check_auto_backup(app: Flask) -> None:
     """Check if auto-backup is due and create one if needed. Call from before_request."""
     db = app.get_db()
     
