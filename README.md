@@ -2,23 +2,29 @@
 
 **Personal Reading Tracker**
 
-A web-based reading tracker designed for personal use, with plans for Raspberry Pi deployment.
+A clean, self-hosted web app to track your reading history. Designed for personal use on your local machine or a home server like a Raspberry Pi.
 
 ## Features
 
-- **Track your reading** - Log books with title, author, pages, dates, and ratings
-- **Automatic calculations** - Days to complete, pages per day
-- **Year-over-year tracking** - Books grouped by year with dual numbering system
-- **Multiple view modes** - Detailed (horizontal) and Compact (stacked) layouts
-- **Dashboard stats** - Total books, books this year, pages read, average pace
-- **Customizable themes** - 5 card color schemes, 4 background options
-- **Encrypted database** - SQLCipher encryption for privacy
-- **Password protected** - Secure access with session timeout
-- **CSV export** - Export your complete reading history
-- **Backup system** - Manual backups with restore capability
+- **Track your reading** — Log books with title, subtitle, author, pages, dates, and ratings
+- **Automatic calculations** — Days to complete, pages per day
+- **Year-over-year tracking** — Books grouped by year with dual numbering (all-time + yearly)
+- **Book types** — Categorize books (Fiction, Non-Fiction, or custom types)
+- **Cover art** — Fetch covers via ISBN from Open Library, or upload your own
+- **Multiple views** — Detailed (horizontal cards) and Compact (stacked) layouts
+- **Dashboard stats** — Draggable info cards with reading charts
+- **7 color themes** — Grimoire, Crimson Veil, Apothecary, Solarium, Arcane, Verdant, Wasteland
+- **Custom backgrounds** — Solid colors or upload your own images
+- **DNF tracking** — Mark books as "Did Not Finish" with pages completed
+- **Fortune bar** — Daily quotes with optional sun/moon astrology signs
+- **Export** — CSV or Markdown with date range filtering
+- **Auto-backup** — Configurable automatic backups with retention settings
+- **Password protected** — Secure access with configurable session timeout
+- **Responsive design** — Works on desktop, tablet, and phone
 
 ## Rating System
 
+Customizable 5-tier rating system (default names):
 - ☆ No rating
 - ★ Black
 - ★ Bronze  
@@ -31,30 +37,33 @@ A web-based reading tracker designed for personal use, with plans for Raspberry 
 ### Requirements
 
 - Python 3.10+
-- SQLCipher (for database encryption)
 
 ### Setup
 
 ```bash
-# Clone or download
-cd ~/libram
+# Clone the repository
+git clone https://github.com/rsembera/libram.git
+cd libram
 
 # Create virtual environment
 python3 -m venv venv
-source venv/bin/activate
+source venv/bin/activate  # On Windows: venv\Scripts\activate
 
 # Install dependencies
 pip install -r requirements.txt
 
-# Run
+# Run (production mode with Waitress)
 python main.py
+
+# Or run in development mode (auto-reload)
+python main.py --debug
 ```
 
-The app will open in your browser at `http://127.0.0.1:8080`
+The app runs at `http://127.0.0.1:8090`
 
 ### First Run
 
-On first run, you'll be prompted to create a master password. This protects access to your reading database.
+On first launch, you'll be prompted to create a password. This protects access to your reading tracker.
 
 ## Usage
 
@@ -62,9 +71,10 @@ On first run, you'll be prompted to create a master password. This protects acce
 
 1. Click **Add Book** from the main view
 2. Fill in title, author, pages
-3. Set the date you began reading
-4. When finished, add the completion date
-5. Optionally add a rating and notes
+3. Optionally add subtitle, ISBN (for cover lookup), or upload a cover
+4. Set the date you began reading
+5. When finished, add the completion date
+6. Add a rating and notes if desired
 
 ### Year Assignment
 
@@ -72,39 +82,48 @@ Books belong to the year they were **begun**, not finished. A book started Decem
 
 ### Keyboard Shortcuts
 
-- `/` - Focus search box
-- `Escape` - Clear search / Close modal
+- `/` — Focus search box
+- `Escape` — Clear search / Close modals
 
 ## Deployment
 
-### Raspberry Pi
+### Home Server / Raspberry Pi
 
 For 24/7 access on your home network:
 
 ```bash
-# Set host to allow network access
 export LIBRAM_HOST=0.0.0.0
-export LIBRAM_PORT=8080
+export LIBRAM_PORT=8090
 python main.py
 ```
 
-Access from other devices at `http://raspberry-pi-ip:8080`
+Access from other devices at `http://your-server-ip:8090`
 
-### Security Note
+### Environment Variables
 
-When exposing to a network, ensure your password is strong. Consider using a reverse proxy (nginx/Caddy) with HTTPS for internet access.
+- `LIBRAM_HOST` — Bind address (default: `127.0.0.1`)
+- `LIBRAM_PORT` — Port number (default: `8090`)
+- `LIBRAM_DEBUG` — Set to `1` for development mode
+- `LIBRAM_BROWSER` — Set to `1` to auto-open browser on start
 
 ## Data Storage
 
-- **Database**: `~/libram/data/libram.db`
-- **Backups**: `~/libram/backups/`
+- **Database**: `data/libram.db` (SQLite)
+- **Covers**: `covers/`
+- **Backups**: `backups/`
+- **Custom backgrounds**: `web/static/backgrounds/`
 
 ## Technology
 
-- **Backend**: Python 3, Flask
-- **Database**: SQLite with SQLCipher encryption
-- **Frontend**: Vanilla JavaScript, Lexend font, Lucide icons
-- **No build step**: Edit and reload
+- **Backend**: Python 3, Flask, Waitress
+- **Database**: SQLite
+- **Frontend**: Vanilla JavaScript, CSS custom properties
+- **Fonts**: Lexend, Alegreya, EB Garamond, Source Serif 4
+- **Icons**: Phosphor Icons
+
+## License
+
+MIT License — see [LICENSE](LICENSE) for details.
 
 ## Credits
 
@@ -113,4 +132,4 @@ Built with Claude
 
 ---
 
-*"Every book is an edge case."*
+*"A libram for every reader."*

@@ -1,0 +1,43 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "libram"
+version = "1.0.0"
+description = "Personal reading tracker - a clean, self-hosted web app to track your reading history"
+readme = "README.md"
+license = {text = "MIT"}
+authors = [
+    {name = "Richard Sembera"}
+]
+requires-python = ">=3.10"
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Environment :: Web Environment",
+    "Framework :: Flask",
+    "Intended Audience :: End Users/Desktop",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Internet :: WWW/HTTP :: WSGI :: Application",
+]
+keywords = ["reading", "tracker", "books", "personal", "flask"]
+dependencies = [
+    "flask>=3.0.0",
+    "ephem",
+    "waitress>=3.0.0",
+    "requests",
+]
+
+[project.urls]
+Homepage = "https://github.com/rsembera/libram"
+Repository = "https://github.com/rsembera/libram"
+Issues = "https://github.com/rsembera/libram/issues"
+
+[tool.ruff]
+line-length = 100
+exclude = ["venv", ".git", "__pycache__"]
