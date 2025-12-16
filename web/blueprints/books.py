@@ -9,6 +9,7 @@ import os
 from datetime import datetime, date
 from flask import Blueprint, render_template, request, redirect, url_for, current_app, Response, jsonify, session
 from core.fortunes import get_fortune
+from core.astrology import get_astrology_line
 
 books_bp = Blueprint('books', __name__)
 
@@ -48,6 +49,9 @@ def index():
     
     # Get fortune from session (set at login)
     fortune = session.get('fortune') or get_fortune()
+    
+    # Get astrology line (calculated fresh since moon changes frequently)
+    astrology = get_astrology_line()
     
     # Get view mode from query string or cookie
     view_mode = request.args.get('view', request.cookies.get('libram_view', 'detailed'))
@@ -89,6 +93,7 @@ def index():
                           current_time=current_time,
                           current_date=current_date,
                           fortune=fortune,
+                          astrology=astrology,
                           view_mode=view_mode,
                           search=search,
                           card_style=card_style,
