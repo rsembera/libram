@@ -59,19 +59,24 @@ class Database:
         """Create tables if they don't exist."""
         cursor = self.conn.cursor()
         
-        # Books table
+        # Books table (complete schema)
         cursor.execute("""
             CREATE TABLE IF NOT EXISTS books (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 title TEXT NOT NULL,
+                subtitle TEXT DEFAULT '',
                 author TEXT NOT NULL,
                 pages INTEGER NOT NULL,
+                pages_completed INTEGER,
                 date_begun INTEGER NOT NULL,
                 date_finished INTEGER,
                 days_paused INTEGER DEFAULT 0,
                 rating INTEGER DEFAULT 0,
                 did_not_finish INTEGER DEFAULT 0,
                 notes TEXT DEFAULT '',
+                type_id INTEGER REFERENCES book_types(id),
+                cover_filename TEXT,
+                isbn TEXT,
                 all_time_number INTEGER,
                 yearly_number INTEGER,
                 created_at INTEGER NOT NULL,
@@ -88,23 +93,6 @@ class Database:
             )
         """)
         
-        # Create indexes
-        cursor.execute("""
-            CREATE INDEX IF NOT EXISTS idx_books_date_begun 
-            ON books(date_begun)
-        """)
-        
-        cursor.execute("""
-            CREATE INDEX IF NOT EXISTS idx_books_all_time_number 
-            ON books(all_time_number)
-        """)
-        
-        # Migration: Add days_paused column if it doesn't exist
-        cursor.execute("PRAGMA table_info(books)")
-        columns = [row[1] for row in cursor.fetchall()]
-        if 'days_paused' not in columns:
-            cursor.execute("ALTER TABLE books ADD COLUMN days_paused INTEGER DEFAULT 0")
-        
         # Book Types table
         cursor.execute("""
             CREATE TABLE IF NOT EXISTS book_types (
@@ -117,23 +105,16 @@ class Database:
             )
         """)
         
-        # Migration: Add type_id column to books if it doesn't exist
-        if 'type_id' not in columns:
-            cursor.execute("ALTER TABLE books ADD COLUMN type_id INTEGER REFERENCES book_types(id)")
+        # Create indexes
+        cursor.execute("""
+            CREATE INDEX IF NOT EXISTS idx_books_date_begun 
+            ON books(date_begun)
+        """)
         
-        # Migration: Add pages_completed column for DNF books
-        if 'pages_completed' not in columns:
-            cursor.execute("ALTER TABLE books ADD COLUMN pages_completed INTEGER")
-        
-        # Migration: Add subtitle column
-        if 'subtitle' not in columns:
-            cursor.execute("ALTER TABLE books ADD COLUMN subtitle TEXT DEFAULT ''")
-        
-        # Migration: Add cover_filename and isbn columns
-        if 'cover_filename' not in columns:
-            cursor.execute("ALTER TABLE books ADD COLUMN cover_filename TEXT")
-        if 'isbn' not in columns:
-            cursor.execute("ALTER TABLE books ADD COLUMN isbn TEXT")
+        cursor.execute("""
+            CREATE INDEX IF NOT EXISTS idx_books_all_time_number 
+            ON books(all_time_number)
+        """)
         
         # Seed default book types if none exist
         cursor.execute("SELECT COUNT(*) FROM book_types")
