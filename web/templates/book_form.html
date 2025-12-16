@@ -282,6 +282,17 @@
 </div>
 {% endif %}
 
+<!-- Message Modal -->
+<div id="message-modal" class="modal">
+    <div class="modal-content">
+        <h3 id="message-modal-title">Notice</h3>
+        <p id="message-modal-text"></p>
+        <div class="modal-actions">
+            <button type="button" class="btn btn-primary" onclick="closeMessageModal()">OK</button>
+        </div>
+    </div>
+</div>
+
 {% endblock %}
 
 {% block extra_js %}
@@ -327,6 +338,23 @@ function closeDeleteModal() {
 document.getElementById('delete-modal')?.addEventListener('click', function(e) {
     if (e.target === this) {
         closeDeleteModal();
+    }
+});
+
+// Message modal functions
+function showMessage(title, text) {
+    document.getElementById('message-modal-title').textContent = title;
+    document.getElementById('message-modal-text').textContent = text;
+    document.getElementById('message-modal').style.display = 'flex';
+}
+
+function closeMessageModal() {
+    document.getElementById('message-modal').style.display = 'none';
+}
+
+document.getElementById('message-modal')?.addEventListener('click', function(e) {
+    if (e.target === this) {
+        closeMessageModal();
     }
 });
 
@@ -428,7 +456,7 @@ document.addEventListener('click', function(e) {
 function searchCover() {
     const isbn = document.getElementById('isbn').value.trim();
     if (!isbn) {
-        alert('Please enter an ISBN first');
+        showMessage('ISBN Required', 'Please enter an ISBN first.');
         return;
     }
     
@@ -449,13 +477,13 @@ function searchCover() {
         if (data.status === 'ok') {
             setCoverPreview(data.filename);
         } else if (data.status === 'not_found') {
-            alert('No cover found for this ISBN. Try uploading one manually.');
+            showMessage('Cover Not Found', 'No cover found for this ISBN. Try uploading one manually.');
         } else {
-            alert('Error: ' + (data.message || 'Unknown error'));
+            showMessage('Error', data.message || 'Unknown error');
         }
     })
     .catch(err => {
-        alert('Failed to search for cover');
+        showMessage('Error', 'Failed to search for cover.');
     })
     .finally(() => {
         btn.innerHTML = originalHtml;
@@ -479,11 +507,11 @@ function uploadCover(input) {
         if (data.status === 'ok') {
             setCoverPreview(data.filename);
         } else {
-            alert('Error: ' + (data.message || 'Unknown error'));
+            showMessage('Error', data.message || 'Unknown error');
         }
     })
     .catch(err => {
-        alert('Failed to upload cover');
+        showMessage('Error', 'Failed to upload cover.');
     });
     
     // Clear input so same file can be selected again
