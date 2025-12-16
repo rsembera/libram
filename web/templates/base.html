@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-<!DOCTYPE html>
 <html lang="en" data-theme="{{ theme or 'grimoire' }}" data-border-style="{{ border_style or 'accent' }}" class="font-size-{{ font_size or 's' }}"{% if rating_5_color or rating_1_color %} style="{% if rating_5_color %}--rating-5-star: {{ rating_5_color }};{% endif %}{% if rating_1_color %}--rating-1-star: {{ rating_1_color }};{% endif %}"{% endif %}>
 <head>
     <meta charset="UTF-8">
@@ -26,6 +25,144 @@
 <body class="font-{{ font_style or 'lexend' }}"{% if background_style and background_style.startswith('user:') %} style="background-image: url('/static/user_backgrounds/{{ background_style[5:] }}'); background-size: cover; background-position: center; background-attachment: fixed;"{% endif %}>
     
     {% block content %}{% endblock %}
+    
+    <!-- Timeout Warning Overlay -->
+    <div id="timeout-warning-overlay" class="timeout-overlay" style="display: none;">
+        <div class="timeout-modal">
+            <h2>Session Expiring</h2>
+            <p>Your session will expire in <span id="timeout-countdown">60</span> seconds due to inactivity.</p>
+            <button type="button" class="btn btn-primary" onclick="window.location.reload()">Stay Logged In</button>
+        </div>
+    </div>
+    
+    <!-- Session Expired Overlay -->
+    <div id="session-expired-overlay" class="timeout-overlay" style="display: none;">
+        <div class="timeout-modal">
+            <h2>Session Expired</h2>
+            <p>Your session has expired due to inactivity. Please log in again.</p>
+            <button type="button" class="btn btn-primary" onclick="window.location.href='/login'">Log In</button>
+        </div>
+    </div>
+    
+    <!-- Session Timeout System -->
+    <script>
+    (function() {
+        let warningShown = false;
+        let countdownInterval = null;
+        let secondsRemaining = 0;
+        let checkInterval = null;
+        
+        // Check session status periodically
+        function checkSession() {
+            fetch('/api/session-status')
+                .then(r => r.json())
+                .then(data => {
+                    if (!data.logged_in) {
+                        // Session expired - blank screen and show modal
+                        blankScreenAndShowExpired();
+                        return;
+                    }
+                    
+                    // Timeout disabled
+                    if (data.timeout_minutes === 0) return;
+                    
+                    secondsRemaining = data.seconds_remaining;
+                    
+                    if (secondsRemaining <= 0) {
+                        blankScreenAndShowExpired();
+                        return;
+                    }
+                    
+                    if (data.warning_needed && !warningShown) {
+                        showWarning();
+                    } else if (!data.warning_needed && warningShown) {
+                        hideWarning();
+                    }
+                    
+                    if (warningShown) {
+                        updateCountdown();
+                    }
+                })
+                .catch(() => {}); // Ignore errors
+        }
+        
+        function showWarning() {
+            warningShown = true;
+            document.getElementById('timeout-warning-overlay').style.display = 'flex';
+            updateCountdown();
+            
+            // Update countdown every second
+            countdownInterval = setInterval(function() {
+                secondsRemaining = Math.max(0, secondsRemaining - 1);
+                updateCountdown();
+                if (secondsRemaining <= 0) {
+                    clearInterval(countdownInterval);
+                    blankScreenAndShowExpired();
+                }
+            }, 1000);
+        }
+        
+        function hideWarning() {
+            warningShown = false;
+            document.getElementById('timeout-warning-overlay').style.display = 'none';
+            if (countdownInterval) {
+                clearInterval(countdownInterval);
+                countdownInterval = null;
+            }
+        }
+        
+        function updateCountdown() {
+            document.getElementById('timeout-countdown').textContent = secondsRemaining;
+        }
+        
+        function blankScreenAndShowExpired() {
+            // Stop checking
+            if (checkInterval) {
+                clearInterval(checkInterval);
+            }
+            if (countdownInterval) {
+                clearInterval(countdownInterval);
+            }
+            
+            // Hide all page content
+            document.body.innerHTML = '';
+            document.body.style.background = 'var(--bg-primary, #1a1a2e)';
+            document.body.style.margin = '0';
+            document.body.style.padding = '0';
+            document.body.style.minHeight = '100vh';
+            document.body.style.display = 'flex';
+            document.body.style.alignItems = 'center';
+            document.body.style.justifyContent = 'center';
+            
+            // Show expired modal
+            const container = document.createElement('div');
+            container.style.cssText = 'background: var(--bg-card, #252540); padding: 2rem; border-radius: 1rem; box-shadow: 0 4px 20px rgba(0,0,0,0.3); text-align: center; max-width: 350px; border: 1px solid var(--border-color, #3a3a5c);';
+            container.innerHTML = `
+                <h2 style="color: var(--text-primary, #e0e0e0); margin: 0 0 0.75rem 0; font-size: 1.375rem; font-weight: 600;">Session Expired</h2>
+                <p style="color: var(--text-secondary, #a0a0b0); margin: 0 0 1.5rem 0; font-size: 0.9375rem;">Your session has expired due to inactivity.</p>
+                <button onclick="window.location.href='/login'" style="padding: 0.75rem 1.5rem; background: var(--accent, #6366f1); color: white; border: none; border-radius: 0.5rem; font-size: 0.9375rem; font-weight: 600; cursor: pointer; width: 100%;">
+                    Log In
+                </button>
+            `;
+            document.body.appendChild(container);
+        }
+        
+        // Only run on authenticated pages (not login/setup)
+        if (!window.location.pathname.includes('/login') && !window.location.pathname.includes('/setup')) {
+            // Check every 10 seconds
+            checkInterval = setInterval(checkSession, 10000);
+            // Initial check after 2 seconds
+            setTimeout(checkSession, 2000);
+            
+            // Check immediately when tab becomes visible
+            document.addEventListener('visibilitychange', function() {
+                if (document.visibilityState === 'visible') {
+                    checkSession();
+                }
+            });
+        }
+    })();
+    </script>
     
     {% block extra_js %}{% endblock %}
 </body>

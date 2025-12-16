@@ -6,7 +6,7 @@ Main application factory and configuration.
 import os
 import time
 from datetime import datetime
-from flask import Flask, g
+from flask import Flask, g, session, jsonify
 
 from core.database import Database
 
@@ -131,5 +131,42 @@ def create_app():
     app.register_blueprint(types_bp)
     app.register_blueprint(exports_bp)
     app.register_blueprint(covers_bp)
+    
+    # Session status API for timeout warning system
+    @app.route('/api/session-status')
+    def session_status():
+        """Return session timeout status for frontend warning system."""
+        if not session.get('logged_in'):
+            return jsonify({'logged_in': False})
+        
+        db = get_db()
+        try:
+            timeout_minutes = int(db.get_setting('session_timeout', '30'))
+        except (ValueError, TypeError):
+            timeout_minutes = 30
+        
+        # If timeout is 0 ("Never"), no warning needed
+        if timeout_minutes == 0:
+            return jsonify({
+                'logged_in': True,
+                'timeout_minutes': 0,
+                'seconds_remaining': None,
+                'warning_needed': False
+            })
+        
+        last_activity = session.get('last_activity', time.time())
+        elapsed = time.time() - last_activity
+        timeout_seconds = timeout_minutes * 60
+        seconds_remaining = max(0, timeout_seconds - elapsed)
+        
+        # Warning threshold: 60 seconds before timeout
+        warning_threshold = 60
+        
+        return jsonify({
+            'logged_in': True,
+            'timeout_minutes': timeout_minutes,
+            'seconds_remaining': int(seconds_remaining),
+            'warning_needed': seconds_remaining <= warning_threshold and seconds_remaining > 0
+        })
     
     return app
