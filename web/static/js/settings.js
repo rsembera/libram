@@ -11,7 +11,33 @@ function saveTimeout() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ timeout: timeout })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === 'ok') {
+            showTimeoutSaved();
+        }
     });
+}
+
+function showTimeoutSaved() {
+    // Remove any existing saved indicator
+    const existing = document.querySelector('.timeout-saved');
+    if (existing) existing.remove();
+    
+    // Show brief "Saved" confirmation next to dropdown
+    const select = document.getElementById('session-timeout');
+    const saved = document.createElement('span');
+    saved.innerHTML = '<i class="ph ph-check"></i> Saved';
+    saved.className = 'timeout-saved';
+    saved.style.cssText = 'color: var(--accent-primary); font-size: 0.85rem; margin-left: 0.5rem; opacity: 1; transition: opacity 0.3s;';
+    select.parentNode.appendChild(saved);
+    
+    // Fade out and remove after 2 seconds
+    setTimeout(() => {
+        saved.style.opacity = '0';
+        setTimeout(() => saved.remove(), 300);
+    }, 2000);
 }
 
 // ============================================================================

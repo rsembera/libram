@@ -115,8 +115,8 @@ def change_password():
 @auth_bp.before_app_request
 def check_session():
     """Check session validity and timeout."""
-    # Skip for static files, login, setup, and logout
-    if request.endpoint in (None, 'static', 'auth.login', 'auth.setup', 'auth.logout'):
+    # Skip for static files, login, setup, logout, and session status API
+    if request.endpoint in (None, 'static', 'auth.login', 'auth.setup', 'auth.logout', 'session_status'):
         return
     
     # Check if logged in
