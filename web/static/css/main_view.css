@@ -208,10 +208,24 @@
     font-weight: 600;
     color: var(--text-primary);
     white-space: nowrap;
+    flex-shrink: 0;
 }
 
 .fortune-divider {
     color: var(--text-muted);
+    flex-shrink: 0;
+}
+
+.fortune-astrology {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.astro-symbol {
+    font-size: 1.3rem;
+    vertical-align: middle;
 }
 
 .fortune-text {
@@ -221,16 +235,6 @@
 
 .fortune-text em {
     color: var(--text-muted);
-}
-
-.fortune-astrology {
-    color: var(--text-secondary);
-    font-size: 0.9rem;
-}
-
-.astro-symbol {
-    font-size: 1.3rem;
-    vertical-align: middle;
 }
 
 /* ============================================
