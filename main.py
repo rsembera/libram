@@ -32,13 +32,14 @@ def main():
     """Start the Libram application."""
     app = create_app()
     
-    # Suppress noisy static file request logs
-    log = logging.getLogger('werkzeug')
-    log.addFilter(QuietRequestFilter())
-    
     # Get port from environment or use default
     port = int(os.environ.get('LIBRAM_PORT', 8090))
     host = os.environ.get('LIBRAM_HOST', '127.0.0.1')
+    
+    # Check for debug mode
+    debug_mode = '--debug' in sys.argv or os.environ.get('LIBRAM_DEBUG') == '1'
+    
+    server_type = "Flask development server" if debug_mode else "Waitress"
     
     print(f"""
     ╔═══════════════════════════════════════════════════════╗
@@ -46,6 +47,7 @@ def main():
     ║   📚  LIBRAM - Personal Reading Tracker              ║
     ║                                                       ║
     ║   Running at: http://{host}:{port}                  ║
+    ║   Server: {server_type:<42} ║
     ║                                                       ║
     ║   Press Ctrl+C to stop                               ║
     ║                                                       ║
@@ -61,8 +63,21 @@ def main():
         import threading
         threading.Thread(target=open_browser, daemon=True).start()
     
-    # Run the Flask app
-    app.run(host=host, port=port, debug=True)
+    if debug_mode:
+        # Development mode with auto-reload
+        log = logging.getLogger('werkzeug')
+        log.addFilter(QuietRequestFilter())
+        app.run(host=host, port=port, debug=True)
+    else:
+        # Production mode with Waitress
+        from waitress import serve
+        
+        # Configure Waitress logging
+        logger = logging.getLogger('waitress')
+        logger.setLevel(logging.INFO)
+        
+        serve(app, host=host, port=port, threads=4)
+
 
 if __name__ == '__main__':
     main()
