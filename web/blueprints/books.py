@@ -64,6 +64,9 @@ def index():
     card_style = db.get_setting('card_style', 'tutti-frutti')
     background_style = db.get_setting('background_style', 'suit-grey')
     
+    # Get card order
+    card_order = db.get_setting('card_order', 'pages,reading-chart,navigation').split(',')
+    
     # Filter books if search provided
     if search:
         search_lower = search.lower()
@@ -99,7 +102,8 @@ def index():
                           view_mode=view_mode,
                           search=search,
                           card_style=card_style,
-                          background_style=background_style)
+                          background_style=background_style,
+                          card_order=card_order)
 
 
 @books_bp.route('/book/new', methods=['GET', 'POST'])

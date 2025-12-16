@@ -751,17 +751,58 @@
 /* ============================================
    RESPONSIVE
    ============================================ */
+
+/* Tablet landscape and below */
 @media (max-width: 1200px) {
     .stats-container {
         grid-template-columns: repeat(2, 1fr);
     }
 }
 
+/* Tablet portrait and phones */
 @media (max-width: 768px) {
-    .stats-container {
-        grid-template-columns: 1fr;
+    /* Fortune bar - stack vertically */
+    .fortune-bar {
+        flex-direction: column;
+        text-align: center;
+        gap: 0.5rem;
+        padding: 1rem 1.25rem;
     }
     
+    .fortune-divider {
+        display: none;
+    }
+    
+    .fortune-date {
+        font-size: 0.95rem;
+    }
+    
+    .fortune-astrology {
+        font-size: 0.85rem;
+    }
+    
+    .fortune-text {
+        font-size: 0.85rem;
+        line-height: 1.5;
+    }
+    
+    /* Stats cards - single column, disable drag */
+    .stats-container {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    .stat-card {
+        cursor: default;
+        height: auto;
+        min-height: 140px;
+    }
+    
+    .stat-card:hover {
+        transform: none;
+    }
+    
+    /* Controls bar - stack */
     .controls-bar {
         flex-direction: column;
         gap: 1rem;
@@ -773,10 +814,15 @@
         justify-content: center;
     }
     
+    .search-box {
+        width: 100%;
+    }
+    
     .search-box input {
         width: 100%;
     }
     
+    /* Hide column headers and view toggle */
     .column-headers {
         display: none;
     }
@@ -792,6 +838,98 @@
     
     .books-container .compact-content {
         display: flex !important;
+    }
+    
+    /* Compact content adjustments for mobile */
+    .compact-content {
+        padding: 1rem !important;
+    }
+    
+    .compact-cover {
+        height: 120px;
+    }
+    
+    .compact-info {
+        gap: 0.25rem;
+    }
+    
+    .compact-title {
+        font-size: 1rem;
+    }
+    
+    .compact-author {
+        font-size: 0.875rem;
+    }
+    
+    .compact-meta {
+        font-size: 0.8rem;
+        flex-wrap: wrap;
+    }
+    
+    /* Year headers */
+    .year-header {
+        padding: 0.75rem 1rem;
+    }
+    
+    .year-header h2 {
+        font-size: 1.25rem;
+    }
+}
+
+/* Small phones */
+@media (max-width: 480px) {
+    .fortune-bar {
+        padding: 0.875rem 1rem;
+        border-radius: 0.75rem;
+    }
+    
+    .fortune-date {
+        font-size: 0.9rem;
+    }
+    
+    .stats-container {
+        gap: 0.75rem;
+    }
+    
+    .stat-card {
+        padding: 1.25rem;
+        min-height: 120px;
+    }
+    
+    .stat-number {
+        font-size: 2rem;
+    }
+    
+    .stat-label {
+        font-size: 0.875rem;
+    }
+    
+    .compact-content {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .compact-cover {
+        width: 100%;
+        height: auto;
+        max-height: 200px;
+        margin-bottom: 0.75rem;
+    }
+    
+    .compact-cover img {
+        width: 100%;
+        height: auto;
+        max-height: 200px;
+        object-fit: contain;
+    }
+    
+    .book-row {
+        border-radius: 0.75rem;
+    }
+    
+    .add-book-btn {
+        width: 100%;
+        justify-content: center;
     }
 }
 

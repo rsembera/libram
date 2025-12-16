@@ -273,6 +273,14 @@
     
     .picker-dropdown {
         min-width: 260px;
+        left: 0 !important;
+        right: auto !important;
+        max-width: calc(100vw - 3rem);
+    }
+    
+    /* Ensure picker container is full width */
+    .picker-container {
+        width: 100%;
     }
 }
 

@@ -496,5 +496,107 @@ details[open] .settings-section-header .arrow {
     background: #7c3aed;
 }
 
+/* Card Position Grid */
+.card-position-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+}
+
+.card-position-grid .form-group {
+    max-width: none;
+}
+
 /* Hidden utility */
 .hidden { display: none !important; }
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+@media (max-width: 768px) {
+    .settings-card {
+        max-width: 100%;
+        margin: 0;
+        padding: 1rem;
+    }
+    
+    .settings-section-header {
+        padding: 1rem 1.25rem;
+    }
+    
+    .settings-section-header h3 {
+        font-size: 1rem;
+    }
+    
+    .settings-section-content {
+        padding: 0 1.25rem 1.5rem 1.25rem;
+    }
+    
+    .settings-section-content .form-group {
+        max-width: 100%;
+    }
+    
+    /* Custom dropdowns - full width on mobile */
+    .custom-dropdown {
+        width: 100%;
+    }
+    
+    .custom-dropdown-trigger {
+        width: 100%;
+    }
+    
+    .custom-dropdown-menu {
+        width: 100%;
+        max-height: 250px;
+        overflow-y: auto;
+    }
+    
+    /* Background/theme previews - smaller grid */
+    .background-grid,
+    .theme-preview-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    /* Card position grid - stack on mobile */
+    .card-position-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    /* Rating name inputs */
+    .rating-names-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    /* About modal */
+    .about-modal-content {
+        max-width: 90%;
+        padding: 1.5rem;
+    }
+    
+    .about-modal-logo {
+        width: 150px;
+    }
+}
+
+@media (max-width: 480px) {
+    .settings-card {
+        padding: 0.75rem;
+    }
+    
+    .settings-section-header {
+        padding: 0.875rem 1rem;
+    }
+    
+    .settings-section-content {
+        padding: 0 1rem 1.25rem 1rem;
+    }
+    
+    .form-group label {
+        font-size: 0.875rem;
+    }
+    
+    select, input[type="text"], input[type="password"] {
+        font-size: 16px; /* Prevent zoom on iOS */
+    }
+}
