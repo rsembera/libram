@@ -47,8 +47,8 @@ def main():
     ║                                                       ║
     ║   📚  LIBRAM - Personal Reading Tracker               ║
     ║                                                       ║
-    ║   Running at: {url:<41}║
-    ║   Server: {server_type:<43}║
+    ║   Running at: {url:<40}║
+    ║   Server: {server_type:<42}║
     ║                                                       ║
     ║   Press Ctrl+C to stop                                ║
     ║                                                       ║
