@@ -4,6 +4,107 @@
     max-width: 700px;
 }
 
+/* Cover Art Section */
+.cover-section {
+    display: flex;
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.cover-preview-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.cover-preview {
+    width: 120px;
+    height: 180px;
+    border-radius: 0.5rem;
+    overflow: hidden;
+    background: var(--bg-card-alt);
+    border: 1px solid var(--border-color);
+}
+
+.cover-preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.cover-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    color: var(--text-muted);
+}
+
+.cover-placeholder i {
+    font-size: 2rem;
+}
+
+.cover-placeholder span {
+    font-size: 0.75rem;
+}
+
+.remove-cover-btn {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+}
+
+.cover-controls {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 1rem;
+}
+
+.isbn-row {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.isbn-row input {
+    flex: 1;
+}
+
+.isbn-row button {
+    white-space: nowrap;
+}
+
+.upload-row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.or-divider {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+}
+
+.upload-btn {
+    cursor: pointer;
+}
+
+/* Spin animation for loading */
+.ph-spin {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
 /* Rating stars */
 .rating-star {
     font-size: 1rem;
