@@ -27,6 +27,7 @@ def settings_page():
         'rating_1_color': db.get_setting('rating_1_color', '#1F2937'),
         'rating_5_name': db.get_setting('rating_5_name', 'Green'),
         'rating_1_name': db.get_setting('rating_1_name', 'Black'),
+        'show_astrology': db.get_setting('show_astrology', '1'),
     }
     
     # Card positions (3 cards)
@@ -80,6 +81,18 @@ def save_font_size():
     
     size = data.get('size', 's')
     db.set_setting('font_size', size)
+    
+    return jsonify({'status': 'ok'})
+
+
+@settings_bp.route('/api/show-astrology', methods=['POST'])
+def save_show_astrology():
+    """Save show astrology preference."""
+    db = current_app.get_db()
+    data = request.get_json()
+    
+    show = '1' if data.get('show', True) else '0'
+    db.set_setting('show_astrology', show)
     
     return jsonify({'status': 'ok'})
 

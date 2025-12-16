@@ -63,6 +63,22 @@ details[open] .settings-section-header .arrow {
     max-width: 350px;
 }
 
+.toggle-label {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    cursor: pointer;
+    font-size: 0.9375rem;
+    color: var(--text-primary);
+}
+
+.toggle-label input[type="checkbox"] {
+    width: 1.125rem;
+    height: 1.125rem;
+    accent-color: var(--accent);
+    cursor: pointer;
+}
+
 /* Native select styling to match custom dropdowns */
 .settings-section-content select {
     width: 100%;

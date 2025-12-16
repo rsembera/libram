@@ -157,6 +157,13 @@
                     </div>
                 </div>
             </div>
+            
+            <div class="form-group">
+                <label class="toggle-label">
+                    <input type="checkbox" id="show-astrology" {{ 'checked' if settings.show_astrology != '0' else '' }} onchange="toggleAstrology(this.checked)">
+                    <span>Show astrology in fortune bar</span>
+                </label>
+            </div>
         </div>
     </details>
     
