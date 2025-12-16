@@ -128,3 +128,67 @@
     cursor: not-allowed;
     background: var(--bg-card-alt);
 }
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+@media (max-width: 768px) {
+    .form-card {
+        max-width: 100%;
+        margin: 0;
+        padding: 1rem;
+    }
+    
+    /* Cover section - stack vertically */
+    .cover-section {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+    
+    .cover-preview {
+        width: 150px;
+        height: 225px;
+    }
+    
+    .cover-controls {
+        width: 100%;
+        align-items: stretch;
+    }
+    
+    .isbn-row {
+        flex-direction: column;
+    }
+    
+    .isbn-row button {
+        width: 100%;
+    }
+    
+    .upload-row {
+        flex-direction: column;
+    }
+    
+    .or-divider {
+        display: none;
+    }
+}
+
+@media (max-width: 480px) {
+    .form-card {
+        padding: 0.75rem;
+    }
+    
+    .cover-preview {
+        width: 120px;
+        height: 180px;
+    }
+    
+    /* Prevent iOS zoom on inputs */
+    input[type="text"],
+    input[type="number"],
+    input[type="date"],
+    select,
+    textarea {
+        font-size: 16px;
+    }
+}

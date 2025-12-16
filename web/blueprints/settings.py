@@ -31,7 +31,7 @@ def settings_page():
     }
     
     # Card positions (3 cards)
-    card_order = db.get_setting('card_order', 'pages-year,reading-chart,navigation')
+    card_order = db.get_setting('card_order', 'pages,reading-chart,navigation')
     settings['card_positions'] = card_order.split(',')
     
     return render_template('settings.html', settings=settings)

@@ -169,3 +169,56 @@
 .btn-secondary:hover {
     background: var(--bg-card);
 }
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+@media (max-width: 768px) {
+    .export-container {
+        padding: 1rem;
+    }
+    
+    .export-card {
+        padding: 1.5rem;
+    }
+    
+    .date-range-row {
+        flex-direction: column;
+        gap: 1rem;
+        align-items: stretch;
+    }
+    
+    .date-range-row .form-group {
+        flex: none;
+        width: 100%;
+    }
+    
+    .date-range-sep {
+        display: none;
+    }
+    
+    .export-actions {
+        flex-direction: column;
+    }
+    
+    .export-actions .btn {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .export-card {
+        padding: 1rem;
+        border-radius: 0.75rem;
+    }
+    
+    .export-card h1 {
+        font-size: 1.25rem;
+    }
+    
+    /* Prevent iOS zoom */
+    input[type="date"] {
+        font-size: 16px;
+    }
+}

@@ -41,6 +41,101 @@ function showTimeoutSaved() {
 }
 
 // ============================================================================
+// CARD POSITION MANAGEMENT
+// ============================================================================
+
+const DEFAULT_CARD_ORDER = ['pages', 'reading-chart', 'navigation'];
+const CARD_NAMES = {
+    'pages': 'Pages Card',
+    'reading-chart': 'Reading Chart',
+    'navigation': 'Navigation'
+};
+
+// Track current order so we know what changed
+let currentCardOrder = [...DEFAULT_CARD_ORDER];
+
+function initCardPositions() {
+    // Get current order from data attribute or use default
+    const container = document.querySelector('[data-card-order]');
+    
+    if (container) {
+        const orderStr = container.dataset.cardOrder;
+        if (orderStr) {
+            currentCardOrder = orderStr.split(',');
+        }
+    }
+    
+    // Set dropdown values
+    for (let i = 0; i < 3; i++) {
+        const select = document.getElementById(`card-position-${i + 1}`);
+        if (select && currentCardOrder[i]) {
+            select.value = currentCardOrder[i];
+        }
+    }
+}
+
+function handleCardPositionChange(position) {
+    const select = document.getElementById(`card-position-${position + 1}`);
+    const newCardId = select.value;
+    const oldCardId = currentCardOrder[position];
+    
+    // If selecting the same card, do nothing
+    if (newCardId === oldCardId) return;
+    
+    // Find where the new card currently is
+    const swapPosition = currentCardOrder.indexOf(newCardId);
+    
+    if (swapPosition !== -1) {
+        // Swap: put the old card into the position where the new card was
+        currentCardOrder[swapPosition] = oldCardId;
+        document.getElementById(`card-position-${swapPosition + 1}`).value = oldCardId;
+    }
+    
+    // Update our tracked order
+    currentCardOrder[position] = newCardId;
+    
+    // Save the new order
+    fetch('/settings/api/card-order', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ order: currentCardOrder })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === 'ok') {
+            showCardOrderSaved();
+        }
+    });
+}
+
+function showCardOrderSaved() {
+    // Remove any existing saved indicator
+    const existing = document.querySelector('.card-order-saved');
+    if (existing) existing.remove();
+    
+    // Show brief "Saved" confirmation
+    const grid = document.querySelector('.card-position-grid');
+    if (!grid) return;
+    
+    const saved = document.createElement('div');
+    saved.innerHTML = '<i class="ph ph-check"></i> Layout saved';
+    saved.className = 'card-order-saved';
+    saved.style.cssText = 'color: var(--accent-primary); font-size: 0.85rem; margin-top: 0.75rem; opacity: 1; transition: opacity 0.3s;';
+    grid.appendChild(saved);
+    
+    // Fade out and remove after 2 seconds
+    setTimeout(() => {
+        saved.style.opacity = '0';
+        setTimeout(() => saved.remove(), 300);
+    }, 2000);
+}
+
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', function() {
+    initCardPositions();
+});
+
+// ============================================================================
 // THEME DROPDOWN
 // ============================================================================
 

@@ -184,6 +184,19 @@ function initCardDragDrop() {
     if (!container) return;
     
     const cards = container.querySelectorAll('.stat-card');
+    
+    // Disable drag-drop on touch devices or narrow screens
+    const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+    const isNarrowScreen = window.innerWidth <= 768;
+    
+    if (isTouchDevice || isNarrowScreen) {
+        // Remove draggable attribute on mobile/tablet
+        cards.forEach(card => {
+            card.removeAttribute('draggable');
+        });
+        return;
+    }
+    
     let draggedCard = null;
     
     cards.forEach(card => {
