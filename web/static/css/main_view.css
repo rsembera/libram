@@ -614,6 +614,28 @@
 .compact-content {
     display: none;
     padding: 1rem 1.25rem;
+    gap: 1rem;
+    align-items: flex-start;
+}
+
+.compact-cover {
+    flex-shrink: 0;
+    height: 145px;
+    border-radius: 0.25rem;
+    overflow: hidden;
+    background: var(--bg-card-alt);
+    align-self: flex-start;
+}
+
+.compact-cover img {
+    height: 100%;
+    width: auto;
+    display: block;
+}
+
+.compact-info {
+    flex: 1;
+    min-width: 0;
 }
 
 .compact-header {
@@ -677,7 +699,7 @@
 }
 
 .books-container.compact-mode .compact-content {
-    display: block;
+    display: flex;
 }
 
 /* ============================================
@@ -755,6 +777,76 @@
     }
     
     .books-container .compact-content {
-        display: block !important;
+        display: flex !important;
     }
+}
+
+/* ============================================
+   COVER LIGHTBOX
+   ============================================ */
+.cover-lightbox {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.9);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+}
+
+.cover-lightbox.active {
+    display: flex;
+}
+
+.lightbox-content {
+    max-width: 90vw;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.lightbox-content img {
+    max-width: 100%;
+    max-height: 80vh;
+    border-radius: 0.5rem;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+}
+
+.lightbox-title {
+    margin-top: 1rem;
+    color: white;
+    font-size: 1.125rem;
+    font-weight: 600;
+    text-align: center;
+}
+
+.lightbox-close {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: transparent;
+    border: none;
+    color: white;
+    font-size: 2rem;
+    cursor: pointer;
+    padding: 0.5rem;
+    opacity: 0.7;
+    transition: opacity 0.2s;
+}
+
+.lightbox-close:hover {
+    opacity: 1;
+}
+
+.compact-cover {
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.compact-cover:hover {
+    transform: scale(1.05);
 }

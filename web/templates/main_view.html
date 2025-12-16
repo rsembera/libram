@@ -169,25 +169,32 @@
                     
                     <!-- Compact View Content -->
                     <div class="compact-content">
-                        <div class="compact-header">
-                            <span class="book-number">#{{ book.all_time_number }} (Yr. #{{ book.yearly_number }})</span>
+                        {% if book.cover_filename %}
+                        <div class="compact-cover" onclick="event.stopPropagation(); showCoverLightbox('{{ url_for('covers.serve_cover', filename=book.cover_filename) }}', '{{ book.title|e }}')">
+                            <img src="{{ url_for('covers.serve_cover', filename=book.cover_filename) }}" alt="">
                         </div>
-                        <div class="book-title"><span class="book-rating">{{ book.rating|rating_star|safe }}</span>{% if book.type_name %} <span class="type-badge" style="background-color: {{ book.type_color }};">{{ book.type_name }}</span>{% endif %} {{ book.title }}</div>
-                        {% if book.subtitle %}<div class="book-subtitle">{{ book.subtitle }}</div>{% endif %}
-                        <div class="book-author">{{ book.author }}</div>
-                        <div class="compact-meta">
-                            <span>{% if book.did_not_finish and book.pages_completed %}{{ book.pages_completed }}/{{ book.pages }}{% else %}{{ book.pages }}{% endif %} pages</span>
-                            <span class="meta-sep">•</span>
-                            <span>{{ book.total_days or '?' }} days{% if book.days_paused %} ({{ book.days_paused }} paused){% endif %}</span>
-                            {% if book.pages_per_day %}
-                            <span class="meta-sep">•</span>
-                            <span>{{ book.pages_per_day }} pg/day</span>
-                            {% endif %}
-                        </div>
-                        <div class="compact-dates">
-                            {{ book.date_begun|timestamp_to_short_date if book.date_begun else '-' }}
-                            → 
-                            {{ book.date_finished|timestamp_to_short_date if book.date_finished else 'In progress' }}
+                        {% endif %}
+                        <div class="compact-info">
+                            <div class="compact-header">
+                                <span class="book-number">#{{ book.all_time_number }} (Yr. #{{ book.yearly_number }})</span>
+                            </div>
+                            <div class="book-title"><span class="book-rating">{{ book.rating|rating_star|safe }}</span>{% if book.type_name %} <span class="type-badge" style="background-color: {{ book.type_color }};">{{ book.type_name }}</span>{% endif %} {{ book.title }}</div>
+                            {% if book.subtitle %}<div class="book-subtitle">{{ book.subtitle }}</div>{% endif %}
+                            <div class="book-author">{{ book.author }}</div>
+                            <div class="compact-meta">
+                                <span>{% if book.did_not_finish and book.pages_completed %}{{ book.pages_completed }}/{{ book.pages }}{% else %}{{ book.pages }}{% endif %} pages</span>
+                                <span class="meta-sep">•</span>
+                                <span>{{ book.total_days or '?' }} days{% if book.days_paused %} ({{ book.days_paused }} paused){% endif %}</span>
+                                {% if book.pages_per_day %}
+                                <span class="meta-sep">•</span>
+                                <span>{{ book.pages_per_day }} pg/day</span>
+                                {% endif %}
+                            </div>
+                            <div class="compact-dates">
+                                {{ book.date_begun|timestamp_to_short_date if book.date_begun else '-' }}
+                                → 
+                                {{ book.date_finished|timestamp_to_short_date if book.date_finished else 'In progress' }}
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -206,5 +213,42 @@
     </a>
 </div>
 {% endif %}
+
+<!-- Cover Lightbox -->
+<div id="cover-lightbox" class="cover-lightbox" onclick="closeCoverLightbox()">
+    <div class="lightbox-content" onclick="event.stopPropagation()">
+        <img id="lightbox-img" src="" alt="">
+        <div id="lightbox-title" class="lightbox-title"></div>
+    </div>
+    <button class="lightbox-close" onclick="closeCoverLightbox()">
+        <i class="ph ph-x"></i>
+    </button>
+</div>
+
+<script>
+function showCoverLightbox(src, title) {
+    const lightbox = document.getElementById('cover-lightbox');
+    const img = document.getElementById('lightbox-img');
+    const titleEl = document.getElementById('lightbox-title');
+    
+    img.src = src;
+    titleEl.textContent = title;
+    lightbox.classList.add('active');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeCoverLightbox() {
+    const lightbox = document.getElementById('cover-lightbox');
+    lightbox.classList.remove('active');
+    document.body.style.overflow = '';
+}
+
+// Close on Escape key
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        closeCoverLightbox();
+    }
+});
+</script>
 
 {% endblock %}

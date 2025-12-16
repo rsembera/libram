@@ -30,7 +30,53 @@
     </div>
     {% endif %}
     
-    <form method="post" id="book-form">
+    <form method="post" id="book-form" enctype="multipart/form-data">
+        <!-- Cover Art Section -->
+        <div class="cover-section">
+            <div class="cover-preview-container">
+                <div class="cover-preview" id="cover-preview">
+                    {% if book and book.cover_filename %}
+                    <img src="{{ url_for('covers.serve_cover', filename=book.cover_filename) }}" alt="Cover">
+                    {% else %}
+                    <div class="cover-placeholder">
+                        <i class="ph ph-book-open"></i>
+                        <span>No cover</span>
+                    </div>
+                    {% endif %}
+                </div>
+                {% if book and book.cover_filename %}
+                <button type="button" class="btn btn-sm btn-danger-light remove-cover-btn" onclick="removeCover()">
+                    <i class="ph ph-x"></i> Remove
+                </button>
+                {% endif %}
+            </div>
+            <div class="cover-controls">
+                <div class="form-group">
+                    <label for="isbn">ISBN</label>
+                    <div class="isbn-row">
+                        <input type="text" id="isbn" name="isbn" 
+                               value="{{ book.isbn if book else '' }}"
+                               placeholder="978-0-123456-78-9"
+                               onkeydown="if(event.key==='Enter'){event.preventDefault(); searchCover();}">
+                        <button type="button" class="btn btn-secondary" onclick="searchCover()">
+                            <i class="ph ph-magnifying-glass"></i> Find Cover
+                        </button>
+                    </div>
+                </div>
+                <div class="upload-row">
+                    <span class="or-divider">or</span>
+                    <label class="btn btn-secondary upload-btn">
+                        <i class="ph ph-upload"></i> Upload Cover
+                        <input type="file" id="cover-file" accept="image/*" onchange="uploadCover(this)" hidden>
+                    </label>
+                </div>
+            </div>
+            <input type="hidden" id="cover_filename" name="cover_filename" 
+                   value="{{ book.cover_filename if book else '' }}">
+            <input type="hidden" name="original_cover_filename" 
+                   value="{{ book.cover_filename if book else '' }}">
+        </div>
+        
         <!-- Title -->
         <div class="form-group">
             <label for="title">Title</label>
@@ -377,5 +423,111 @@ document.addEventListener('click', function(e) {
         typeDropdown.classList.remove('open');
     }
 });
+
+// Cover art functions
+function searchCover() {
+    const isbn = document.getElementById('isbn').value.trim();
+    if (!isbn) {
+        alert('Please enter an ISBN first');
+        return;
+    }
+    
+    const btn = event.target.closest('button');
+    const originalHtml = btn.innerHTML;
+    btn.innerHTML = '<i class="ph ph-circle-notch ph-spin"></i> Searching...';
+    btn.disabled = true;
+    
+    const formData = new FormData();
+    formData.append('isbn', isbn);
+    
+    fetch('/covers/search', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === 'ok') {
+            setCoverPreview(data.filename);
+        } else if (data.status === 'not_found') {
+            alert('No cover found for this ISBN. Try uploading one manually.');
+        } else {
+            alert('Error: ' + (data.message || 'Unknown error'));
+        }
+    })
+    .catch(err => {
+        alert('Failed to search for cover');
+    })
+    .finally(() => {
+        btn.innerHTML = originalHtml;
+        btn.disabled = false;
+    });
+}
+
+function uploadCover(input) {
+    if (!input.files || !input.files[0]) return;
+    
+    const file = input.files[0];
+    const formData = new FormData();
+    formData.append('cover', file);
+    
+    fetch('/covers/upload', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === 'ok') {
+            setCoverPreview(data.filename);
+        } else {
+            alert('Error: ' + (data.message || 'Unknown error'));
+        }
+    })
+    .catch(err => {
+        alert('Failed to upload cover');
+    });
+    
+    // Clear input so same file can be selected again
+    input.value = '';
+}
+
+function setCoverPreview(filename) {
+    const preview = document.getElementById('cover-preview');
+    const container = preview.parentElement;
+    
+    // Update hidden input
+    document.getElementById('cover_filename').value = filename;
+    
+    // Update preview
+    preview.innerHTML = `<img src="/covers/${filename}" alt="Cover">`;
+    
+    // Add remove button if not present
+    if (!container.querySelector('.remove-cover-btn')) {
+        const removeBtn = document.createElement('button');
+        removeBtn.type = 'button';
+        removeBtn.className = 'btn btn-sm btn-danger-light remove-cover-btn';
+        removeBtn.innerHTML = '<i class="ph ph-x"></i> Remove';
+        removeBtn.onclick = removeCover;
+        container.appendChild(removeBtn);
+    }
+}
+
+function removeCover() {
+    // Clear hidden input (file deletion happens on save, server-side)
+    document.getElementById('cover_filename').value = '';
+    
+    // Reset preview
+    const preview = document.getElementById('cover-preview');
+    preview.innerHTML = `
+        <div class="cover-placeholder">
+            <i class="ph ph-book-open"></i>
+            <span>No cover</span>
+        </div>
+    `;
+    
+    // Remove the remove button
+    const container = preview.parentElement;
+    const removeBtn = container.querySelector('.remove-cover-btn');
+    if (removeBtn) removeBtn.remove();
+}
 </script>
 {% endblock %}

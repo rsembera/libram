@@ -129,6 +129,12 @@ class Database:
         if 'subtitle' not in columns:
             cursor.execute("ALTER TABLE books ADD COLUMN subtitle TEXT DEFAULT ''")
         
+        # Migration: Add cover_filename and isbn columns
+        if 'cover_filename' not in columns:
+            cursor.execute("ALTER TABLE books ADD COLUMN cover_filename TEXT")
+        if 'isbn' not in columns:
+            cursor.execute("ALTER TABLE books ADD COLUMN isbn TEXT")
+        
         # Seed default book types if none exist
         cursor.execute("SELECT COUNT(*) FROM book_types")
         if cursor.fetchone()[0] == 0:
@@ -153,7 +159,8 @@ class Database:
                  days_paused: int = 0, rating: int = 0, 
                  did_not_finish: bool = False, notes: str = '',
                  type_id: int = None, pages_completed: int = None,
-                 subtitle: str = '') -> int:
+                 subtitle: str = '', isbn: str = None,
+                 cover_filename: str = None) -> int:
         """
         Add a new book to the database.
         
@@ -178,13 +185,14 @@ class Database:
                 title, subtitle, author, pages, date_begun, date_finished,
                 days_paused, rating, did_not_finish, notes,
                 all_time_number, yearly_number,
-                type_id, pages_completed, created_at, modified_at
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                type_id, pages_completed, isbn, cover_filename,
+                created_at, modified_at
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """, (
             title, subtitle, author, pages, begun_ts, finished_ts,
             days_paused, rating, 1 if did_not_finish else 0, notes,
             all_time_number, yearly_number,
-            type_id, pages_completed, now, now
+            type_id, pages_completed, isbn, cover_filename, now, now
         ))
         
         self.conn.commit()
@@ -251,7 +259,7 @@ class Database:
         allowed_fields = {
             'title', 'subtitle', 'author', 'pages', 'date_begun', 'date_finished',
             'days_paused', 'rating', 'did_not_finish', 'notes', 'type_id',
-            'pages_completed'
+            'pages_completed', 'isbn', 'cover_filename'
         }
         
         updates = []

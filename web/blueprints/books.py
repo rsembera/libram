@@ -5,11 +5,29 @@ Main book CRUD operations and views.
 
 import csv
 import io
+import os
 from datetime import datetime, date
 from flask import Blueprint, render_template, request, redirect, url_for, current_app, Response, jsonify, session
 from core.fortunes import get_fortune
 
 books_bp = Blueprint('books', __name__)
+
+COVERS_DIR = os.path.expanduser('~/libram/covers')
+
+
+def _delete_cover_file(filename):
+    """Delete a cover file if it exists."""
+    if not filename:
+        return
+    # Security: prevent path traversal
+    if '..' in filename or '/' in filename:
+        return
+    filepath = os.path.join(COVERS_DIR, filename)
+    if os.path.exists(filepath):
+        try:
+            os.remove(filepath)
+        except Exception:
+            pass
 
 
 @books_bp.route('/')
@@ -107,6 +125,8 @@ def add_book():
         notes = request.form.get('notes', '').strip()
         type_id = request.form.get('type_id', '')
         type_id = int(type_id) if type_id.isdigit() else None
+        isbn = request.form.get('isbn', '').strip() or None
+        cover_filename = request.form.get('cover_filename', '').strip() or None
         
         # Validation
         errors = []
@@ -140,7 +160,9 @@ def add_book():
             did_not_finish=did_not_finish,
             notes=notes,
             type_id=type_id,
-            pages_completed=pages_completed
+            pages_completed=pages_completed,
+            isbn=isbn,
+            cover_filename=cover_filename
         )
         
         return redirect(url_for('books.index'))
@@ -165,6 +187,9 @@ def edit_book(book_id):
     if request.method == 'POST':
         # Check for delete action
         if request.form.get('action') == 'delete':
+            # Delete cover file if exists
+            if book.get('cover_filename'):
+                _delete_cover_file(book['cover_filename'])
             db.delete_book(book_id)
             return redirect(url_for('books.index'))
         
@@ -188,6 +213,9 @@ def edit_book(book_id):
         notes = request.form.get('notes', '').strip()
         type_id = request.form.get('type_id', '')
         type_id = int(type_id) if type_id.isdigit() else None
+        isbn = request.form.get('isbn', '').strip() or None
+        cover_filename = request.form.get('cover_filename', '').strip() or None
+        original_cover = request.form.get('original_cover_filename', '').strip() or None
         
         # Validation
         errors = []
@@ -209,6 +237,10 @@ def edit_book(book_id):
                                   **_get_date_options(),
                                   **_get_form_context())
         
+        # Delete old cover if it changed
+        if original_cover and original_cover != cover_filename:
+            _delete_cover_file(original_cover)
+        
         # Update book
         db.update_book(book_id,
             title=title,
@@ -222,7 +254,9 @@ def edit_book(book_id):
             did_not_finish=did_not_finish,
             notes=notes,
             type_id=type_id,
-            pages_completed=pages_completed
+            pages_completed=pages_completed,
+            isbn=isbn,
+            cover_filename=cover_filename
         )
         
         return redirect(url_for('books.index'))
