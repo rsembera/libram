@@ -4,7 +4,7 @@ Application configuration and preferences.
 """
 
 from pathlib import Path
-from flask import Blueprint, render_template, request, redirect, url_for, current_app, jsonify
+from flask import Blueprint, render_template, request, current_app, jsonify
 from werkzeug.utils import secure_filename
 
 settings_bp = Blueprint('settings', __name__)
