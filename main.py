@@ -40,16 +40,17 @@ def main():
     debug_mode = '--debug' in sys.argv or os.environ.get('LIBRAM_DEBUG') == '1'
     
     server_type = "Flask development server" if debug_mode else "Waitress"
+    url = f"http://{host}:{port}"
     
     print(f"""
     ╔═══════════════════════════════════════════════════════╗
     ║                                                       ║
-    ║   📚  LIBRAM - Personal Reading Tracker              ║
+    ║   📚  LIBRAM - Personal Reading Tracker               ║
     ║                                                       ║
-    ║   Running at: http://{host}:{port}                  ║
-    ║   Server: {server_type:<42} ║
+    ║   Running at: {url:<41}║
+    ║   Server: {server_type:<43}║
     ║                                                       ║
-    ║   Press Ctrl+C to stop                               ║
+    ║   Press Ctrl+C to stop                                ║
     ║                                                       ║
     ╚═══════════════════════════════════════════════════════╝
     """)
