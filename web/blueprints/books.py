@@ -52,6 +52,7 @@ def index():
     
     # Get astrology line (calculated fresh since moon changes frequently)
     astrology = get_astrology_line()
+    show_astrology = db.get_setting('show_astrology', '1') != '0'
     
     # Get view mode from query string or cookie
     view_mode = request.args.get('view', request.cookies.get('libram_view', 'detailed'))
@@ -94,6 +95,7 @@ def index():
                           current_date=current_date,
                           fortune=fortune,
                           astrology=astrology,
+                          show_astrology=show_astrology,
                           view_mode=view_mode,
                           search=search,
                           card_style=card_style,

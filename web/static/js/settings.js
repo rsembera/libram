@@ -511,6 +511,15 @@ function closeAboutModal() {
     modal.style.display = 'none';
 }
 
+// Astrology toggle
+function toggleAstrology(show) {
+    fetch('/settings/api/show-astrology', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ show: show })
+    });
+}
+
 // Close modal on backdrop click
 document.addEventListener('click', function(e) {
     const modal = document.getElementById('about-modal');

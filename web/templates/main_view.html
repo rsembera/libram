@@ -58,8 +58,10 @@
 <div class="fortune-bar">
     <span class="fortune-date">{{ current_date }}</span>
     <span class="fortune-divider">•</span>
+    {% if show_astrology %}
     <span class="fortune-astrology"><span class="astro-symbol">☉</span> in <span class="astro-symbol">{{ astrology.sun }}</span>, <span class="astro-symbol">☽</span> in <span class="astro-symbol">{{ astrology.moon }}</span></span>
     <span class="fortune-divider">•</span>
+    {% endif %}
     <span class="fortune-text">{{ fortune }}</span>
 </div>
 
