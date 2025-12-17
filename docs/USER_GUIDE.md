@@ -16,7 +16,7 @@ When you first open Libram, you'll be asked to create a password. This protects 
 
 The main view shows:
 
-- **Info Cards** — Three draggable cards at the top showing your stats, a reading chart, and navigation links
+- **Info Cards** — Three draggable cards at the top: Pages (this year + lifetime), Reading Chart, and Navigation
 - **Fortune Bar** — Today's date, optional astrology, and a random quote
 - **Your Books** — Grouped by year, with the current year expanded by default
 
@@ -67,23 +67,23 @@ Every book gets two numbers:
 
 ## Editing and Deleting Books
 
-Click the **lock icon** on any book to unlock it for editing. Make your changes, then click the lock again to save and re-lock.
+Click on any book card to open it for editing. Make your changes, then click **Save Changes**.
 
-To delete a book, unlock it first, then click the trash icon. You'll be asked to confirm.
+To delete a book, click the **Delete** button at the bottom of the edit page. You'll be asked to confirm.
 
 ---
 
 ## Search
 
-Press `/` or click the search box to filter your books. Search matches against title and author. The filter applies across all years.
+Type in the search box to filter your books. Search matches against title and author. The filter applies across all years.
 
-Press `Escape` to clear the search.
+Click the X button to clear the search.
 
 ---
 
 ## Book Types
 
-Book types let you categorize your reading. Libram comes with Fiction and Non-Fiction, but you can create your own.
+Book types let you categorize your reading. Libram comes with Fiction and Non-Fict, but you can create your own.
 
 Go to **Settings → Manage Book Types** to add, edit, or delete types. Each type has a color that appears as a badge on book cards.
 
@@ -91,7 +91,7 @@ Go to **Settings → Manage Book Types** to add, edit, or delete types. Each typ
 
 ## Settings
 
-Access Settings from the navigation card or the main view.
+Access Settings from the Navigation card on the main view.
 
 ### Appearance
 
@@ -101,9 +101,9 @@ Access Settings from the navigation card or the main view.
 - **Font Size** — Small, Medium, or Large
 - **Border Style** — Accent colored borders or subtle gray
 
-### Rating Names
+### Rating Colors
 
-Customize what your 5-star ratings are called. Default names are Black, Bronze, Silver, Gold, Green — but you can rename them to anything.
+Customize the colors for your 1-star and 5-star ratings. Ratings 2-4 (bronze, silver, gold) are fixed. Choose from colors like Black, Green, Blue, Purple, and more.
 
 ### Show Astrology
 
@@ -146,7 +146,7 @@ Click **Create Backup Now** to save a snapshot of your database.
 
 ### Auto-Backup
 
-Enable automatic backups with your preferred frequency (daily, weekly, etc.) and retention period (how many days to keep old backups).
+Enable automatic backups with your preferred frequency (Daily, Weekly, or Monthly) and retention period (7, 14, 30, or 90 days, or keep forever).
 
 ### Restore
 
@@ -162,8 +162,7 @@ You can also download backup files to your computer for safekeeping.
 
 | Key | Action |
 |-----|--------|
-| `/` | Focus search box |
-| `Escape` | Clear search / Close modal |
+| `Escape` | Close cover image lightbox |
 
 ---
 
