@@ -13,7 +13,7 @@ A clean, self-hosted web app to track your reading history. Designed for persona
 - **Cover art** — Fetch covers via ISBN from Open Library, or upload your own
 - **Multiple views** — Detailed (horizontal cards) and Compact (stacked) layouts
 - **Dashboard stats** — Draggable info cards with reading charts
-- **7 color themes** — Grimoire, Crimson Veil, Apothecary, Solarium, Arcane, Verdant, Wasteland
+- **7 color themes** — Grimoire, Crimson Veil, Wasteland, Lost World, Terminal, Hardboiled, The Witching Hour
 - **Custom backgrounds** — Solid colors or upload your own images
 - **DNF tracking** — Mark books as "Did Not Finish" with pages completed
 - **Fortune bar** — Daily quotes with optional sun/moon astrology signs
@@ -118,7 +118,7 @@ Access from other devices at `http://your-server-ip:8090`
 - **Backend**: Python 3, Flask, Waitress
 - **Database**: SQLite
 - **Frontend**: Vanilla JavaScript, CSS custom properties
-- **Fonts**: Lexend, Alegreya, EB Garamond, Source Serif 4
+- **Fonts**: Lexend, Libre Baskerville, Lora, Source Sans 3, Literata
 - **Icons**: Phosphor Icons
 
 ## License
