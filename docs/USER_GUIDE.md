@@ -95,9 +95,9 @@ Access Settings from the navigation card or the main view.
 
 ### Appearance
 
-- **Theme** — Seven color themes: Grimoire (default), Crimson Veil, Apothecary, Solarium, Arcane, Verdant, Wasteland
+- **Theme** — Seven color themes: Grimoire (default), Crimson Veil, Wasteland, Lost World, Terminal, Hardboiled, The Witching Hour
 - **Background** — Solid colors or upload a custom background image
-- **Font** — Choose from several font families including dyslexia-friendly options
+- **Font** — Choose from Lexend, Libre Baskerville, Lora, Source Sans 3, or Literata
 - **Font Size** — Small, Medium, or Large
 - **Border Style** — Accent colored borders or subtle gray
 
