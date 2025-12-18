@@ -734,18 +734,31 @@
    EMPTY STATE
    ============================================ */
 .empty-state {
-    background: white;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
     border-radius: 1.5rem;
     padding: 4rem 2rem;
     text-align: center;
     max-width: 500px;
     margin: 2rem auto;
     box-shadow: var(--shadow-lg);
+    color: var(--text-primary);
+}
+
+.empty-state h3 {
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+}
+
+.empty-state p {
+    color: var(--text-secondary);
+    margin-bottom: 1.5rem;
 }
 
 .empty-icon {
     font-size: 4rem;
     margin-bottom: 1rem;
+    color: var(--text-muted);
 }
 
 /* ============================================
