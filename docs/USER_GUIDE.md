@@ -95,7 +95,7 @@ Access Settings from the Navigation card on the main view.
 
 ### Appearance
 
-- **Theme** — Seven color themes: Grimoire (default), Crimson Veil, Wasteland, Lost World, Terminal, Hardboiled, The Witching Hour
+- **Theme** — Seven color themes: The Witching Hour (default), Crimson Veil, Hardboiled, Grimoire, Wasteland, Lost World, Terminal
 - **Background** — Solid colors or upload a custom background image
 - **Font** — Choose from Lexend, Libre Baskerville, Lora, Source Sans 3, or Literata
 - **Font Size** — Small, Medium, or Large

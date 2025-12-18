@@ -3,56 +3,56 @@
    Seven distinct reading atmospheres
    ============================================ */
 
-/* Default Theme - Grimoire (purple/lavender - fantasy/magic) */
+/* Default Theme - The Witching Hour (dark blue/purple - horror/gothic) */
 :root {
     /* Page background */
-    --bg-page: #c8c0d8;
+    --bg-page: #101220;
     
-    /* Card backgrounds - warm cream with lavender tint */
-    --bg-card: #f8f6fc;
-    --bg-card-alt: #f0eef6;
-    --bg-card-hover: #e8e4f2;
+    /* Card backgrounds */
+    --bg-card: #1c1e2a;
+    --bg-card-alt: #22243a;
+    --bg-card-hover: #2a2c44;
     
     /* Info card accent colors */
-    --bg-card-1: #e8e0f4;
-    --bg-card-2: #dcd4ec;
-    --bg-card-3: #d0c8e4;
+    --bg-card-1: #242640;
+    --bg-card-2: #282a48;
+    --bg-card-3: #2c2e50;
     
     /* Text colors */
-    --text-primary: #2d2640;
-    --text-secondary: #5a5070;
-    --text-muted: #7a7090;
+    --text-primary: #e8e6f0;
+    --text-secondary: #a8a4b8;
+    --text-muted: #707088;
     --text-on-accent: #ffffff;
     
-    /* Accent colors - richer purple */
-    --accent-primary: #7c6fb0;
-    --accent-hover: #6558a0;
-    --accent-light: #b8b0d8;
+    /* Accent colors */
+    --accent-primary: #7080c0;
+    --accent-hover: #8898d8;
+    --accent-light: #4a5080;
     
     /* Borders, dividers */
-    --border-color: #b0a8c8;
-    --card-border: #5a4a90;
-    --card-border-vibrant: #c9a227;
-    --divider-color: #8878b0;
-    --chart-grid: #c0b8d0;
-    --shadow-color: rgba(100,80,140,0.15);
+    --border-color: #3a3c58;
+    --card-border: #6878b0;
+    --card-border-vibrant: #c0a040;
+    --divider-color: #6070a8;
+    --chart-grid: #383a50;
+    --shadow-color: rgba(0,0,0,0.5);
     
     /* Button colors */
-    --btn-primary-bg: #7c6fb0;
+    --btn-primary-bg: #7080c0;
     --btn-primary-text: #ffffff;
-    --btn-secondary-bg: #e0dae8;
-    --btn-secondary-text: #2d2640;
+    --btn-secondary-bg: #2c2e48;
+    --btn-secondary-text: #e8e6f0;
     
     /* Chart colors */
-    --chart-bar: #7c6fb0;
-    --chart-bar-alt: #5bb87a;
-    --chart-empty: #ddd8e8;
+    --chart-bar: #7080c0;
+    --chart-bar-alt: #50a898;
+    --chart-empty: #2a2c44;
     
     /* Book list */
-    --book-row-even: #f8f6fc;
-    --book-row-odd: #f0edf8;
-    --book-row-hover: #e6e0f0;
-    --year-header-bg: #ddd6ec;
+    --book-row-even: #1c1e2a;
+    --book-row-odd: #202234;
+    --book-row-hover: #282a40;
+    --year-header-bg: #242640;
     
     /* Rating colors */
     --rating-5-star: #10B981;
@@ -275,46 +275,47 @@
 }
 
 /* The Witching Hour - Dark Mode - horror/gothic */
-[data-theme="witching-hour"] {
-    --bg-page: #101220;
+/* Grimoire - Purple/Lavender - fantasy/magic */
+[data-theme="grimoire"] {
+    --bg-page: #c8c0d8;
     
-    --bg-card: #1c1e2a;
-    --bg-card-alt: #22243a;
-    --bg-card-hover: #2a2c44;
+    --bg-card: #f8f6fc;
+    --bg-card-alt: #f0eef6;
+    --bg-card-hover: #e8e4f2;
     
-    --bg-card-1: #242640;
-    --bg-card-2: #282a48;
-    --bg-card-3: #2c2e50;
+    --bg-card-1: #e8e0f4;
+    --bg-card-2: #dcd4ec;
+    --bg-card-3: #d0c8e4;
     
-    --text-primary: #e8e6f0;
-    --text-secondary: #a8a4b8;
-    --text-muted: #707088;
+    --text-primary: #2d2640;
+    --text-secondary: #5a5070;
+    --text-muted: #7a7090;
     --text-on-accent: #ffffff;
     
-    --accent-primary: #7080c0;
-    --accent-hover: #8898d8;
-    --accent-light: #4a5080;
+    --accent-primary: #7c6fb0;
+    --accent-hover: #6558a0;
+    --accent-light: #b8b0d8;
     
-    --border-color: #3a3c58;
-    --card-border: #6878b0;
-    --card-border-vibrant: #c0a040;
-    --divider-color: #6070a8;
-    --chart-grid: #383a50;
-    --shadow-color: rgba(0,0,0,0.5);
+    --border-color: #b0a8c8;
+    --card-border: #5a4a90;
+    --card-border-vibrant: #c9a227;
+    --divider-color: #8878b0;
+    --chart-grid: #c0b8d0;
+    --shadow-color: rgba(100,80,140,0.15);
     
-    --btn-primary-bg: #7080c0;
+    --btn-primary-bg: #7c6fb0;
     --btn-primary-text: #ffffff;
-    --btn-secondary-bg: #2c2e48;
-    --btn-secondary-text: #e8e6f0;
+    --btn-secondary-bg: #e0dae8;
+    --btn-secondary-text: #2d2640;
     
-    --chart-bar: #7080c0;
-    --chart-bar-alt: #50a898;
-    --chart-empty: #2a2c44;
+    --chart-bar: #7c6fb0;
+    --chart-bar-alt: #5bb87a;
+    --chart-empty: #ddd8e8;
     
-    --book-row-even: #1c1e2a;
-    --book-row-odd: #202234;
-    --book-row-hover: #282a40;
-    --year-header-bg: #242640;
+    --book-row-even: #f8f6fc;
+    --book-row-odd: #f0edf8;
+    --book-row-hover: #e6e0f0;
+    --year-header-bg: #ddd6ec;
 }
 
 

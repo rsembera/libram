@@ -140,13 +140,13 @@ document.addEventListener('DOMContentLoaded', function() {
 // ============================================================================
 
 const themeNames = {
-    'grimoire': 'Grimoire',
+    'witching-hour': 'The Witching Hour',
     'crimson-veil': 'Crimson Veil',
+    'hardboiled': 'Hardboiled',
+    'grimoire': 'Grimoire',
     'wasteland': 'Wasteland',
     'lost-world': 'Lost World',
-    'terminal': 'Terminal',
-    'hardboiled': 'Hardboiled',
-    'witching-hour': 'The Witching Hour'
+    'terminal': 'Terminal'
 };
 
 function toggleThemeDropdown() {
