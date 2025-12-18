@@ -143,10 +143,11 @@ const themeNames = {
     'witching-hour': 'The Witching Hour',
     'crimson-veil': 'Crimson Veil',
     'hardboiled': 'Hardboiled',
+    'terminal': 'Terminal',
     'grimoire': 'Grimoire',
     'wasteland': 'Wasteland',
     'lost-world': 'Lost World',
-    'terminal': 'Terminal'
+    'nautilus': 'Nautilus'
 };
 
 function toggleThemeDropdown() {

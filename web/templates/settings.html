@@ -46,6 +46,10 @@
                              data-value="hardboiled" onclick="selectTheme(this)">
                             <span class="theme-preview theme-preview-hardboiled"></span>Hardboiled
                         </div>
+                        <div class="custom-dropdown-option {{ 'selected' if settings.theme == 'terminal' else '' }}" 
+                             data-value="terminal" onclick="selectTheme(this)">
+                            <span class="theme-preview theme-preview-terminal"></span>Terminal
+                        </div>
                         <div class="custom-dropdown-option {{ 'selected' if settings.theme == 'grimoire' else '' }}" 
                              data-value="grimoire" onclick="selectTheme(this)">
                             <span class="theme-preview theme-preview-grimoire"></span>Grimoire
@@ -58,9 +62,9 @@
                              data-value="lost-world" onclick="selectTheme(this)">
                             <span class="theme-preview theme-preview-lost-world"></span>Lost World
                         </div>
-                        <div class="custom-dropdown-option {{ 'selected' if settings.theme == 'terminal' else '' }}" 
-                             data-value="terminal" onclick="selectTheme(this)">
-                            <span class="theme-preview theme-preview-terminal"></span>Terminal
+                        <div class="custom-dropdown-option {{ 'selected' if settings.theme == 'nautilus' else '' }}" 
+                             data-value="nautilus" onclick="selectTheme(this)">
+                            <span class="theme-preview theme-preview-nautilus"></span>Nautilus
                         </div>
                     </div>
                 </div>

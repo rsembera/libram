@@ -189,7 +189,8 @@
 }
 
 /* Terminal - Teal/Cyan - cyberpunk/sci-fi */
-[data-theme="terminal"] {
+/* Nautilus - Teal/Cyan - underwater/adventure */
+[data-theme="nautilus"] {
     --bg-page: #98c8d8;
     
     --bg-card: #e0f2f4;
@@ -229,6 +230,49 @@
     --book-row-odd: #d4eaee;
     --book-row-hover: #c8e4e8;
     --year-header-bg: #c8e0e8;
+}
+
+/* Terminal - Green on black - classic CRT */
+[data-theme="terminal"] {
+    --bg-page: #0a0a0a;
+    
+    --bg-card: #0f0f0f;
+    --bg-card-alt: #141414;
+    --bg-card-hover: #1a1a1a;
+    
+    --bg-card-1: #101410;
+    --bg-card-2: #121812;
+    --bg-card-3: #141c14;
+    
+    --text-primary: #33ff33;
+    --text-secondary: #28cc28;
+    --text-muted: #1a801a;
+    --text-on-accent: #0a0a0a;
+    
+    --accent-primary: #33ff33;
+    --accent-hover: #66ff66;
+    --accent-light: #145014;
+    
+    --border-color: #1a401a;
+    --card-border: #28cc28;
+    --card-border-vibrant: #ff6633;
+    --divider-color: #28cc28;
+    --chart-grid: #1a401a;
+    --shadow-color: rgba(0,0,0,0.5);
+    
+    --btn-primary-bg: #28cc28;
+    --btn-primary-text: #0a0a0a;
+    --btn-secondary-bg: #1a281a;
+    --btn-secondary-text: #33ff33;
+    
+    --chart-bar: #33ff33;
+    --chart-bar-alt: #33ccff;
+    --chart-empty: #1a1a1a;
+    
+    --book-row-even: #0f0f0f;
+    --book-row-odd: #121412;
+    --book-row-hover: #1a201a;
+    --year-header-bg: #101410;
 }
 
 /* Hardboiled - Dark smoky grays with amber - noir/detective */
