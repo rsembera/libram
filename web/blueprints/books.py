@@ -135,7 +135,7 @@ def add_book():
         notes = request.form.get('notes', '').strip()
         type_id = request.form.get('type_id', '')
         type_id = int(type_id) if type_id.isdigit() else None
-        isbn = request.form.get('isbn', '').strip() or None
+        isbn = request.form.get('isbn', '').strip().replace('-', '').replace(' ', '') or None
         cover_filename = request.form.get('cover_filename', '').strip() or None
         
         # Validation
@@ -223,7 +223,7 @@ def edit_book(book_id):
         notes = request.form.get('notes', '').strip()
         type_id = request.form.get('type_id', '')
         type_id = int(type_id) if type_id.isdigit() else None
-        isbn = request.form.get('isbn', '').strip() or None
+        isbn = request.form.get('isbn', '').strip().replace('-', '').replace(' ', '') or None
         cover_filename = request.form.get('cover_filename', '').strip() or None
         original_cover = request.form.get('original_cover_filename', '').strip() or None
         
