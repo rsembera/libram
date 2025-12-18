@@ -59,47 +59,47 @@
     --rating-1-star: #1F2937;
 }
 
-/* Crimson Veil - Pink/Rose - dark romance/gothic */
+/* Crimson Veil - Deep blacks with blood red - dark romance/gothic */
 [data-theme="crimson-veil"] {
-    --bg-page: #d8c0c8;
+    --bg-page: #0a0608;
     
-    --bg-card: #fdf8f8;
-    --bg-card-alt: #f8f0f2;
-    --bg-card-hover: #f4e8ec;
+    --bg-card: #1a1214;
+    --bg-card-alt: #221a1c;
+    --bg-card-hover: #2a2024;
     
-    --bg-card-1: #f8e0e4;
-    --bg-card-2: #f0d4da;
-    --bg-card-3: #e8c8d0;
+    --bg-card-1: #241418;
+    --bg-card-2: #2a181c;
+    --bg-card-3: #301c20;
     
-    --text-primary: #402830;
-    --text-secondary: #704858;
-    --text-muted: #906878;
+    --text-primary: #f0e8ea;
+    --text-secondary: #b8a0a8;
+    --text-muted: #887078;
     --text-on-accent: #ffffff;
     
-    --accent-primary: #c46b80;
-    --accent-hover: #b05570;
-    --accent-light: #e8b0c0;
+    --accent-primary: #a03050;
+    --accent-hover: #c04068;
+    --accent-light: #602038;
     
-    --border-color: #d0b0b8;
-    --card-border: #a05068;
-    --card-border-vibrant: #2a9a8a;
-    --divider-color: #c46b80;
-    --chart-grid: #d8c0c8;
-    --shadow-color: rgba(160,80,100,0.12);
+    --border-color: #3a2830;
+    --card-border: #802040;
+    --card-border-vibrant: #40a0a0;
+    --divider-color: #903050;
+    --chart-grid: #382830;
+    --shadow-color: rgba(0,0,0,0.5);
     
-    --btn-primary-bg: #c46b80;
+    --btn-primary-bg: #a03050;
     --btn-primary-text: #ffffff;
-    --btn-secondary-bg: #f0dce0;
-    --btn-secondary-text: #402830;
+    --btn-secondary-bg: #2a1820;
+    --btn-secondary-text: #f0e8ea;
     
-    --chart-bar: #c46b80;
-    --chart-bar-alt: #5bb87a;
-    --chart-empty: #e8d8dc;
+    --chart-bar: #a03050;
+    --chart-bar-alt: #50a898;
+    --chart-empty: #2a2024;
     
-    --book-row-even: #fdf8f8;
-    --book-row-odd: #f8f2f4;
-    --book-row-hover: #f2e8ec;
-    --year-header-bg: #f0d8e0;
+    --book-row-even: #1a1214;
+    --book-row-odd: #1e1618;
+    --book-row-hover: #281c20;
+    --year-header-bg: #241418;
 }
 
 /* Wasteland - Amber/Orange - post-apocalyptic/dystopian */
@@ -231,47 +231,47 @@
     --year-header-bg: #c8e0e8;
 }
 
-/* Hardboiled - Brown/Tan - noir/detective */
+/* Hardboiled - Dark smoky grays with amber - noir/detective */
 [data-theme="hardboiled"] {
-    --bg-page: #c8b8a0;
+    --bg-page: #0c0a08;
     
-    --bg-card: #fcfaf6;
-    --bg-card-alt: #f6f4ee;
-    --bg-card-hover: #f0ece4;
+    --bg-card: #1a1814;
+    --bg-card-alt: #22201a;
+    --bg-card-hover: #2a2820;
     
-    --bg-card-1: #ece4d8;
-    --bg-card-2: #e4dcd0;
-    --bg-card-3: #dcd4c8;
+    --bg-card-1: #241e18;
+    --bg-card-2: #2a241c;
+    --bg-card-3: #302a20;
     
-    --text-primary: #302820;
-    --text-secondary: #584838;
-    --text-muted: #786858;
+    --text-primary: #f0ece4;
+    --text-secondary: #b8b0a0;
+    --text-muted: #888070;
     --text-on-accent: #ffffff;
     
-    --accent-primary: #987050;
-    --accent-hover: #805838;
-    --accent-light: #c8a888;
+    --accent-primary: #c89030;
+    --accent-hover: #e0a840;
+    --accent-light: #705020;
     
-    --border-color: #c0b098;
-    --card-border: #7a5838;
-    --card-border-vibrant: #3868a0;
-    --divider-color: #987050;
-    --chart-grid: #c8b8a8;
-    --shadow-color: rgba(120,80,50,0.12);
+    --border-color: #3a3428;
+    --card-border: #a07820;
+    --card-border-vibrant: #4080a0;
+    --divider-color: #b08030;
+    --chart-grid: #383020;
+    --shadow-color: rgba(0,0,0,0.5);
     
-    --btn-primary-bg: #987050;
-    --btn-primary-text: #ffffff;
-    --btn-secondary-bg: #e4dcd0;
-    --btn-secondary-text: #302820;
+    --btn-primary-bg: #c89030;
+    --btn-primary-text: #1a1814;
+    --btn-secondary-bg: #2a2418;
+    --btn-secondary-text: #f0ece4;
     
-    --chart-bar: #987050;
-    --chart-bar-alt: #4a9058;
-    --chart-empty: #dcd4c8;
+    --chart-bar: #c89030;
+    --chart-bar-alt: #50a898;
+    --chart-empty: #2a2820;
     
-    --book-row-even: #fcfaf6;
-    --book-row-odd: #f7f4ee;
-    --book-row-hover: #f0ebe0;
-    --year-header-bg: #e4dac8;
+    --book-row-even: #1a1814;
+    --book-row-odd: #1e1c16;
+    --book-row-hover: #28241c;
+    --year-header-bg: #241e18;
 }
 
 /* The Witching Hour - Dark Mode - horror/gothic */
