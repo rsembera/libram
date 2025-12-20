@@ -13,7 +13,7 @@ A clean, self-hosted web app to track your reading history. Designed for persona
 - **Cover art** — Fetch covers via ISBN from Open Library, or upload your own
 - **Multiple views** — Detailed (horizontal cards) and Compact (stacked) layouts
 - **Dashboard stats** — Draggable info cards with reading charts
-- **8 color themes** — The Witching Hour, Crimson Veil, Hardboiled, Terminal, Grimoire, Wasteland, Lost World, Nautilus
+- **8 color themes** — Witching Hour, Crimson Veil, Hardboiled, Terminal, Grimoire, Wasteland, Lost World, Nautilus
 - **Custom backgrounds** — Solid colors or upload your own images
 - **DNF tracking** — Mark books as "Did Not Finish" with pages completed
 - **Fortune bar** — Daily quotes with optional sun/moon astrology signs

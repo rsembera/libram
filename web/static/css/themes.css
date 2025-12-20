@@ -3,7 +3,7 @@
    Seven distinct reading atmospheres
    ============================================ */
 
-/* Default Theme - The Witching Hour (dark blue/purple - horror/gothic) */
+/* Default Theme - Witching Hour (dark blue/purple - horror/gothic) */
 :root {
     /* Page background */
     --bg-page: #101220;
@@ -318,7 +318,6 @@
     --year-header-bg: #241e18;
 }
 
-/* The Witching Hour - Dark Mode - horror/gothic */
 /* Grimoire - Purple/Lavender - fantasy/magic */
 [data-theme="grimoire"] {
     --bg-page: #c8c0d8;
