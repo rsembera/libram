@@ -66,7 +66,7 @@ def upload_cover() -> tuple[Response, int] | Response:
 
 @covers_bp.route('/search', methods=['POST'])
 def search_cover() -> tuple[Response, int] | Response:
-    """Search for a cover on Open Library by ISBN."""
+    """Search for a cover and book info on Open Library by ISBN."""
     isbn = request.form.get('isbn', '').strip()
     
     if not isbn:
@@ -86,27 +86,33 @@ def search_cover() -> tuple[Response, int] | Response:
             return jsonify({'status': 'not_found', 'message': 'ISBN not found in Open Library'})
         
         book_info = api_data[book_key]
-        if 'cover' not in book_info:
-            return jsonify({'status': 'not_found', 'message': 'No cover available for this ISBN'})
         
-        # Get the large cover image
-        cover_url = book_info['cover'].get('large') or book_info['cover'].get('medium')
-        if not cover_url:
-            return jsonify({'status': 'not_found', 'message': 'No cover image available'})
+        # Extract book metadata
+        metadata = {
+            'title': book_info.get('title', ''),
+            'subtitle': book_info.get('subtitle', ''),
+            'authors': ', '.join(a.get('name', '') for a in book_info.get('authors', [])),
+            'pages': book_info.get('number_of_pages'),
+        }
         
-        # Download the cover
-        img_resp = requests.get(cover_url, timeout=10)
-        if img_resp.status_code != 200 or len(img_resp.content) < 1000:
-            return jsonify({'status': 'not_found', 'message': 'Failed to download cover image'})
+        # Check for cover
+        filename = None
+        if 'cover' in book_info:
+            cover_url = book_info['cover'].get('large') or book_info['cover'].get('medium')
+            if cover_url:
+                # Download the cover
+                img_resp = requests.get(cover_url, timeout=10)
+                if img_resp.status_code == 200 and len(img_resp.content) >= 1000:
+                    filename = f"{uuid.uuid4().hex}.jpg"
+                    filepath = os.path.join(COVERS_DIR, filename)
+                    with open(filepath, 'wb') as f:
+                        f.write(img_resp.content)
         
-        # Save the cover
-        filename = f"{uuid.uuid4().hex}.jpg"
-        filepath = os.path.join(COVERS_DIR, filename)
-        
-        with open(filepath, 'wb') as f:
-            f.write(img_resp.content)
-        
-        return jsonify({'status': 'ok', 'filename': filename})
+        return jsonify({
+            'status': 'ok',
+            'filename': filename,
+            'metadata': metadata
+        })
     
     except requests.RequestException as e:
         return jsonify({'status': 'error', 'message': f'Failed to search: {str(e)}'}), 500

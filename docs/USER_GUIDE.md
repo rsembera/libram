@@ -41,7 +41,7 @@ Click **Add Book** to log a new book. Fill in:
 
 You can add cover art two ways:
 
-1. **ISBN Lookup** — Enter the ISBN and click the search icon. Libram fetches the cover from Open Library.
+1. **ISBN Lookup** — Enter the ISBN and click the search icon. Libram fetches the cover, title, author, and page count from Open Library (only populates empty fields).
 2. **Upload** — Click "Upload" to add your own image.
 
 ### Did Not Finish (DNF)
