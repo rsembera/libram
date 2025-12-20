@@ -8,7 +8,6 @@ from __future__ import annotations
 import os
 import shutil
 from datetime import datetime, timedelta
-from typing import Optional
 from flask import Blueprint, render_template, request, current_app, jsonify, send_file, Flask
 
 backups_bp = Blueprint('backups', __name__)
