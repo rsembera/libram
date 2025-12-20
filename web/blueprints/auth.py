@@ -6,7 +6,7 @@ Login, logout, and session management.
 from __future__ import annotations
 
 import time
-from flask import Blueprint, render_template, request, redirect, url_for, session, make_response, current_app, Response
+from flask import Blueprint, render_template, request, redirect, url_for, session, make_response, current_app
 from core.fortunes import get_fortune
 
 auth_bp = Blueprint('auth', __name__)

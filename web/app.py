@@ -8,7 +8,6 @@ from __future__ import annotations
 import os
 import time
 from datetime import datetime
-from typing import Optional
 from flask import Flask, g, session, jsonify
 
 from core.database import Database
