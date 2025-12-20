@@ -10,7 +10,7 @@ A clean, self-hosted web app to track your reading history. Designed for persona
 - **Automatic calculations** — Days to complete, pages per day
 - **Year-over-year tracking** — Books grouped by year with dual numbering (all-time + yearly)
 - **Book types** — Categorize books (Fiction, Non-Fiction, or custom types)
-- **Cover art** — Fetch covers via ISBN from Open Library, or upload your own
+- **Cover art** — Fetch covers and book info via ISBN from Open Library, or upload your own
 - **Multiple views** — Detailed (horizontal cards) and Compact (stacked) layouts
 - **Dashboard stats** — Draggable info cards with reading charts
 - **8 color themes** — Witching Hour, Crimson Veil, Hardboiled, Terminal, Grimoire, Wasteland, Lost World, Nautilus
@@ -71,7 +71,7 @@ On first launch, you'll be prompted to create a password. This protects access t
 
 1. Click **Add Book** from the main view
 2. Fill in title, author, pages
-3. Optionally add subtitle, ISBN (for cover lookup), or upload a cover
+3. Optionally add ISBN (auto-fills title, author, pages, and cover), or upload a cover
 4. Set the date you began reading
 5. When finished, add the completion date
 6. Add a rating and notes if desired

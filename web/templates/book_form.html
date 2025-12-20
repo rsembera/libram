@@ -475,9 +475,39 @@ function searchCover() {
     .then(response => response.json())
     .then(data => {
         if (data.status === 'ok') {
-            setCoverPreview(data.filename);
+            // Set cover if found
+            if (data.filename) {
+                setCoverPreview(data.filename);
+            }
+            
+            // Auto-populate empty fields with metadata
+            if (data.metadata) {
+                const m = data.metadata;
+                const titleField = document.getElementById('title');
+                const subtitleField = document.getElementById('subtitle');
+                const authorField = document.getElementById('author');
+                const pagesField = document.getElementById('pages');
+                
+                if (m.title && !titleField.value.trim()) {
+                    titleField.value = m.title;
+                }
+                if (m.subtitle && !subtitleField.value.trim()) {
+                    subtitleField.value = m.subtitle;
+                }
+                if (m.authors && !authorField.value.trim()) {
+                    authorField.value = m.authors;
+                }
+                if (m.pages && !pagesField.value) {
+                    pagesField.value = m.pages;
+                }
+            }
+            
+            // Show message if no cover but we got metadata
+            if (!data.filename && data.metadata && data.metadata.title) {
+                showMessage('Partial Match', 'Book info found but no cover available. Try uploading one manually.');
+            }
         } else if (data.status === 'not_found') {
-            showMessage('Cover Not Found', 'No cover found for this ISBN. Try uploading one manually.');
+            showMessage('Not Found', 'ISBN not found in Open Library.');
         } else {
             showMessage('Error', data.message || 'Unknown error');
         }
