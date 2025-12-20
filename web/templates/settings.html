@@ -30,13 +30,13 @@
                 <label>Theme</label>
                 <div class="custom-dropdown" id="theme-dropdown">
                     <button type="button" class="custom-dropdown-trigger" onclick="toggleThemeDropdown()">
-                        <span id="theme-selected-text">The Witching Hour</span>
+                        <span id="theme-selected-text">Witching Hour</span>
                         <i class="ph ph-caret-down" class="dropdown-arrow" style="width: 18px; height: 18px;"></i>
                     </button>
                     <div class="custom-dropdown-menu">
                         <div class="custom-dropdown-option {{ 'selected' if settings.theme == 'witching-hour' or not settings.theme else '' }}" 
                              data-value="witching-hour" onclick="selectTheme(this)">
-                            <span class="theme-preview theme-preview-witching-hour"></span>The Witching Hour
+                            <span class="theme-preview theme-preview-witching-hour"></span>Witching Hour
                         </div>
                         <div class="custom-dropdown-option {{ 'selected' if settings.theme == 'crimson-veil' else '' }}" 
                              data-value="crimson-veil" onclick="selectTheme(this)">

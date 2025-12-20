@@ -140,7 +140,7 @@ document.addEventListener('DOMContentLoaded', function() {
 // ============================================================================
 
 const themeNames = {
-    'witching-hour': 'The Witching Hour',
+    'witching-hour': 'Witching Hour',
     'crimson-veil': 'Crimson Veil',
     'hardboiled': 'Hardboiled',
     'terminal': 'Terminal',
