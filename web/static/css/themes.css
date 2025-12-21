@@ -57,6 +57,10 @@
     /* Rating colors */
     --rating-5-star: #10B981;
     --rating-1-star: #1F2937;
+    
+    /* Danger colors */
+    --color-danger: #c06080;
+    --color-danger-hover: #a04060;
 }
 
 /* Crimson Veil - Deep blacks with blood red - dark romance/gothic */
@@ -100,6 +104,10 @@
     --book-row-odd: #1e1618;
     --book-row-hover: #281c20;
     --year-header-bg: #241418;
+    
+    /* Danger colors - matches theme's red palette */
+    --color-danger: #c04060;
+    --color-danger-hover: #a03050;
 }
 
 /* Wasteland - Amber/Orange - post-apocalyptic/dystopian */
@@ -143,6 +151,10 @@
     --book-row-odd: #faf6ed;
     --book-row-hover: #f4eee0;
     --year-header-bg: #f4e4cc;
+    
+    /* Danger colors - burnt orange */
+    --color-danger: #c04020;
+    --color-danger-hover: #a03018;
 }
 
 /* Lost World - Green/Sage - adventure/expedition */
@@ -186,6 +198,10 @@
     --book-row-odd: #dceede;
     --book-row-hover: #d0e8d0;
     --year-header-bg: #cce4cc;
+    
+    /* Danger colors - coral red */
+    --color-danger: #c05050;
+    --color-danger-hover: #a04040;
 }
 
 /* Terminal - Teal/Cyan - cyberpunk/sci-fi */
@@ -230,6 +246,10 @@
     --book-row-odd: #d4eaee;
     --book-row-hover: #c8e4e8;
     --year-header-bg: #c8e0e8;
+    
+    /* Danger colors - coral */
+    --color-danger: #c06060;
+    --color-danger-hover: #a04848;
 }
 
 /* Terminal - Green on black - classic CRT */
@@ -273,6 +293,10 @@
     --book-row-odd: #121412;
     --book-row-hover: #1a201a;
     --year-header-bg: #101410;
+    
+    /* Danger colors - stays green for monochrome consistency */
+    --color-danger: #33ff33;
+    --color-danger-hover: #66ff66;
 }
 
 /* Hardboiled - Dark smoky grays with amber - noir/detective */
@@ -316,6 +340,10 @@
     --book-row-odd: #1e1c16;
     --book-row-hover: #28241c;
     --year-header-bg: #241e18;
+    
+    /* Danger colors - burnt amber */
+    --color-danger: #c05030;
+    --color-danger-hover: #a04028;
 }
 
 /* Grimoire - Purple/Lavender - fantasy/magic */
@@ -359,6 +387,10 @@
     --book-row-odd: #f0edf8;
     --book-row-hover: #e6e0f0;
     --year-header-bg: #ddd6ec;
+    
+    /* Danger colors - muted plum */
+    --color-danger: #a05070;
+    --color-danger-hover: #803858;
 }
 
 
