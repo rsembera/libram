@@ -169,6 +169,13 @@
     /* Danger colors - burnt orange */
     --color-danger: #c04020;
     --color-danger-hover: #a03018;
+    
+    /* Danger button (filled for light themes) */
+    --btn-danger-light-bg: #FEE2E2;
+    --btn-danger-light-text: #DC2626;
+    --btn-danger-light-border: transparent;
+    --btn-danger-light-hover-bg: #FECACA;
+    --btn-danger-light-hover-text: #DC2626;
 }
 
 /* Lost World - Green/Sage - adventure/expedition */
@@ -216,6 +223,13 @@
     /* Danger colors - coral red */
     --color-danger: #c05050;
     --color-danger-hover: #a04040;
+    
+    /* Danger button (filled for light themes) */
+    --btn-danger-light-bg: #FEE2E2;
+    --btn-danger-light-text: #DC2626;
+    --btn-danger-light-border: transparent;
+    --btn-danger-light-hover-bg: #FECACA;
+    --btn-danger-light-hover-text: #DC2626;
 }
 
 /* Terminal - Teal/Cyan - cyberpunk/sci-fi */
@@ -264,6 +278,13 @@
     /* Danger colors - coral */
     --color-danger: #c06060;
     --color-danger-hover: #a04848;
+    
+    /* Danger button (filled for light themes) */
+    --btn-danger-light-bg: #FEE2E2;
+    --btn-danger-light-text: #DC2626;
+    --btn-danger-light-border: transparent;
+    --btn-danger-light-hover-bg: #FECACA;
+    --btn-danger-light-hover-text: #DC2626;
 }
 
 /* Terminal - Green on black - classic CRT */
@@ -419,6 +440,13 @@
     /* Danger colors - muted plum */
     --color-danger: #a05070;
     --color-danger-hover: #803858;
+    
+    /* Danger button (filled for light themes) */
+    --btn-danger-light-bg: #FEE2E2;
+    --btn-danger-light-text: #DC2626;
+    --btn-danger-light-border: transparent;
+    --btn-danger-light-hover-bg: #FECACA;
+    --btn-danger-light-hover-text: #DC2626;
 }
 
 
