@@ -61,6 +61,13 @@
     /* Danger colors */
     --color-danger: #c06080;
     --color-danger-hover: #a04060;
+    
+    /* Danger button (outlined for dark themes) */
+    --btn-danger-light-bg: transparent;
+    --btn-danger-light-text: #c06080;
+    --btn-danger-light-border: #c06080;
+    --btn-danger-light-hover-bg: #c06080;
+    --btn-danger-light-hover-text: white;
 }
 
 /* Crimson Veil - Deep blacks with blood red - dark romance/gothic */
@@ -108,6 +115,13 @@
     /* Danger colors - matches theme's red palette */
     --color-danger: #c04060;
     --color-danger-hover: #a03050;
+    
+    /* Danger button (outlined for dark themes) */
+    --btn-danger-light-bg: transparent;
+    --btn-danger-light-text: #c04060;
+    --btn-danger-light-border: #c04060;
+    --btn-danger-light-hover-bg: #c04060;
+    --btn-danger-light-hover-text: white;
 }
 
 /* Wasteland - Amber/Orange - post-apocalyptic/dystopian */
@@ -297,6 +311,13 @@
     /* Danger colors - stays green for monochrome consistency */
     --color-danger: #33ff33;
     --color-danger-hover: #66ff66;
+    
+    /* Danger button (outlined for dark themes) */
+    --btn-danger-light-bg: transparent;
+    --btn-danger-light-text: #33ff33;
+    --btn-danger-light-border: #33ff33;
+    --btn-danger-light-hover-bg: #33ff33;
+    --btn-danger-light-hover-text: #0a0a0a;
 }
 
 /* Hardboiled - Dark smoky grays with amber - noir/detective */
@@ -344,6 +365,13 @@
     /* Danger colors - burnt amber */
     --color-danger: #c05030;
     --color-danger-hover: #a04028;
+    
+    /* Danger button (outlined for dark themes) */
+    --btn-danger-light-bg: transparent;
+    --btn-danger-light-text: #c05030;
+    --btn-danger-light-border: #c05030;
+    --btn-danger-light-hover-bg: #c05030;
+    --btn-danger-light-hover-text: white;
 }
 
 /* Grimoire - Purple/Lavender - fantasy/magic */
