@@ -252,14 +252,14 @@ html.font-size-l { font-size: 20px; }
 }
 
 .btn-danger-light {
-    background: transparent;
-    color: var(--color-danger);
-    border: 1px solid var(--color-danger);
+    background: var(--btn-danger-light-bg, #FEE2E2);
+    color: var(--btn-danger-light-text, #DC2626);
+    border: 1px solid var(--btn-danger-light-border, transparent);
 }
 
 .btn-danger-light:hover {
-    background: var(--color-danger);
-    color: white;
+    background: var(--btn-danger-light-hover-bg, #FECACA);
+    color: var(--btn-danger-light-hover-text, #DC2626);
 }
 
 .btn-sm {
