@@ -74,21 +74,21 @@
             <div class="backup-info">
                 <div class="backup-name">{{ backup.filename }}</div>
                 <div class="backup-meta">
-                    {{ backup.created_str }} • {{ backup.size }}
+                    {{ backup.created_str }} • {{ backup.size }} • {{ backup.location_name }}
                 </div>
             </div>
             <div class="backup-actions">
-                <a href="{{ url_for('backups.download_backup', filename=backup.filename) }}" 
+                <a href="{{ url_for('backups.download_backup', filename=backup.filename, location=backup.location) }}" 
                    class="btn btn-sm btn-icon btn-secondary" title="Download">
                     <i class="ph ph-download-simple"></i>
                 </a>
                 <button class="btn btn-sm btn-icon btn-secondary" 
-                        onclick="confirmRestore('{{ backup.filename }}')" 
+                        onclick="confirmRestore('{{ backup.filename }}', '{{ backup.location }}')" 
                         title="Restore">
                     <i class="ph ph-arrow-counter-clockwise"></i>
                 </button>
                 <button class="btn btn-sm btn-icon btn-danger-light" 
-                        onclick="confirmDelete('{{ backup.filename }}')" 
+                        onclick="confirmDelete('{{ backup.filename }}', '{{ backup.location }}')" 
                         title="Delete">
                     <i class="ph ph-trash"></i>
                 </button>
