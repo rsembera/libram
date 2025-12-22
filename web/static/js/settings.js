@@ -144,9 +144,9 @@ const themeNames = {
     'crimson-veil': 'Crimson Veil',
     'hardboiled': 'Hardboiled',
     'terminal': 'Terminal',
-    'grimoire': 'Grimoire',
-    'wasteland': 'Wasteland',
-    'lost-world': 'Lost World',
+    'ink': 'Ink',
+    'slate': 'Slate',
+    'parchment': 'Parchment',
     'nautilus': 'Nautilus'
 };
 
