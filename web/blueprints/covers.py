@@ -6,11 +6,14 @@ Book cover upload, search, and serving.
 import os
 import uuid
 import requests
+from pathlib import Path
 from flask import Blueprint, request, jsonify, send_file, Response
 
 covers_bp = Blueprint('covers', __name__, url_prefix='/covers')
 
-COVERS_DIR = os.path.expanduser('~/libram/covers')
+# App root is parent of 'web/blueprints' directory
+APP_ROOT = Path(__file__).parent.parent.parent
+COVERS_DIR = str(APP_ROOT / 'covers')
 
 # Ensure covers directory exists
 os.makedirs(COVERS_DIR, exist_ok=True)

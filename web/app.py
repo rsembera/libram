@@ -8,9 +8,13 @@ from __future__ import annotations
 import os
 import time
 from datetime import datetime
+from pathlib import Path
 from flask import Flask, g, session, jsonify
 
 from core.database import Database
+
+# App root is parent of 'web' directory
+APP_ROOT = Path(__file__).parent.parent
 
 
 def create_app() -> Flask:
@@ -29,7 +33,7 @@ def create_app() -> Flask:
     # Database path
     app.config['DATABASE_PATH'] = os.environ.get(
         'LIBRAM_DB_PATH',
-        os.path.expanduser('~/libram/data/libram.db')
+        str(APP_ROOT / 'data' / 'libram.db')
     )
     
     # Register template filters
