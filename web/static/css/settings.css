@@ -437,53 +437,55 @@ details[open] .settings-section-header .arrow {
 }
 
 .about-modal-content {
-    background: #0a0a0a;
-    padding: 2rem;
+    background: #f5f3f0;
+    padding: 2.5rem 2rem;
     border-radius: 1rem;
-    max-width: 400px;
+    max-width: 340px;
     text-align: center;
-    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.15);
+    border: 1px solid #c8c4c0;
 }
 
 .about-modal-logo {
-    width: 200px;
-    margin-bottom: 1rem;
+    width: 180px;
+    margin-bottom: 1.25rem;
     border-radius: 0.5rem;
 }
 
 .about-modal-content h2 {
-    color: #e0e0e0;
+    color: #1a1a1a;
     margin-bottom: 0.25rem;
-    font-size: 1.5rem;
+    font-size: 1.75rem;
     font-weight: 700;
+    letter-spacing: 0.02em;
 }
 
 .about-modal-content .version {
-    color: #8b5cf6;
-    margin-bottom: 0.75rem;
-    font-size: 1rem;
-    font-weight: 600;
+    color: #707070;
+    margin-bottom: 1rem;
+    font-size: 0.9375rem;
+    font-weight: 400;
 }
 
 .about-modal-content .credits {
-    color: #9ca3af;
+    color: #404040;
     margin-bottom: 0.25rem;
     font-size: 0.875rem;
 }
 
 .about-modal-content .motto {
-    color: #c4b5fd;
+    color: #707070;
     font-style: italic;
     margin: 1.25rem 0;
-    font-size: 1rem;
+    font-size: 0.9375rem;
 }
 
 .about-close-btn {
-    background: #6d28d9;
-    color: white;
+    background: #2a2a2a;
+    color: #f5f3f0;
     border: none;
     padding: 0.75rem 1.5rem;
-    border-radius: 0.75rem;
+    border-radius: 0.5rem;
     font-size: 0.9375rem;
     font-weight: 600;
     cursor: pointer;
@@ -492,7 +494,7 @@ details[open] .settings-section-header .arrow {
 }
 
 .about-close-btn:hover {
-    background: #7c3aed;
+    background: #1a1a1a;
 }
 
 /* Card Position Grid */
