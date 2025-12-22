@@ -10,7 +10,11 @@ import time
 import hashlib
 import sqlite3
 from datetime import datetime, date
+from pathlib import Path
 from typing import Optional
+
+# App root is parent of 'core' directory
+APP_ROOT = Path(__file__).parent.parent
 
 
 class Database:
@@ -21,10 +25,10 @@ class Database:
         Initialize database connection.
         
         Args:
-            db_path: Path to database file. Defaults to ~/libram/data/libram.db
+            db_path: Path to database file. Defaults to <app_root>/data/libram.db
         """
         if db_path is None:
-            db_path = os.path.expanduser('~/libram/data/libram.db')
+            db_path = str(APP_ROOT / 'data' / 'libram.db')
         
         self.db_path = db_path
         self.conn = None

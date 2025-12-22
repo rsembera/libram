@@ -9,6 +9,7 @@ import csv
 import io
 import os
 from datetime import datetime, date
+from pathlib import Path
 from typing import Optional
 from flask import Blueprint, render_template, request, redirect, url_for, current_app, Response, jsonify, session
 from core.fortunes import get_fortune
@@ -16,7 +17,9 @@ from core.astrology import get_astrology_line
 
 books_bp = Blueprint('books', __name__)
 
-COVERS_DIR = os.path.expanduser('~/libram/covers')
+# App root is parent of 'web/blueprints' directory
+APP_ROOT = Path(__file__).parent.parent.parent
+COVERS_DIR = str(APP_ROOT / 'covers')
 
 
 def _delete_cover_file(filename: Optional[str]) -> None:

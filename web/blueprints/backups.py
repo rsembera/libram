@@ -8,11 +8,14 @@ from __future__ import annotations
 import os
 import shutil
 from datetime import datetime, timedelta
+from pathlib import Path
 from flask import Blueprint, render_template, request, current_app, jsonify, send_file, Flask
 
 backups_bp = Blueprint('backups', __name__)
 
-BACKUP_DIR = os.path.expanduser('~/libram/backups')
+# App root is parent of 'web/blueprints' directory
+APP_ROOT = Path(__file__).parent.parent.parent
+BACKUP_DIR = str(APP_ROOT / 'backups')
 
 # Auto-backup frequency options (in hours, 0 = never)
 FREQUENCY_OPTIONS = [
