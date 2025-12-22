@@ -1,6 +1,6 @@
 /* ============================================
    LIBRAM THEME SYSTEM
-   Seven distinct reading atmospheres
+   Eight distinct reading atmospheres
    ============================================ */
 
 /* Default Theme - Witching Hour (dark blue/purple - horror/gothic) */
@@ -70,6 +70,162 @@
     --btn-danger-light-hover-text: white;
 }
 
+/* Ink - clean off-white, dark text, minimal accents */
+[data-theme="ink"] {
+    --bg-page: #e8e4e0;
+    
+    --bg-card: #f5f3f0;
+    --bg-card-alt: #ebe8e4;
+    --bg-card-hover: #e0dcd8;
+    
+    --bg-card-1: #f0ebe6;
+    --bg-card-2: #e8e2dc;
+    --bg-card-3: #e0dad4;
+    
+    --text-primary: #1a1a1a;
+    --text-secondary: #404040;
+    --text-muted: #707070;
+    --text-on-accent: #f5f3f0;
+    
+    --accent-primary: #2a2a2a;
+    --accent-hover: #1a1a1a;
+    --accent-light: #d0ccc8;
+    
+    --border-color: #c8c4c0;
+    --card-border: #404040;
+    --card-border-vibrant: #8b4513;
+    --divider-color: #a0a0a0;
+    --chart-grid: #d0ccc8;
+    --shadow-color: rgba(0,0,0,0.1);
+    
+    --btn-primary-bg: #2a2a2a;
+    --btn-primary-text: #f5f3f0;
+    --btn-secondary-bg: #e0dcd8;
+    --btn-secondary-text: #1a1a1a;
+    
+    --chart-bar: #404040;
+    --chart-bar-alt: #808080;
+    --chart-empty: #ddd8d4;
+    
+    --book-row-even: #f5f3f0;
+    --book-row-odd: #efebe8;
+    --book-row-hover: #e4e0dc;
+    --year-header-bg: #e8e4e0;
+    
+    /* Danger button colors (light theme) */
+    --color-danger: #a03030;
+    --color-danger-hover: #802020;
+    --btn-danger-light-bg: #fde8e8;
+    --btn-danger-light-text: #a03030;
+    --btn-danger-light-border: transparent;
+    --btn-danger-light-hover-bg: #f8d0d0;
+    --btn-danger-light-hover-text: #802020;
+}
+
+/* Slate - cool grays, muted blue accent */
+[data-theme="slate"] {
+    --bg-page: #e0e4e8;
+    
+    --bg-card: #f0f2f4;
+    --bg-card-alt: #e8eaee;
+    --bg-card-hover: #dce0e4;
+    
+    --bg-card-1: #e8ecf0;
+    --bg-card-2: #e0e4ea;
+    --bg-card-3: #d8dce4;
+    
+    --text-primary: #1a1e24;
+    --text-secondary: #404850;
+    --text-muted: #687078;
+    --text-on-accent: #f0f2f4;
+    
+    --accent-primary: #4a6080;
+    --accent-hover: #3a5070;
+    --accent-light: #c8d0d8;
+    
+    --border-color: #c0c8d0;
+    --card-border: #4a6080;
+    --card-border-vibrant: #806040;
+    --divider-color: #98a0a8;
+    --chart-grid: #c8d0d8;
+    --shadow-color: rgba(0,0,0,0.1);
+    
+    --btn-primary-bg: #4a6080;
+    --btn-primary-text: #f0f2f4;
+    --btn-secondary-bg: #dce0e6;
+    --btn-secondary-text: #1a1e24;
+    
+    --chart-bar: #4a6080;
+    --chart-bar-alt: #708090;
+    --chart-empty: #d8dce0;
+    
+    --book-row-even: #f0f2f4;
+    --book-row-odd: #e8ecf0;
+    --book-row-hover: #e0e4ea;
+    --year-header-bg: #e0e4e8;
+    
+    /* Danger button colors (light theme) */
+    --color-danger: #904040;
+    --color-danger-hover: #703030;
+    --btn-danger-light-bg: #fde8e8;
+    --btn-danger-light-text: #904040;
+    --btn-danger-light-border: transparent;
+    --btn-danger-light-hover-bg: #f8d0d0;
+    --btn-danger-light-hover-text: #703030;
+}
+
+/* Parchment - warm cream/tan, brown text, subtle gold accents */
+[data-theme="parchment"] {
+    --bg-page: #e8e0d0;
+    
+    --bg-card: #f8f4ec;
+    --bg-card-alt: #f0ebe0;
+    --bg-card-hover: #e8e0d4;
+    
+    --bg-card-1: #f4ece0;
+    --bg-card-2: #ece4d4;
+    --bg-card-3: #e4dcc8;
+    
+    --text-primary: #2c2416;
+    --text-secondary: #504030;
+    --text-muted: #787060;
+    --text-on-accent: #f8f4ec;
+    
+    --accent-primary: #8b7355;
+    --accent-hover: #705840;
+    --accent-light: #d8d0c0;
+    
+    --border-color: #d0c8b8;
+    --card-border: #8b7355;
+    --card-border-vibrant: #b8860b;
+    --divider-color: #a89878;
+    --chart-grid: #d8d0c0;
+    --shadow-color: rgba(60,40,20,0.1);
+    
+    --btn-primary-bg: #8b7355;
+    --btn-primary-text: #f8f4ec;
+    --btn-secondary-bg: #e8e0d4;
+    --btn-secondary-text: #2c2416;
+    
+    --chart-bar: #8b7355;
+    --chart-bar-alt: #a89060;
+    --chart-empty: #e0d8c8;
+    
+    --book-row-even: #f8f4ec;
+    --book-row-odd: #f0ebe0;
+    --book-row-hover: #e8e0d4;
+    --year-header-bg: #e8e0d0;
+    
+    /* Danger button colors (light theme) */
+    --color-danger: #8b4030;
+    --color-danger-hover: #703020;
+    --btn-danger-light-bg: #fce8e4;
+    --btn-danger-light-text: #8b4030;
+    --btn-danger-light-border: transparent;
+    --btn-danger-light-hover-bg: #f8d4cc;
+    --btn-danger-light-hover-text: #703020;
+}
+
 /* Crimson Veil - Deep blacks with blood red - dark romance/gothic */
 [data-theme="crimson-veil"] {
     --bg-page: #0a0608;
@@ -124,115 +280,6 @@
     --btn-danger-light-hover-text: white;
 }
 
-/* Wasteland - Amber/Orange - post-apocalyptic/dystopian */
-[data-theme="wasteland"] {
-    --bg-page: #d8c8a8;
-    
-    --bg-card: #fefcf6;
-    --bg-card-alt: #faf6ee;
-    --bg-card-hover: #f6f0e4;
-    
-    --bg-card-1: #f8e8d0;
-    --bg-card-2: #f4e0c0;
-    --bg-card-3: #f0d8b0;
-    
-    --text-primary: #3d3020;
-    --text-secondary: #685840;
-    --text-muted: #887860;
-    --text-on-accent: #ffffff;
-    
-    --accent-primary: #d08030;
-    --accent-hover: #b86a20;
-    --accent-light: #f0c080;
-    
-    --border-color: #d0c0a0;
-    --card-border: #b87020;
-    --card-border-vibrant: #2070b8;
-    --divider-color: #d08030;
-    --chart-grid: #d8c8b0;
-    --shadow-color: rgba(180,100,30,0.12);
-    
-    --btn-primary-bg: #d08030;
-    --btn-primary-text: #ffffff;
-    --btn-secondary-bg: #f0e4d0;
-    --btn-secondary-text: #3d3020;
-    
-    --chart-bar: #d08030;
-    --chart-bar-alt: #5bb87a;
-    --chart-empty: #e8dcc8;
-    
-    --book-row-even: #fefcf6;
-    --book-row-odd: #faf6ed;
-    --book-row-hover: #f4eee0;
-    --year-header-bg: #f4e4cc;
-    
-    /* Danger colors - burnt orange */
-    --color-danger: #c04020;
-    --color-danger-hover: #a03018;
-    
-    /* Danger button (filled for light themes) */
-    --btn-danger-light-bg: #FEE2E2;
-    --btn-danger-light-text: #DC2626;
-    --btn-danger-light-border: transparent;
-    --btn-danger-light-hover-bg: #FECACA;
-    --btn-danger-light-hover-text: #DC2626;
-}
-
-/* Lost World - Green/Sage - adventure/expedition */
-[data-theme="lost-world"] {
-    --bg-page: #a8d0a8;
-    
-    --bg-card: #e8f4e8;
-    --bg-card-alt: #dceede;
-    --bg-card-hover: #d0e8d0;
-    
-    --bg-card-1: #d8ecd8;
-    --bg-card-2: #c8e0c8;
-    --bg-card-3: #b8d4b8;
-    
-    --text-primary: #1e3020;
-    --text-secondary: #3d5840;
-    --text-muted: #5d7860;
-    --text-on-accent: #ffffff;
-    
-    --accent-primary: #4a9058;
-    --accent-hover: #3a7848;
-    --accent-light: #90c8a0;
-    
-    --border-color: #98c0a0;
-    --card-border: #4a8055;
-    --card-border-vibrant: #a04a80;
-    --divider-color: #4a9058;
-    --chart-grid: #b0c8b0;
-    --shadow-color: rgba(60,120,70,0.12);
-    
-    --btn-primary-bg: #4a9058;
-    --btn-primary-text: #ffffff;
-    --btn-secondary-bg: #c0dcc0;
-    --btn-secondary-text: #1e3020;
-    
-    --chart-bar: #4a9058;
-    --chart-bar-alt: #4898a0;
-    --chart-empty: #d0dcd0;
-    
-    --book-row-even: #e8f4e8;
-    --book-row-odd: #dceede;
-    --book-row-hover: #d0e8d0;
-    --year-header-bg: #cce4cc;
-    
-    /* Danger colors - coral red */
-    --color-danger: #c05050;
-    --color-danger-hover: #a04040;
-    
-    /* Danger button (filled for light themes) */
-    --btn-danger-light-bg: #FEE2E2;
-    --btn-danger-light-text: #DC2626;
-    --btn-danger-light-border: transparent;
-    --btn-danger-light-hover-bg: #FECACA;
-    --btn-danger-light-hover-text: #DC2626;
-}
-
-/* Terminal - Teal/Cyan - cyberpunk/sci-fi */
 /* Nautilus - Teal/Cyan - underwater/adventure */
 [data-theme="nautilus"] {
     --bg-page: #98c8d8;
@@ -394,61 +441,6 @@
     --btn-danger-light-hover-bg: #c05030;
     --btn-danger-light-hover-text: white;
 }
-
-/* Grimoire - Purple/Lavender - fantasy/magic */
-[data-theme="grimoire"] {
-    --bg-page: #c8c0d8;
-    
-    --bg-card: #f8f6fc;
-    --bg-card-alt: #f0eef6;
-    --bg-card-hover: #e8e4f2;
-    
-    --bg-card-1: #e8e0f4;
-    --bg-card-2: #dcd4ec;
-    --bg-card-3: #d0c8e4;
-    
-    --text-primary: #2d2640;
-    --text-secondary: #5a5070;
-    --text-muted: #7a7090;
-    --text-on-accent: #ffffff;
-    
-    --accent-primary: #7c6fb0;
-    --accent-hover: #6558a0;
-    --accent-light: #b8b0d8;
-    
-    --border-color: #b0a8c8;
-    --card-border: #5a4a90;
-    --card-border-vibrant: #c9a227;
-    --divider-color: #8878b0;
-    --chart-grid: #c0b8d0;
-    --shadow-color: rgba(100,80,140,0.15);
-    
-    --btn-primary-bg: #7c6fb0;
-    --btn-primary-text: #ffffff;
-    --btn-secondary-bg: #e0dae8;
-    --btn-secondary-text: #2d2640;
-    
-    --chart-bar: #7c6fb0;
-    --chart-bar-alt: #5bb87a;
-    --chart-empty: #ddd8e8;
-    
-    --book-row-even: #f8f6fc;
-    --book-row-odd: #f0edf8;
-    --book-row-hover: #e6e0f0;
-    --year-header-bg: #ddd6ec;
-    
-    /* Danger colors - muted plum */
-    --color-danger: #a05070;
-    --color-danger-hover: #803858;
-    
-    /* Danger button (filled for light themes) */
-    --btn-danger-light-bg: #FEE2E2;
-    --btn-danger-light-text: #DC2626;
-    --btn-danger-light-border: transparent;
-    --btn-danger-light-hover-bg: #FECACA;
-    --btn-danger-light-hover-text: #DC2626;
-}
-
 
 /* ============================================
    VIBRANT BORDER STYLE

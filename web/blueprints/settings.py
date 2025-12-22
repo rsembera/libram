@@ -19,7 +19,7 @@ def settings_page():
     
     # Load current settings
     settings = {
-        'theme': db.get_setting('theme', 'grimoire'),
+        'theme': db.get_setting('theme', 'witching-hour'),
         'background_style': db.get_setting('background_style', ''),
         'font_style': db.get_setting('font_style', 'lexend'),
         'font_size': db.get_setting('font_size', 's'),
@@ -45,7 +45,7 @@ def save_theme():
     db = current_app.get_db()
     data = request.get_json()
     
-    theme = data.get('theme', 'grimoire')
+    theme = data.get('theme', 'witching-hour')
     db.set_setting('theme', theme)
     
     return jsonify({'status': 'ok'})
