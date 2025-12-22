@@ -27,6 +27,7 @@ def download():
     # Get format and order
     export_format = request.form.get('format', 'csv')
     order = request.form.get('order', 'newest')
+    md_style = request.form.get('md_style', 'compact')
     
     # Get date range
     date_from = request.form.get('date_from', '')
@@ -71,7 +72,7 @@ def download():
     
     # Generate export
     if export_format == 'markdown':
-        return generate_markdown(all_books, from_date, to_date, order)
+        return generate_markdown(all_books, from_date, to_date, order, md_style)
     else:
         return generate_csv(all_books)
 
@@ -131,7 +132,7 @@ def generate_csv(books):
     )
 
 
-def generate_markdown(books, from_date=None, to_date=None, order='newest'):
+def generate_markdown(books, from_date=None, to_date=None, order='newest', style='compact'):
     """Generate Markdown export."""
     lines = []
     
@@ -161,6 +162,14 @@ def generate_markdown(books, from_date=None, to_date=None, order='newest'):
     lines.append('---')
     lines.append('')
     
+    if style == 'detailed':
+        return generate_markdown_detailed(books, lines, order)
+    else:
+        return generate_markdown_compact(books, lines, order)
+
+
+def generate_markdown_compact(books, lines, order):
+    """Generate compact Markdown format (grouped list with notes)."""
     # Group by year
     books_by_year = {}
     for book in books:
@@ -239,8 +248,95 @@ def generate_markdown(books, from_date=None, to_date=None, order='newest'):
                 stats.append(date_str)
             
             lines.append(f'  {" · ".join(stats)}')
+            
+            # Notes (if any)
+            if book.get('notes') and book['notes'].strip():
+                lines.append(f'  > {book["notes"].strip()}')
+            
             lines.append('')
         
+        lines.append('')
+    
+    # Create response
+    content = '\n'.join(lines)
+    filename = f"libram-export-{date.today().strftime('%Y-%m-%d')}.md"
+    
+    return Response(
+        content,
+        mimetype='text/markdown',
+        headers={'Content-Disposition': f'attachment; filename={filename}'}
+    )
+
+
+def generate_markdown_detailed(books, lines, order):
+    """Generate detailed Markdown format (table)."""
+    # Group by year
+    books_by_year = {}
+    for book in books:
+        if book['date_begun_date']:
+            year = book['date_begun_date'].year
+        else:
+            year = 'Unknown'
+        if year not in books_by_year:
+            books_by_year[year] = []
+        books_by_year[year].append(book)
+    
+    # Sort years based on order preference
+    reverse_years = (order == 'newest')
+    sorted_years = sorted([y for y in books_by_year.keys() if isinstance(y, int)], reverse=reverse_years)
+    if 'Unknown' in books_by_year:
+        sorted_years.append('Unknown')
+    
+    # Output each year
+    for year in sorted_years:
+        year_books = books_by_year[year]
+        lines.append(f'## {year}')
+        lines.append('')
+        
+        # Table header
+        lines.append('| # | Title | Author | Type | Pages | Days | Pace | Rating |')
+        lines.append('|---|-------|--------|------|------:|-----:|-----:|:------:|')
+        
+        for book in year_books:
+            # Book number
+            num = f'#{book["all_time_number"]}'
+            
+            # Title (with subtitle if present)
+            title = book['title']
+            if book.get('subtitle'):
+                title += f': {book["subtitle"]}'
+            # Escape pipe characters in title
+            title = title.replace('|', '\\|')
+            
+            # Author
+            author = book['author'].replace('|', '\\|')
+            
+            # Type
+            book_type = book.get('type_name', '') or ''
+            
+            # Pages
+            if book['did_not_finish'] and book.get('pages_completed'):
+                pages = f'{book["pages_completed"]}/{book["pages"]}'
+            else:
+                pages = str(book['pages']) if book['pages'] else ''
+            
+            # Days
+            days = str(book['total_days']) if book['total_days'] else ''
+            
+            # Pace
+            pace = str(book['pages_per_day']) if book['pages_per_day'] else ''
+            
+            # Rating
+            if book['did_not_finish']:
+                rating = 'DNF'
+            elif book['rating'] > 0:
+                rating = '★' * book['rating']
+            else:
+                rating = ''
+            
+            lines.append(f'| {num} | {title} | {author} | {book_type} | {pages} | {days} | {pace} | {rating} |')
+        
+        lines.append('')
         lines.append('')
     
     # Create response
