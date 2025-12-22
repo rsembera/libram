@@ -64,6 +64,30 @@
                 </div>
             </div>
             
+            <!-- Markdown Style (only visible when Markdown selected) -->
+            <div class="form-section markdown-style-section" id="markdown-style-section" style="display: none;">
+                <h2>Markdown Style</h2>
+                <input type="hidden" name="md_style" id="md-style-value" value="compact">
+                
+                <div class="format-options">
+                    <div class="format-card selected" data-mdstyle="compact" onclick="selectMdStyle('compact')">
+                        <i class="ph ph-list"></i>
+                        <div class="format-info">
+                            <span class="format-name">Compact</span>
+                            <span class="format-desc">Grouped list with notes</span>
+                        </div>
+                    </div>
+                    
+                    <div class="format-card" data-mdstyle="detailed" onclick="selectMdStyle('detailed')">
+                        <i class="ph ph-table"></i>
+                        <div class="format-info">
+                            <span class="format-name">Detailed</span>
+                            <span class="format-desc">Table format</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
             <!-- Order -->
             <div class="form-section">
                 <h2>Order</h2>
@@ -107,12 +131,21 @@ function selectFormat(value) {
     document.querySelectorAll('[data-format]').forEach(function(card) {
         card.classList.toggle('selected', card.dataset.format === value);
     });
+    // Show/hide markdown style section
+    document.getElementById('markdown-style-section').style.display = (value === 'markdown') ? 'block' : 'none';
 }
 
 function selectOrder(value) {
     document.getElementById('order-value').value = value;
     document.querySelectorAll('[data-order]').forEach(function(card) {
         card.classList.toggle('selected', card.dataset.order === value);
+    });
+}
+
+function selectMdStyle(value) {
+    document.getElementById('md-style-value').value = value;
+    document.querySelectorAll('[data-mdstyle]').forEach(function(card) {
+        card.classList.toggle('selected', card.dataset.mdstyle === value);
     });
 }
 
