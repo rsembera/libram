@@ -98,7 +98,7 @@ def create_app() -> Flask:
         try:
             db = get_db()
             return {
-                'theme': db.get_setting('theme', 'witching-hour'),
+                'theme': db.get_setting('theme', 'ink'),
                 'background_style': db.get_setting('background_style', ''),
                 'font_style': db.get_setting('font_style', 'lexend'),
                 'font_size': db.get_setting('font_size', 's'),
@@ -110,7 +110,7 @@ def create_app() -> Flask:
             }
         except Exception:
             return {
-                'theme': 'witching-hour',
+                'theme': 'ink',
                 'background_style': '',
                 'font_style': 'lexend',
                 'font_size': 's',

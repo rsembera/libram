@@ -140,14 +140,12 @@ document.addEventListener('DOMContentLoaded', function() {
 // ============================================================================
 
 const themeNames = {
-    'witching-hour': 'Witching Hour',
-    'crimson-veil': 'Crimson Veil',
-    'hardboiled': 'Hardboiled',
-    'terminal': 'Terminal',
     'ink': 'Ink',
     'slate': 'Slate',
     'parchment': 'Parchment',
-    'nautilus': 'Nautilus'
+    'witching-hour': 'Witching Hour',
+    'crimson-veil': 'Crimson Veil',
+    'terminal': 'Terminal'
 };
 
 function toggleThemeDropdown() {

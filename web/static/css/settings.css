@@ -321,13 +321,11 @@ details[open] .settings-section-header .arrow {
 }
 
 .theme-preview-ink { background: linear-gradient(135deg, #f5f3f0 0%, #2a2a2a 100%); }
-.theme-preview-crimson-veil { background: linear-gradient(135deg, #1a1214 0%, #a03050 100%); }
 .theme-preview-slate { background: linear-gradient(135deg, #e0e4e8 0%, #4a6080 100%); }
 .theme-preview-parchment { background: linear-gradient(135deg, #f8f4ec 0%, #8b7355 100%); }
-.theme-preview-nautilus { background: linear-gradient(135deg, #D0E8E8 0%, #2890a0 100%); }
-.theme-preview-terminal { background: linear-gradient(135deg, #0a0a0a 0%, #33ff33 100%); }
-.theme-preview-hardboiled { background: linear-gradient(135deg, #1a1814 0%, #c89030 100%); }
 .theme-preview-witching-hour { background: linear-gradient(135deg, #1c1e2a 0%, #7080c0 100%); }
+.theme-preview-crimson-veil { background: linear-gradient(135deg, #1a1214 0%, #a03050 100%); }
+.theme-preview-terminal { background: linear-gradient(135deg, #0a0a0a 0%, #33ff33 100%); }
 
 .bg-preview-default { 
     background: linear-gradient(135deg, #f0f0f0 25%, transparent 25%, transparent 75%, #f0f0f0 75%);
