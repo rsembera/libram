@@ -46,6 +46,20 @@
                 </select>
             </div>
         </div>
+        <div class="settings-row">
+            <div class="form-group">
+                <label for="location">Backup Location</label>
+                <select id="location" onchange="saveBackupSettings()">
+                    <option value="default" {% if not backup_location %}selected{% endif %}>Default (app folder)</option>
+                    {% for folder in cloud_folders %}
+                    <option value="{{ folder.path }}" {% if backup_location == folder.path %}selected{% endif %}>{{ folder.name }}</option>
+                    {% endfor %}
+                </select>
+                {% if backup_location %}
+                <p class="location-path">{{ backup_location }}</p>
+                {% endif %}
+            </div>
+        </div>
         {% if last_auto_backup %}
         <p class="last-backup-info">Last auto-backup: {{ last_auto_backup[:16] | replace('T', ' ') }}</p>
         {% endif %}

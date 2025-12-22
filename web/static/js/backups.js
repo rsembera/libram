@@ -5,10 +5,14 @@ let pendingFilename = null;
 function saveBackupSettings() {
     const frequency = document.getElementById('frequency').value;
     const retention = document.getElementById('retention').value;
+    const locationSelect = document.getElementById('location');
+    const location = locationSelect.value;
+    const previousLocation = locationSelect.dataset.lastValue || 'default';
     
     const formData = new FormData();
     formData.append('frequency', frequency);
     formData.append('retention', retention);
+    formData.append('location', location);
     
     fetch('/backups/settings', {
         method: 'POST',
@@ -18,11 +22,17 @@ function saveBackupSettings() {
     .then(data => {
         if (data.status !== 'ok') {
             alert('Error saving settings: ' + (data.message || 'Unknown error'));
+        } else if (location !== previousLocation) {
+            // Reload page to show backup list from new location
+            window.location.reload();
         }
     })
     .catch(err => {
         alert('Error saving settings');
     });
+    
+    // Track current value for comparison
+    locationSelect.dataset.lastValue = location;
 }
 
 function createBackup() {
