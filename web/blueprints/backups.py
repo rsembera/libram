@@ -259,17 +259,23 @@ def _cleanup_old_backups(retention_days, db=None):
                     pass
 
 
+def _get_backup_path(filename, location):
+    """Get the full path for a backup file given its location."""
+    if location == 'default' or not location:
+        return DEFAULT_BACKUP_DIR / filename
+    return Path(location) / filename
+
+
 @backups_bp.route('/download/<filename>')
 def download_backup(filename):
     """Download a backup file."""
-    db = current_app.get_db()
-    backup_dir = get_backup_dir(db)
+    location = request.args.get('location', 'default')
     
     # Security: ensure filename doesn't contain path traversal
     if '..' in filename or '/' in filename:
         return 'Invalid filename', 400
     
-    backup_path = backup_dir / filename
+    backup_path = _get_backup_path(filename, location)
     
     if not backup_path.exists():
         return 'Backup not found', 404
@@ -280,14 +286,13 @@ def download_backup(filename):
 @backups_bp.route('/delete/<filename>', methods=['POST'])
 def delete_backup(filename):
     """Delete a backup file."""
-    db = current_app.get_db()
-    backup_dir = get_backup_dir(db)
+    location = request.form.get('location', 'default')
     
     # Security: ensure filename doesn't contain path traversal
     if '..' in filename or '/' in filename:
         return jsonify({'status': 'error', 'message': 'Invalid filename'}), 400
     
-    backup_path = backup_dir / filename
+    backup_path = _get_backup_path(filename, location)
     
     if not backup_path.exists():
         return jsonify({'status': 'error', 'message': 'Backup not found'}), 404
@@ -303,13 +308,14 @@ def delete_backup(filename):
 def restore_backup(filename):
     """Restore from a backup file."""
     db = current_app.get_db()
-    backup_dir = get_backup_dir(db)
+    location = request.form.get('location', 'default')
+    backup_dir = get_backup_dir(db)  # Where to save pre-restore backup
     
     # Security: ensure filename doesn't contain path traversal
     if '..' in filename or '/' in filename:
         return jsonify({'status': 'error', 'message': 'Invalid filename'}), 400
     
-    backup_path = backup_dir / filename
+    backup_path = _get_backup_path(filename, location)
     db_path = Path(current_app.config['DATABASE_PATH'])
     
     if not backup_path.exists():
@@ -317,6 +323,7 @@ def restore_backup(filename):
     
     try:
         # Create a backup of current database before restoring
+        os.makedirs(backup_dir, exist_ok=True)
         timestamp = datetime.now().strftime('%Y-%m-%d_%H%M%S')
         pre_restore_backup = backup_dir / f'pre_restore_{timestamp}.db'
         shutil.copy2(db_path, pre_restore_backup)
@@ -330,24 +337,43 @@ def restore_backup(filename):
 
 
 def _get_backup_list(db=None) -> list:
-    """Get list of backup files with metadata."""
-    backup_dir = get_backup_dir(db)
-    
-    if not backup_dir.exists():
-        return []
-    
+    """Get list of backup files with metadata from all locations."""
     backups = []
-    for filename in os.listdir(backup_dir):
-        if filename.endswith('.db'):
-            filepath = backup_dir / filename
-            stat = os.stat(filepath)
-            
-            backups.append({
-                'filename': filename,
-                'size': _format_size(stat.st_size),
-                'created': datetime.fromtimestamp(stat.st_mtime),
-                'created_str': datetime.fromtimestamp(stat.st_mtime).strftime('%b %d, %Y %I:%M %p')
-            })
+    scanned_dirs = set()
+    
+    # Always scan default location
+    if DEFAULT_BACKUP_DIR.exists():
+        scanned_dirs.add(str(DEFAULT_BACKUP_DIR))
+        for filename in os.listdir(DEFAULT_BACKUP_DIR):
+            if filename.endswith('.db'):
+                filepath = DEFAULT_BACKUP_DIR / filename
+                stat = os.stat(filepath)
+                backups.append({
+                    'filename': filename,
+                    'size': _format_size(stat.st_size),
+                    'created': datetime.fromtimestamp(stat.st_mtime),
+                    'created_str': datetime.fromtimestamp(stat.st_mtime).strftime('%b %d, %Y %I:%M %p'),
+                    'location': 'default',
+                    'location_name': 'App folder'
+                })
+    
+    # Scan all cloud folders that exist
+    for folder in detect_cloud_folders():
+        folder_path = Path(folder['path'])
+        if folder_path.exists() and str(folder_path) not in scanned_dirs:
+            scanned_dirs.add(str(folder_path))
+            for filename in os.listdir(folder_path):
+                if filename.endswith('.db'):
+                    filepath = folder_path / filename
+                    stat = os.stat(filepath)
+                    backups.append({
+                        'filename': filename,
+                        'size': _format_size(stat.st_size),
+                        'created': datetime.fromtimestamp(stat.st_mtime),
+                        'created_str': datetime.fromtimestamp(stat.st_mtime).strftime('%b %d, %Y %I:%M %p'),
+                        'location': folder['path'],
+                        'location_name': folder['name']
+                    })
     
     # Sort by date, newest first
     backups.sort(key=lambda x: x['created'], reverse=True)

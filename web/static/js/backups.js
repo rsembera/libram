@@ -1,6 +1,7 @@
 /* Libram - Backups JavaScript */
 
 let pendingFilename = null;
+let pendingLocation = null;
 
 function saveBackupSettings() {
     const frequency = document.getElementById('frequency').value;
@@ -61,26 +62,33 @@ function createBackup() {
     });
 }
 
-function confirmRestore(filename) {
+function confirmRestore(filename, location) {
     pendingFilename = filename;
+    pendingLocation = location;
     document.getElementById('restore-modal').style.display = 'flex';
 }
 
-function confirmDelete(filename) {
+function confirmDelete(filename, location) {
     pendingFilename = filename;
+    pendingLocation = location;
     document.getElementById('delete-modal').style.display = 'flex';
 }
 
 function closeModal(modalId) {
     document.getElementById(modalId).style.display = 'none';
     pendingFilename = null;
+    pendingLocation = null;
 }
 
 function doRestore() {
     if (!pendingFilename) return;
     
+    const formData = new FormData();
+    formData.append('location', pendingLocation || 'default');
+    
     fetch('/backups/restore/' + pendingFilename, {
-        method: 'POST'
+        method: 'POST',
+        body: formData
     })
     .then(response => response.json())
     .then(data => {
@@ -102,8 +110,12 @@ function doRestore() {
 function doDelete() {
     if (!pendingFilename) return;
     
+    const formData = new FormData();
+    formData.append('location', pendingLocation || 'default');
+    
     fetch('/backups/delete/' + pendingFilename, {
-        method: 'POST'
+        method: 'POST',
+        body: formData
     })
     .then(response => response.json())
     .then(data => {
