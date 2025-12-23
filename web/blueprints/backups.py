@@ -198,14 +198,23 @@ def check_auto_backup(app: Flask) -> None:
     
     last_backup_str = db.get_setting('last_auto_backup', '')
     
-    # Check if backup is due
+    # Check if backup is due (calendar-based)
     backup_due = False
+    today = datetime.now().date()
+    
     if not last_backup_str:
         backup_due = True
     else:
         try:
             last_backup = datetime.fromisoformat(last_backup_str)
-            if datetime.now() - last_backup > timedelta(hours=frequency_hours):
+            last_backup_date = last_backup.date()
+            days_since = (today - last_backup_date).days
+            
+            # Convert frequency hours to days for calendar comparison
+            # 24h = daily (1 day), 168h = weekly (7 days), 720h = monthly (30 days)
+            frequency_days = frequency_hours // 24
+            
+            if days_since >= frequency_days:
                 backup_due = True
         except ValueError:
             backup_due = True
