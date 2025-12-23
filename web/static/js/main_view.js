@@ -28,10 +28,24 @@ if (document.readyState === 'loading') {
 /* ============================================
    VIEW MODE
    ============================================ */
+const COMPACT_ONLY_BREAKPOINT = 1200;
+
 function initViewMode() {
-    const mode = getCookie('libram_view') || 'detailed';
-    setViewMode(mode, false);
+    // Force compact on smaller screens regardless of saved preference
+    if (window.innerWidth <= COMPACT_ONLY_BREAKPOINT) {
+        setViewMode('compact', false);
+    } else {
+        const mode = getCookie('libram_view') || 'detailed';
+        setViewMode(mode, false);
+    }
 }
+
+// Re-check view mode on resize
+window.addEventListener('resize', function() {
+    if (window.innerWidth <= COMPACT_ONLY_BREAKPOINT) {
+        setViewMode('compact', false);
+    }
+});
 
 function setViewMode(mode, save = true) {
     const container = document.getElementById('books-container');

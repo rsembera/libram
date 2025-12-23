@@ -765,10 +765,28 @@
    RESPONSIVE
    ============================================ */
 
-/* Tablet landscape and below */
+/* Tablet landscape and below - force compact view */
 @media (max-width: 1200px) {
     .stats-container {
         grid-template-columns: repeat(2, 1fr);
+    }
+    
+    /* Hide column headers and view toggle */
+    .column-headers {
+        display: none;
+    }
+    
+    .view-toggle {
+        display: none;
+    }
+    
+    /* Force compact view */
+    .books-container .detailed-content {
+        display: none !important;
+    }
+    
+    .books-container .compact-content {
+        display: flex !important;
     }
 }
 
@@ -833,24 +851,6 @@
     
     .search-box input {
         width: 100%;
-    }
-    
-    /* Hide column headers and view toggle */
-    .column-headers {
-        display: none;
-    }
-    
-    .view-toggle {
-        display: none;
-    }
-    
-    /* Force compact view on mobile */
-    .books-container .detailed-content {
-        display: none !important;
-    }
-    
-    .books-container .compact-content {
-        display: flex !important;
     }
     
     /* Compact content adjustments for mobile */
