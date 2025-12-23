@@ -30,31 +30,61 @@
     <div class="backup-settings">
         <div class="settings-row">
             <div class="form-group">
-                <label for="frequency">Frequency</label>
-                <select id="frequency" onchange="saveBackupSettings()">
-                    {% for value, label in frequency_options %}
-                    <option value="{{ value }}" {% if value == auto_frequency %}selected{% endif %}>{{ label }}</option>
-                    {% endfor %}
-                </select>
+                <label>Frequency</label>
+                <div class="custom-dropdown" id="frequency-dropdown">
+                    <button type="button" class="custom-dropdown-trigger" onclick="toggleDropdown('frequency-dropdown')">
+                        <span id="frequency-selected-text">{% for value, label in frequency_options %}{% if value == auto_frequency %}{{ label }}{% endif %}{% endfor %}</span>
+                        <i class="ph ph-caret-down dropdown-arrow"></i>
+                    </button>
+                    <div class="custom-dropdown-menu">
+                        {% for value, label in frequency_options %}
+                        <div class="custom-dropdown-option {% if value == auto_frequency %}selected{% endif %}" 
+                             data-value="{{ value }}" onclick="selectFrequency(this)">
+                            {{ label }}
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
             </div>
             <div class="form-group">
-                <label for="retention">Keep backups for</label>
-                <select id="retention" onchange="saveBackupSettings()">
-                    {% for value, label in retention_options %}
-                    <option value="{{ value }}" {% if value == retention_days %}selected{% endif %}>{{ label }}</option>
-                    {% endfor %}
-                </select>
+                <label>Keep backups for</label>
+                <div class="custom-dropdown" id="retention-dropdown">
+                    <button type="button" class="custom-dropdown-trigger" onclick="toggleDropdown('retention-dropdown')">
+                        <span id="retention-selected-text">{% for value, label in retention_options %}{% if value == retention_days %}{{ label }}{% endif %}{% endfor %}</span>
+                        <i class="ph ph-caret-down dropdown-arrow"></i>
+                    </button>
+                    <div class="custom-dropdown-menu">
+                        {% for value, label in retention_options %}
+                        <div class="custom-dropdown-option {% if value == retention_days %}selected{% endif %}" 
+                             data-value="{{ value }}" onclick="selectRetention(this)">
+                            {{ label }}
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
             </div>
         </div>
         <div class="settings-row">
             <div class="form-group">
-                <label for="location">Backup Location</label>
-                <select id="location" onchange="saveBackupSettings()">
-                    <option value="default" {% if not backup_location %}selected{% endif %}>Default (app folder)</option>
-                    {% for folder in cloud_folders %}
-                    <option value="{{ folder.path }}" {% if backup_location == folder.path %}selected{% endif %}>{{ folder.name }}</option>
-                    {% endfor %}
-                </select>
+                <label>Backup Location</label>
+                <div class="custom-dropdown" id="location-dropdown">
+                    <button type="button" class="custom-dropdown-trigger" onclick="toggleDropdown('location-dropdown')">
+                        <span id="location-selected-text">{% if backup_location %}{% for folder in cloud_folders %}{% if folder.path == backup_location %}{{ folder.name }}{% endif %}{% endfor %}{% else %}Default (app folder){% endif %}</span>
+                        <i class="ph ph-caret-down dropdown-arrow"></i>
+                    </button>
+                    <div class="custom-dropdown-menu">
+                        <div class="custom-dropdown-option {% if not backup_location %}selected{% endif %}" 
+                             data-value="default" onclick="selectLocation(this)">
+                            Default (app folder)
+                        </div>
+                        {% for folder in cloud_folders %}
+                        <div class="custom-dropdown-option {% if backup_location == folder.path %}selected{% endif %}" 
+                             data-value="{{ folder.path }}" onclick="selectLocation(this)">
+                            {{ folder.name }}
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
                 {% if backup_location %}
                 <p class="location-path">{{ backup_location }}</p>
                 {% endif %}

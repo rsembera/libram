@@ -181,9 +181,9 @@
     box-sizing: border-box;
 }
 
-/* Form elements don't inherit fonts by default - use !important to override page-specific styles */
+/* Form elements don't inherit fonts by default */
 input, button, textarea, select {
-    font-family: inherit !important;
+    font-family: inherit;
 }
 
 body {
