@@ -402,6 +402,8 @@
     color: var(--text-secondary);
     text-transform: uppercase;
     letter-spacing: 0.03em;
+    box-shadow: 0 2px 8px var(--shadow-color);
+    border: 1px solid var(--card-border);
 }
 
 .column-headers.hidden {
