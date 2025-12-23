@@ -4,13 +4,34 @@
 let currentBackgroundValue = '';
 let userBackgrounds = [];
 
-function saveTimeout() {
-    const timeout = document.getElementById('session-timeout').value;
+// ============================================================================
+// TIMEOUT DROPDOWN
+// ============================================================================
+
+function toggleTimeoutDropdown() {
+    const dropdown = document.getElementById('timeout-dropdown');
+    closeAllDropdowns();
+    dropdown.classList.toggle('open');
+}
+
+function selectTimeout(element) {
+    const value = element.dataset.value;
+    const text = element.textContent.trim();
     
+    document.getElementById('timeout-selected-text').textContent = text;
+    
+    document.querySelectorAll('#timeout-dropdown .custom-dropdown-option').forEach(opt => {
+        opt.classList.remove('selected');
+    });
+    element.classList.add('selected');
+    
+    document.getElementById('timeout-dropdown').classList.remove('open');
+    
+    // Save to server
     fetch('/settings/api/timeout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ timeout: timeout })
+        body: JSON.stringify({ timeout: value })
     })
     .then(response => response.json())
     .then(data => {
@@ -26,12 +47,12 @@ function showTimeoutSaved() {
     if (existing) existing.remove();
     
     // Show brief "Saved" confirmation next to dropdown
-    const select = document.getElementById('session-timeout');
+    const dropdown = document.getElementById('timeout-dropdown');
     const saved = document.createElement('span');
     saved.innerHTML = '<i class="ph ph-check"></i> Saved';
     saved.className = 'timeout-saved';
     saved.style.cssText = 'color: var(--accent-primary); font-size: 0.85rem; margin-left: 0.5rem; opacity: 1; transition: opacity 0.3s;';
-    select.parentNode.appendChild(saved);
+    dropdown.parentNode.appendChild(saved);
     
     // Fade out and remove after 2 seconds
     setTimeout(() => {
@@ -65,19 +86,36 @@ function initCardPositions() {
         }
     }
     
-    // Set dropdown values
+    // Update dropdown displays and selected states
     for (let i = 0; i < 3; i++) {
-        const select = document.getElementById(`card-position-${i + 1}`);
-        if (select && currentCardOrder[i]) {
-            select.value = currentCardOrder[i];
+        const cardId = currentCardOrder[i];
+        const textSpan = document.getElementById(`card-position-${i + 1}-text`);
+        if (textSpan && CARD_NAMES[cardId]) {
+            textSpan.textContent = CARD_NAMES[cardId];
+        }
+        
+        // Set selected state
+        const dropdown = document.getElementById(`card-position-${i + 1}-dropdown`);
+        if (dropdown) {
+            dropdown.querySelectorAll('.custom-dropdown-option').forEach(opt => {
+                opt.classList.toggle('selected', opt.dataset.value === cardId);
+            });
         }
     }
 }
 
-function handleCardPositionChange(position) {
-    const select = document.getElementById(`card-position-${position + 1}`);
-    const newCardId = select.value;
+function toggleCardPositionDropdown(position) {
+    const dropdown = document.getElementById(`card-position-${position + 1}-dropdown`);
+    closeAllDropdowns();
+    dropdown.classList.toggle('open');
+}
+
+function selectCardPosition(position, element) {
+    const newCardId = element.dataset.value;
     const oldCardId = currentCardOrder[position];
+    
+    // Close dropdown
+    document.getElementById(`card-position-${position + 1}-dropdown`).classList.remove('open');
     
     // If selecting the same card, do nothing
     if (newCardId === oldCardId) return;
@@ -88,11 +126,33 @@ function handleCardPositionChange(position) {
     if (swapPosition !== -1) {
         // Swap: put the old card into the position where the new card was
         currentCardOrder[swapPosition] = oldCardId;
-        document.getElementById(`card-position-${swapPosition + 1}`).value = oldCardId;
+        
+        // Update the swapped dropdown's display
+        const swapTextSpan = document.getElementById(`card-position-${swapPosition + 1}-text`);
+        if (swapTextSpan) {
+            swapTextSpan.textContent = CARD_NAMES[oldCardId];
+        }
+        
+        // Update selected state for swapped dropdown
+        const swapDropdown = document.getElementById(`card-position-${swapPosition + 1}-dropdown`);
+        if (swapDropdown) {
+            swapDropdown.querySelectorAll('.custom-dropdown-option').forEach(opt => {
+                opt.classList.toggle('selected', opt.dataset.value === oldCardId);
+            });
+        }
     }
     
     // Update our tracked order
     currentCardOrder[position] = newCardId;
+    
+    // Update this dropdown's display
+    document.getElementById(`card-position-${position + 1}-text`).textContent = CARD_NAMES[newCardId];
+    
+    // Update selected state
+    const dropdown = document.getElementById(`card-position-${position + 1}-dropdown`);
+    dropdown.querySelectorAll('.custom-dropdown-option').forEach(opt => {
+        opt.classList.toggle('selected', opt.dataset.value === newCardId);
+    });
     
     // Save the new order
     fetch('/settings/api/card-order', {
@@ -150,12 +210,8 @@ const themeNames = {
 
 function toggleThemeDropdown() {
     const dropdown = document.getElementById('theme-dropdown');
+    closeAllDropdowns();
     dropdown.classList.toggle('open');
-    // Close other dropdowns
-    document.getElementById('background-dropdown').classList.remove('open');
-    document.getElementById('font-dropdown').classList.remove('open');
-    const borderDropdown = document.getElementById('border-style-dropdown');
-    if (borderDropdown) borderDropdown.classList.remove('open');
 }
 
 function selectTheme(element) {
@@ -191,12 +247,8 @@ function selectTheme(element) {
 
 function toggleFontDropdown() {
     const dropdown = document.getElementById('font-dropdown');
+    closeAllDropdowns();
     dropdown.classList.toggle('open');
-    // Close other dropdowns
-    document.getElementById('background-dropdown').classList.remove('open');
-    document.getElementById('theme-dropdown').classList.remove('open');
-    const borderDropdown = document.getElementById('border-style-dropdown');
-    if (borderDropdown) borderDropdown.classList.remove('open');
 }
 
 function selectFont(element) {
@@ -255,11 +307,8 @@ function selectFontSize(size) {
 
 function toggleBorderStyleDropdown() {
     const dropdown = document.getElementById('border-style-dropdown');
+    closeAllDropdowns();
     dropdown.classList.toggle('open');
-    // Close other dropdowns
-    document.getElementById('background-dropdown').classList.remove('open');
-    document.getElementById('theme-dropdown').classList.remove('open');
-    document.getElementById('font-dropdown').classList.remove('open');
 }
 
 function selectBorderStyle(element) {
@@ -348,12 +397,8 @@ async function loadBackgroundOptions() {
 
 function toggleBackgroundDropdown() {
     const dropdown = document.getElementById('background-dropdown');
+    closeAllDropdowns();
     dropdown.classList.toggle('open');
-    // Close other dropdowns
-    document.getElementById('font-dropdown').classList.remove('open');
-    document.getElementById('theme-dropdown').classList.remove('open');
-    const borderDropdown = document.getElementById('border-style-dropdown');
-    if (borderDropdown) borderDropdown.classList.remove('open');
 }
 
 function selectBackground(element) {
@@ -555,20 +600,17 @@ function showUploadStatus(message, type) {
 // INITIALIZATION
 // ============================================================================
 
+// Helper to close all dropdowns
+function closeAllDropdowns() {
+    document.querySelectorAll('.custom-dropdown').forEach(d => {
+        d.classList.remove('open');
+    });
+}
+
 // Close dropdowns when clicking outside
 document.addEventListener('click', function(e) {
-    const fontDropdown = document.getElementById('font-dropdown');
-    const bgDropdown = document.getElementById('background-dropdown');
-    const themeDropdown = document.getElementById('theme-dropdown');
-    
-    if (fontDropdown && !fontDropdown.contains(e.target)) {
-        fontDropdown.classList.remove('open');
-    }
-    if (bgDropdown && !bgDropdown.contains(e.target)) {
-        bgDropdown.classList.remove('open');
-    }
-    if (themeDropdown && !themeDropdown.contains(e.target)) {
-        themeDropdown.classList.remove('open');
+    if (!e.target.closest('.custom-dropdown')) {
+        closeAllDropdowns();
     }
 });
 
