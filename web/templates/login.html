@@ -250,6 +250,9 @@
         {% endif %}
         
         <form method="post">
+            <!-- Hidden username for password managers -->
+            <input type="hidden" name="username" value="libram" autocomplete="username">
+            
             <div class="form-group">
                 <label for="password">Password</label>
                 <div class="password-wrapper">
