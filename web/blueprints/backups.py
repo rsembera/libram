@@ -193,29 +193,53 @@ def check_auto_backup(app: Flask) -> None:
     Called from logout and shutdown handlers.
     
     Uses calendar-based comparison:
-    - 'startup': Always backup on session end
+    - 'startup': Always backup on session end (if data changed)
     - 'daily': Backup if last backup was on a different calendar day
     - 'weekly': Backup if 7+ calendar days since last backup
     - 'manual': Never auto-backup
+    
+    Skips backup if database hasn't been modified since last backup.
     """
     db = app.get_db()
     
     frequency = db.get_setting('backup_frequency', 'daily')
+    
+    # Handle legacy values from old hour-based system
+    legacy_map = {'0': 'manual', '24': 'daily', '168': 'weekly', '720': 'weekly'}
+    if frequency in legacy_map:
+        frequency = legacy_map[frequency]
+        db.set_setting('backup_frequency', frequency)  # Migrate to new value
+    
+    # Validate frequency is a known value
+    if frequency not in ('startup', 'daily', 'weekly', 'manual'):
+        frequency = 'daily'  # Default to daily for unknown values
+    
     if frequency == 'manual':
         return  # Auto-backup disabled
     
-    if frequency == 'startup':
-        # Always backup on session end
-        _create_auto_backup(app, db)
-        return
-    
+    # Check if database has been modified since last backup
+    db_path = Path(app.config['DATABASE_PATH'])
     last_backup_str = db.get_setting('last_auto_backup', '')
     
-    # Check if backup is due (calendar-based)
+    if last_backup_str:
+        try:
+            last_backup_time = datetime.fromisoformat(last_backup_str)
+            db_mtime = datetime.fromtimestamp(db_path.stat().st_mtime)
+            
+            # If database hasn't been modified since last backup, skip
+            if db_mtime <= last_backup_time:
+                return
+        except (ValueError, OSError):
+            pass  # Continue with backup if we can't determine
+    
+    # Check if backup is due based on frequency
     backup_due = False
     today = datetime.now().date()
     
-    if not last_backup_str:
+    if frequency == 'startup':
+        # Always backup on session end (we already checked for changes above)
+        backup_due = True
+    elif not last_backup_str:
         backup_due = True
     else:
         try:
