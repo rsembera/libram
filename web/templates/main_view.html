@@ -137,9 +137,8 @@
             <div class="year-header" onclick="toggleYear('year-{{ year_group.year }}')">
                 <span class="year-header-text">
                     <span id="year-{{ year_group.year }}-icon">{{ '▼' if year_group.is_current else '▶' }}</span>
-                    {{ year_group.year }}
+                    {{ year_group.year }} <span class="year-book-count">– {{ year_group.total }} Book{{ 's' if year_group.total != 1 else '' }}</span>
                 </span>
-                <span class="entry-count">{{ year_group.total }} Book{{ 's' if year_group.total != 1 else '' }}</span>
             </div>
             
             <!-- Year Content (collapsible) -->
