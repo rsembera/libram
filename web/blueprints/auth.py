@@ -80,7 +80,21 @@ def setup():
 
 @auth_bp.route('/logout')
 def logout():
-    """Log out and clear session."""
+    """Log out - run backup check and checkpoint database."""
+    # Run automatic backup check before closing session
+    try:
+        from web.blueprints.backups import check_auto_backup
+        check_auto_backup(current_app)
+    except Exception as e:
+        print(f"[Backup] Auto-backup failed: {e}")
+    
+    # Checkpoint the database
+    try:
+        db = current_app.get_db()
+        db.checkpoint()
+    except Exception:
+        pass
+    
     session.clear()
     return redirect(url_for('auth.login'))
 
@@ -139,13 +153,6 @@ def check_session():
     
     # Update last activity
     session['last_activity'] = time.time()
-    
-    # Check auto-backup (only once per session, or every hour)
-    last_backup_check = session.get('last_backup_check', 0)
-    if time.time() - last_backup_check > 3600:  # Check at most once per hour
-        session['last_backup_check'] = time.time()
-        from web.blueprints.backups import check_auto_backup
-        check_auto_backup(current_app)
 
 
 @auth_bp.after_app_request

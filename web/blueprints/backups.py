@@ -17,21 +17,20 @@ backups_bp = Blueprint('backups', __name__)
 APP_ROOT = Path(__file__).parent.parent.parent
 DEFAULT_BACKUP_DIR = APP_ROOT / 'backups'
 
-# Auto-backup frequency options (in hours, 0 = never)
+# Auto-backup frequency options
 FREQUENCY_OPTIONS = [
-    ('0', 'Never'),
-    ('24', 'Daily'),
-    ('168', 'Weekly'),
-    ('720', 'Monthly'),
+    ('startup', 'Every Session'),
+    ('daily', 'Daily'),
+    ('weekly', 'Weekly'),
+    ('manual', 'Manual Only'),
 ]
 
-# Retention period options (in days, 0 = always)
+# Retention period options
 RETENTION_OPTIONS = [
-    ('7', '7 days'),
-    ('14', '14 days'),
-    ('30', '30 days'),
-    ('90', '90 days'),
-    ('0', 'Always'),
+    ('1_month', '1 Month'),
+    ('6_months', '6 Months'),
+    ('1_year', '1 Year'),
+    ('forever', 'Forever'),
 ]
 
 
@@ -107,8 +106,8 @@ def backups_page():
     backups = _get_backup_list(db)
     
     # Get current settings
-    auto_frequency = db.get_setting('backup_frequency', '168')  # Default: Weekly
-    retention_days = db.get_setting('backup_retention', '7')    # Default: 7 days
+    auto_frequency = db.get_setting('backup_frequency', 'daily')
+    retention = db.get_setting('backup_retention', '1_month')
     last_auto_backup = db.get_setting('last_auto_backup', '')
     backup_location = db.get_setting('backup_location', '')
     
@@ -118,7 +117,7 @@ def backups_page():
     return render_template('backups.html', 
                           backups=backups,
                           auto_frequency=auto_frequency,
-                          retention_days=retention_days,
+                          retention=retention,
                           last_auto_backup=last_auto_backup,
                           backup_location=backup_location,
                           cloud_folders=cloud_folders,
@@ -153,8 +152,8 @@ def save_settings():
     """Save auto-backup settings."""
     db = current_app.get_db()
     
-    frequency = request.form.get('frequency', '0')
-    retention = request.form.get('retention', '0')
+    frequency = request.form.get('frequency', 'manual')
+    retention = request.form.get('retention', '1_month')
     location = request.form.get('location', '')
     
     # Validate frequency and retention
@@ -182,19 +181,33 @@ def save_settings():
                 return jsonify({'status': 'error', 'message': f'Cannot create folder: {e}'}), 400
     
     # Run cleanup if retention changed
-    if retention != '0':
-        _cleanup_old_backups(int(retention), db)
+    if retention != 'forever':
+        _cleanup_old_backups(retention, db)
     
     return jsonify({'status': 'ok'})
 
 
 def check_auto_backup(app: Flask) -> None:
-    """Check if auto-backup is due and create one if needed. Call from before_request."""
+    """
+    Check if auto-backup is due and create one if needed.
+    Called from logout and shutdown handlers.
+    
+    Uses calendar-based comparison:
+    - 'startup': Always backup on session end
+    - 'daily': Backup if last backup was on a different calendar day
+    - 'weekly': Backup if 7+ calendar days since last backup
+    - 'manual': Never auto-backup
+    """
     db = app.get_db()
     
-    frequency_hours = int(db.get_setting('backup_frequency', '168'))  # Default: Weekly
-    if frequency_hours == 0:
+    frequency = db.get_setting('backup_frequency', 'daily')
+    if frequency == 'manual':
         return  # Auto-backup disabled
+    
+    if frequency == 'startup':
+        # Always backup on session end
+        _create_auto_backup(app, db)
+        return
     
     last_backup_str = db.get_setting('last_auto_backup', '')
     
@@ -210,11 +223,9 @@ def check_auto_backup(app: Flask) -> None:
             last_backup_date = last_backup.date()
             days_since = (today - last_backup_date).days
             
-            # Convert frequency hours to days for calendar comparison
-            # 24h = daily (1 day), 168h = weekly (7 days), 720h = monthly (30 days)
-            frequency_days = frequency_hours // 24
-            
-            if days_since >= frequency_days:
+            if frequency == 'daily' and days_since >= 1:
+                backup_due = True
+            elif frequency == 'weekly' and days_since >= 7:
                 backup_due = True
         except ValueError:
             backup_due = True
@@ -240,16 +251,30 @@ def _create_auto_backup(app, db):
         shutil.copy2(db_path, backup_path)
         db.set_setting('last_auto_backup', datetime.now().isoformat())
         
-        # Cleanup old backups (0 = Always keep)
-        retention_days = int(db.get_setting('backup_retention', '7'))
-        if retention_days > 0:
-            _cleanup_old_backups(retention_days, db)
+        # Cleanup old backups
+        retention = db.get_setting('backup_retention', '1_month')
+        if retention != 'forever':
+            _cleanup_old_backups(retention, db)
     except Exception:
         pass  # Silently fail for auto-backups
 
 
-def _cleanup_old_backups(retention_days, db=None):
-    """Delete backups older than retention period."""
+def _cleanup_old_backups(retention, db=None):
+    """Delete backups older than retention period.
+    
+    Args:
+        retention: String value - '1_month', '6_months', '1_year', or 'forever'
+    """
+    if retention == 'forever':
+        return
+    
+    # Convert retention to days
+    retention_days = {
+        '1_month': 30,
+        '6_months': 180,
+        '1_year': 365
+    }.get(retention, 30)  # Default to 30 days
+    
     backup_dir = get_backup_dir(db)
     
     if not backup_dir.exists():

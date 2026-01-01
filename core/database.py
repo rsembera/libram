@@ -673,3 +673,11 @@ class Database:
     def has_password(self) -> bool:
         """Check if a password has been set."""
         return self.get_setting('password_hash') is not None
+    
+    def checkpoint(self) -> None:
+        """Flush WAL to main database file (if WAL mode is enabled)."""
+        if self.conn:
+            try:
+                self.conn.execute("PRAGMA wal_checkpoint(TRUNCATE)")
+            except sqlite3.OperationalError:
+                pass  # Not in WAL mode, ignore

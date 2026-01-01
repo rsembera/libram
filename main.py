@@ -4,10 +4,12 @@ Libram - Personal Reading Tracker
 Entry point for the application.
 """
 
+import atexit
 import os
 import sys
 import logging
 import webbrowser
+import signal
 import time
 from pathlib import Path
 
@@ -16,6 +18,37 @@ PROJECT_ROOT = Path(__file__).parent
 sys.path.insert(0, str(PROJECT_ROOT))
 
 from web.app import create_app  # noqa: E402
+
+# Track if cleanup has run to avoid running twice
+_cleanup_done = False
+_app = None
+
+
+def _cleanup():
+    """Cleanup function for atexit - backup and checkpoint database."""
+    global _cleanup_done
+    if _cleanup_done or _app is None:
+        return
+    _cleanup_done = True
+    
+    try:
+        with _app.app_context():
+            db = _app.get_db()
+            if db:
+                # Run backup check before shutdown
+                try:
+                    from web.blueprints.backups import check_auto_backup
+                    check_auto_backup(_app)
+                except Exception as e:
+                    print(f"[Backup] Warning: {e}")
+                
+                db.checkpoint()
+    except Exception:
+        pass  # Silent fail on exit
+
+
+# Register atexit handler
+atexit.register(_cleanup)
 
 
 class QuietRequestFilter(logging.Filter):
@@ -28,9 +61,39 @@ class QuietRequestFilter(logging.Filter):
         return True
 
 
+def shutdown_handler(signum, frame):
+    """Handle Ctrl-C gracefully - backup and checkpoint database before exit."""
+    global _cleanup_done
+    
+    print("\n\nShutting down...")
+    
+    if not _cleanup_done and _app is not None:
+        _cleanup_done = True
+        try:
+            with _app.app_context():
+                db = _app.get_db()
+                if db:
+                    # Run backup check before shutdown
+                    try:
+                        from web.blueprints.backups import check_auto_backup
+                        check_auto_backup(_app)
+                        print("[Backup] Auto-backup check completed.")
+                    except Exception as e:
+                        print(f"[Backup] Warning: {e}")
+                    
+                    db.checkpoint()
+                    print("[Database] Checkpoint completed.")
+        except Exception as e:
+            print(f"[Shutdown] Warning: {e}")
+    
+    sys.exit(0)
+
+
 def main():
     """Start the Libram application."""
+    global _app
     app = create_app()
+    _app = app
     
     # Get port from environment or use default
     port = int(os.environ.get('LIBRAM_PORT', 8090))
@@ -54,6 +117,10 @@ def main():
     ║                                                       ║
     ╚═══════════════════════════════════════════════════════╝
     """)
+    
+    # Register shutdown handler for clean database checkpoint on Ctrl-C
+    signal.signal(signal.SIGINT, shutdown_handler)
+    signal.signal(signal.SIGTERM, shutdown_handler)
     
     # Open browser after short delay (only if explicitly requested)
     if os.environ.get('LIBRAM_BROWSER') == '1':
