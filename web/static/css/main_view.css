@@ -435,7 +435,6 @@
 
 .year-header {
     display: flex;
-    justify-content: space-between;
     align-items: center;
     background: var(--year-header-bg);
     border-radius: 1rem;
@@ -457,10 +456,9 @@
     color: var(--text-primary);
 }
 
-.entry-count {
-    font-size: 0.875rem;
-    color: var(--text-secondary);
+.year-book-count {
     font-weight: 500;
+    color: var(--text-secondary);
 }
 
 .year-content {
