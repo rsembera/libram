@@ -50,12 +50,12 @@
                 <label>Keep backups for</label>
                 <div class="custom-dropdown" id="retention-dropdown">
                     <button type="button" class="custom-dropdown-trigger" onclick="toggleDropdown('retention-dropdown')">
-                        <span id="retention-selected-text">{% for value, label in retention_options %}{% if value == retention_days %}{{ label }}{% endif %}{% endfor %}</span>
+                        <span id="retention-selected-text">{% for value, label in retention_options %}{% if value == retention %}{{ label }}{% endif %}{% endfor %}</span>
                         <i class="ph ph-caret-down dropdown-arrow"></i>
                     </button>
                     <div class="custom-dropdown-menu">
                         {% for value, label in retention_options %}
-                        <div class="custom-dropdown-option {% if value == retention_days %}selected{% endif %}" 
+                        <div class="custom-dropdown-option {% if value == retention %}selected{% endif %}" 
                              data-value="{{ value }}" onclick="selectRetention(this)">
                             {{ label }}
                         </div>
