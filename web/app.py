@@ -91,6 +91,14 @@ def create_app() -> Flask:
     # Make get_db available to blueprints
     app.get_db = get_db
     
+    # Heartbeat update for desktop mode (on any request)
+    @app.before_request
+    def update_desktop_heartbeat():
+        """Update heartbeat timestamp on any request for desktop mode."""
+        heartbeat_func = app.config.get('HEARTBEAT_CALLBACK')
+        if heartbeat_func:
+            heartbeat_func()
+    
     # Context processor to inject theme settings into all templates
     @app.context_processor
     def inject_theme_settings():

@@ -11,6 +11,7 @@ import logging
 import webbrowser
 import signal
 import time
+import threading
 from pathlib import Path
 
 # Add project root to path
@@ -22,6 +23,35 @@ from web.app import create_app  # noqa: E402
 # Track if cleanup has run to avoid running twice
 _cleanup_done = False
 _app = None
+
+# Heartbeat tracking for desktop mode
+_last_heartbeat = time.time()
+_heartbeat_lock = threading.Lock()
+HEARTBEAT_TIMEOUT = 30  # seconds without heartbeat before shutdown
+
+
+def update_heartbeat():
+    """Update the last heartbeat timestamp. Called from session-status endpoint."""
+    global _last_heartbeat
+    with _heartbeat_lock:
+        _last_heartbeat = time.time()
+
+
+def _heartbeat_monitor():
+    """Background thread that monitors for heartbeat timeout in desktop mode."""
+    global _last_heartbeat
+    
+    while True:
+        time.sleep(5)  # Check every 5 seconds
+        
+        with _heartbeat_lock:
+            elapsed = time.time() - _last_heartbeat
+        
+        if elapsed > HEARTBEAT_TIMEOUT:
+            print(f"\n[Desktop] No browser heartbeat for {int(elapsed)}s - shutting down...")
+            # Trigger graceful shutdown
+            os.kill(os.getpid(), signal.SIGTERM)
+            break
 
 
 def _cleanup():
@@ -95,6 +125,11 @@ def main():
     app = create_app()
     _app = app
     
+    # Desktop mode: register heartbeat callback
+    desktop_mode = os.environ.get('LIBRAM_DESKTOP') == '1'
+    if desktop_mode:
+        app.config['HEARTBEAT_CALLBACK'] = update_heartbeat
+    
     # Get port from environment or use default
     port = int(os.environ.get('LIBRAM_PORT', 8090))
     host = os.environ.get('LIBRAM_HOST', '127.0.0.1')
@@ -122,13 +157,23 @@ def main():
     signal.signal(signal.SIGINT, shutdown_handler)
     signal.signal(signal.SIGTERM, shutdown_handler)
     
-    # Open browser after short delay (only if explicitly requested)
-    if os.environ.get('LIBRAM_BROWSER') == '1':
+    # Desktop mode: start heartbeat monitor and auto-open browser
+    desktop_mode = os.environ.get('LIBRAM_DESKTOP') == '1'
+    if desktop_mode:
+        # Start heartbeat monitor thread
+        monitor = threading.Thread(target=_heartbeat_monitor, daemon=True)
+        monitor.start()
+        
+        # Always open browser in desktop mode
         def open_browser():
             time.sleep(1.0)
             webbrowser.open(f'http://{host}:{port}')
-        
-        import threading
+        threading.Thread(target=open_browser, daemon=True).start()
+    elif os.environ.get('LIBRAM_BROWSER') == '1':
+        # Manual browser open request
+        def open_browser():
+            time.sleep(1.0)
+            webbrowser.open(f'http://{host}:{port}')
         threading.Thread(target=open_browser, daemon=True).start()
     
     if debug_mode:
