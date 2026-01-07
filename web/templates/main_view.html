@@ -51,7 +51,7 @@
                 <a href="{{ url_for('exports.export_page') }}" class="nav-btn teal">
                     <i class="ph ph-download-simple" class="icon-sm icon-inline"></i>Export
                 </a>
-                <a href="{{ url_for('auth.logout') }}" class="nav-btn purple">
+                <a href="#" onclick="showLogoutModal(); return false;" class="nav-btn purple">
                     <i class="ph ph-sign-out" class="icon-sm icon-inline"></i>Logout
                 </a>
             </div>
@@ -258,6 +258,29 @@ document.addEventListener('keydown', function(e) {
         closeCoverLightbox();
     }
 });
+
+/**
+ * Show logout modal and navigate to logout after minimum display time
+ */
+function showLogoutModal() {
+    const modal = document.getElementById('logout-modal');
+    modal.style.display = 'flex';
+    
+    // Minimum display time so modal doesn't flash too quickly
+    setTimeout(() => {
+        window.location.href = '/logout';
+    }, 400);
+}
 </script>
+
+<!-- Logout Modal -->
+<div id="logout-modal" class="modal">
+    <div class="modal-content" style="max-width: 300px;">
+        <div class="logout-modal-content">
+            <div class="logout-spinner"></div>
+            <p>Logging out...</p>
+        </div>
+    </div>
+</div>
 
 {% endblock %}
