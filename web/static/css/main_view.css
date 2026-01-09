@@ -637,7 +637,7 @@
     border-radius: 0.25rem;
     overflow: hidden;
     background: var(--bg-card-alt);
-    align-self: flex-start;
+    align-self: center;
 }
 
 .compact-cover img {
