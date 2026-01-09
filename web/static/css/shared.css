@@ -381,6 +381,7 @@ html.font-size-l { font-size: 20px; }
 .actions-right {
     display: flex;
     gap: 0.75rem;
+    margin-left: auto;
 }
 
 /* ============================================
