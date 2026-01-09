@@ -15,9 +15,6 @@
             <i class="ph ph-{{ 'pencil-simple' if mode == 'edit' else 'plus' }} page-icon"></i>
             {{ 'Edit Book' if mode == 'edit' else 'Add Book' }}
         </h2>
-        <a href="{{ url_for('books.index') }}" class="btn btn-secondary">
-            <i class="ph ph-arrow-left" class="icon-sm icon-inline"></i> Back
-        </a>
     </div>
     
     {% if errors %}
