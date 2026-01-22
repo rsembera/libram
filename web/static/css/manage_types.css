@@ -1,7 +1,7 @@
 /* Manage Types Page Styles */
 
 .types-page {
-    max-width: min(900px, 95vw);
+    max-width: min(600px, 95vw);
 }
 
 .types-page .form-header {
