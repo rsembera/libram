@@ -27,7 +27,7 @@
             <tr>
                 <th>Name</th>
                 <th>Colour</th>
-                <th class="text-center">Status</th>
+                <th class="text-center">Books</th>
             </tr>
         </thead>
         <tbody>
@@ -41,23 +41,15 @@
                         {{ type.color_name }}
                     </span>
                 </td>
-                <td class="text-center">
-                    {% if type.book_count == 0 and types|length > 1 %}
-                    <span class="deletable-indicator">
-                        <i class="ph ph-check"></i> EDITABLE
-                    </span>
-                    {% else %}
-                    <span class="editable-indicator">
-                        <i class="ph ph-check"></i> EDITABLE
-                    </span>
-                    {% endif %}
+                <td class="text-center book-count">
+                    {{ type.book_count }}
                 </td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
     <small class="helper-text">
-        Click any row to edit. Types can be renamed, recoloured, or deleted (if no books assigned).
+        Click any row to edit. Types with 0 books can be deleted.
     </small>
     
     <a href="{{ url_for('books.index') }}" class="btn btn-secondary back-btn">
