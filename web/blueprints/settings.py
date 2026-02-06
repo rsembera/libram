@@ -6,10 +6,19 @@ Application configuration and preferences.
 from __future__ import annotations
 
 from pathlib import Path
+import re
 from flask import Blueprint, render_template, request, current_app, jsonify
 from werkzeug.utils import secure_filename
 
 settings_bp = Blueprint('settings', __name__)
+
+# Valid values for settings that accept a fixed set of options
+VALID_THEMES = {'ink', 'slate', 'parchment', 'witching-hour', 'crimson-veil', 'terminal'}
+VALID_FONTS = {'lexend', 'libre-baskerville', 'lora', 'source-sans', 'literata'}
+VALID_FONT_SIZES = {'s', 'm', 'l'}
+VALID_BORDER_STYLES = {'accent', 'vibrant'}
+VALID_CARD_IDS = {'pages', 'reading-chart', 'navigation'}
+VALID_TIMEOUTS = {'15', '30', '60', '120', '0'}
 
 
 @settings_bp.route('/')
@@ -46,6 +55,8 @@ def save_theme():
     data = request.get_json()
     
     theme = data.get('theme', 'ink')
+    if theme not in VALID_THEMES:
+        return jsonify({'status': 'error', 'message': 'Invalid theme'}), 400
     db.set_setting('theme', theme)
     
     return jsonify({'status': 'ok'})
@@ -70,6 +81,8 @@ def save_font():
     data = request.get_json()
     
     style = data.get('style', 'lexend')
+    if style not in VALID_FONTS:
+        return jsonify({'status': 'error', 'message': 'Invalid font'}), 400
     db.set_setting('font_style', style)
     
     return jsonify({'status': 'ok'})
@@ -82,6 +95,8 @@ def save_font_size():
     data = request.get_json()
     
     size = data.get('size', 's')
+    if size not in VALID_FONT_SIZES:
+        return jsonify({'status': 'error', 'message': 'Invalid font size'}), 400
     db.set_setting('font_size', size)
     
     return jsonify({'status': 'ok'})
@@ -106,6 +121,8 @@ def save_border_style():
     data = request.get_json()
     
     style = data.get('style', 'accent')
+    if style not in VALID_BORDER_STYLES:
+        return jsonify({'status': 'error', 'message': 'Invalid border style'}), 400
     db.set_setting('border_style', style)
     
     return jsonify({'status': 'ok'})
@@ -118,8 +135,15 @@ def save_rating_color():
     data = request.get_json()
     
     rating = data.get('rating')
-    color = data.get('color')
-    name = data.get('name')
+    color = data.get('color', '')
+    name = data.get('name', '')
+    
+    # Validate hex color format
+    if not re.match(r'^#[0-9A-Fa-f]{6}$', color or ''):
+        return jsonify({'status': 'error', 'message': 'Invalid color'}), 400
+    
+    # Sanitize name (alphanumeric + spaces, max 20 chars)
+    name = re.sub(r'[^a-zA-Z0-9 ]', '', name or '')[:20]
     
     if rating == 5:
         db.set_setting('rating_5_color', color)
@@ -138,7 +162,7 @@ def save_card_order():
     data = request.get_json()
     
     order = data.get('order', [])
-    if order:
+    if order and all(card in VALID_CARD_IDS for card in order):
         db.set_setting('card_order', ','.join(order))
     
     return jsonify({'status': 'ok'})
@@ -151,6 +175,8 @@ def save_timeout():
     data = request.get_json()
     
     timeout = str(data.get('timeout', 30))
+    if timeout not in VALID_TIMEOUTS:
+        return jsonify({'status': 'error', 'message': 'Invalid timeout'}), 400
     db.set_setting('session_timeout', timeout)
     
     return jsonify({'status': 'ok'})
