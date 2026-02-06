@@ -301,6 +301,20 @@ class Database:
     # BOOK TYPE OPERATIONS
     # =========================================================================
     
+    def get_all_book_types_with_counts(self) -> list[dict]:
+        """Get all book types with book counts in a single query."""
+        cursor = self.conn.cursor()
+        cursor.execute("""
+            SELECT bt.*, COUNT(b.id) as book_count
+            FROM book_types bt
+            LEFT JOIN books b ON b.type_id = bt.id
+            GROUP BY bt.id
+            ORDER BY bt.name
+        """)
+        rows = cursor.fetchall()
+        columns = [desc[0] for desc in cursor.description]
+        return [dict(zip(columns, row)) for row in rows]
+
     def get_all_book_types(self) -> list[dict]:
         """Get all book types."""
         cursor = self.conn.cursor()
@@ -659,19 +673,50 @@ class Database:
     # =========================================================================
     
     def verify_password(self, password: str) -> bool:
-        """Verify the master password."""
+        """Verify the master password.
+        
+        Supports both legacy SHA-256 hashes (64-char hex) and modern
+        PBKDF2 hashes (pbkdf2:iterations:salt:hash). Legacy hashes are
+        automatically upgraded to PBKDF2 on successful verification.
+        """
         stored_hash = self.get_setting('password_hash')
         if not stored_hash:
             return False
         
-        # Hash the provided password
-        test_hash = hashlib.sha256(password.encode()).hexdigest()
-        return test_hash == stored_hash
+        if stored_hash.startswith('pbkdf2:'):
+            # Modern PBKDF2 format
+            parts = stored_hash.split(':')
+            if len(parts) != 4:
+                return False
+            _, iterations, salt_hex, hash_hex = parts
+            test_hash = hashlib.pbkdf2_hmac(
+                'sha256',
+                password.encode(),
+                bytes.fromhex(salt_hex),
+                int(iterations)
+            ).hex()
+            return test_hash == hash_hex
+        else:
+            # Legacy SHA-256 format — verify then auto-migrate
+            test_hash = hashlib.sha256(password.encode()).hexdigest()
+            if test_hash == stored_hash:
+                # Upgrade to PBKDF2 on successful login
+                self.set_password(password)
+                return True
+            return False
     
     def set_password(self, password: str) -> None:
-        """Set or change the master password."""
-        password_hash = hashlib.sha256(password.encode()).hexdigest()
-        self.set_setting('password_hash', password_hash)
+        """Set or change the master password using PBKDF2-HMAC-SHA256."""
+        salt = os.urandom(16)
+        iterations = 600_000
+        password_hash = hashlib.pbkdf2_hmac(
+            'sha256',
+            password.encode(),
+            salt,
+            iterations
+        ).hex()
+        stored = f'pbkdf2:{iterations}:{salt.hex()}:{password_hash}'
+        self.set_setting('password_hash', stored)
     
     def has_password(self) -> bool:
         """Check if a password has been set."""

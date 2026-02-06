@@ -35,11 +35,10 @@ def get_color_name(hex_color: str) -> str:
 def manage_types() -> str:
     """Display book types management page."""
     db = current_app.get_db()
-    all_types = db.get_all_book_types()
+    all_types = db.get_all_book_types_with_counts()
     
-    # Add book count and color name to each type
+    # Add color name to each type
     for t in all_types:
-        t['book_count'] = db.get_books_count_by_type(t['id'])
         t['color_name'] = get_color_name(t['color'])
     
     return render_template('manage_types.html', types=all_types)

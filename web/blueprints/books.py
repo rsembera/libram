@@ -155,7 +155,6 @@ def add_book():
                                   mode='add',
                                   errors=errors,
                                   book=request.form,
-                                  **_get_date_options(),
                                   **_get_form_context())
         
         # Create book
@@ -182,7 +181,6 @@ def add_book():
     return render_template('book_form.html',
                           mode='add',
                           book=None,
-                          **_get_date_options(),
                           **_get_form_context())
 
 
@@ -245,7 +243,6 @@ def edit_book(book_id):
                                   errors=errors,
                                   book=request.form,
                                   book_id=book_id,
-                                  **_get_date_options(),
                                   **_get_form_context())
         
         # Delete old cover if it changed
@@ -277,7 +274,6 @@ def edit_book(book_id):
                           mode='edit',
                           book=book,
                           book_id=book_id,
-                          **_get_date_options(),
                           **_get_form_context())
 
 
@@ -302,10 +298,6 @@ def _parse_date_from_form(field_name: str) -> Optional[date]:
     
     return None
 
-
-def _get_date_options() -> dict:
-    """Get date options (kept for backward compatibility)."""
-    return {}
 
 
 def _get_form_context() -> dict:
