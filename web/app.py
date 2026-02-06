@@ -6,6 +6,7 @@ Main application factory and configuration.
 from __future__ import annotations
 
 import os
+import secrets
 import time
 from datetime import datetime
 from pathlib import Path
@@ -17,6 +18,22 @@ from core.database import Database
 APP_ROOT = Path(__file__).parent.parent
 
 
+def _get_or_create_secret_key() -> str:
+    """Get secret key from file, or generate and store a new one."""
+    key_path = APP_ROOT / 'data' / '.secret_key'
+
+    if key_path.exists():
+        return key_path.read_text().strip()
+
+    # Generate a new key
+    os.makedirs(key_path.parent, exist_ok=True)
+    key = secrets.token_hex(32)
+    key_path.write_text(key)
+    # Restrict permissions (owner read/write only)
+    key_path.chmod(0o600)
+    return key
+
+
 def create_app() -> Flask:
     """Create and configure the Flask application."""
     
@@ -25,7 +42,7 @@ def create_app() -> Flask:
                 template_folder='templates')
     
     # Configuration
-    app.secret_key = os.environ.get('LIBRAM_SECRET_KEY', 'dev-secret-key-change-in-production')
+    app.secret_key = os.environ.get('LIBRAM_SECRET_KEY') or _get_or_create_secret_key()
     app.config['SESSION_COOKIE_NAME'] = 'libram_session'
     app.config['SESSION_COOKIE_HTTPONLY'] = True
     app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'

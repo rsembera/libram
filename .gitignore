@@ -12,9 +12,8 @@ dist/
 build/
 .eggs/
 
-# Database
-data/*.db
-data/backups/
+# Database and app data
+data/
 backups/
 
 # IDE
