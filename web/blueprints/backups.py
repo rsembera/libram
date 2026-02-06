@@ -141,6 +141,8 @@ def create_backup():
     backup_path = backup_dir / backup_filename
     
     try:
+        # Checkpoint WAL to ensure backup has all data
+        db.checkpoint()
         shutil.copy2(db_path, backup_path)
         return jsonify({'status': 'ok', 'filename': backup_filename})
     except Exception as e:
@@ -272,6 +274,8 @@ def _create_auto_backup(app, db):
     backup_path = backup_dir / backup_filename
     
     try:
+        # Checkpoint WAL to ensure backup has all data
+        db.checkpoint()
         shutil.copy2(db_path, backup_path)
         db.set_setting('last_auto_backup', datetime.now().isoformat())
         
