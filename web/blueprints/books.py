@@ -5,13 +5,11 @@ Main book CRUD operations and views.
 
 from __future__ import annotations
 
-import csv
-import io
 import os
 from datetime import datetime, date
 from pathlib import Path
 from typing import Optional
-from flask import Blueprint, render_template, request, redirect, url_for, current_app, Response, jsonify, session
+from flask import Blueprint, render_template, request, redirect, url_for, current_app, jsonify, session
 from core.fortunes import get_fortune
 from core.astrology import get_astrology_line
 
@@ -282,56 +280,6 @@ def edit_book(book_id):
                           **_get_date_options(),
                           **_get_form_context())
 
-
-@books_bp.route('/export/csv')
-def export_csv():
-    """Export all books to CSV."""
-    db = current_app.get_db()
-    books = db.get_all_books()
-    
-    # Create CSV in memory
-    output = io.StringIO()
-    writer = csv.writer(output)
-    
-    # Header row
-    writer.writerow([
-        'All-Time #', 'Year #', 'Title', 'Subtitle', 'Author', 'Pages',
-        'Date Begun', 'Date Finished', 'Days', 'Days Paused', 'Pages/Day',
-        'Rating', 'Did Not Finish', 'Pages Completed', 'Notes'
-    ])
-    
-    # Rating labels
-    rating_labels = {0: '', 1: 'Black', 2: 'Bronze', 3: 'Silver', 4: 'Gold', 5: 'Green'}
-    
-    # Data rows
-    for book in books:
-        writer.writerow([
-            book['all_time_number'],
-            book['yearly_number'],
-            book['title'],
-            book.get('subtitle', '') or '',
-            book['author'],
-            book['pages'],
-            book['date_begun_date'].strftime('%Y-%m-%d') if book['date_begun_date'] else '',
-            book['date_finished_date'].strftime('%Y-%m-%d') if book['date_finished_date'] else '',
-            book['total_days'] or '',
-            book.get('days_paused', 0) or '',
-            book['pages_per_day'] or '',
-            rating_labels.get(book['rating'], ''),
-            'Yes' if book['did_not_finish'] else '',
-            book.get('pages_completed', '') or '',
-            book['notes']
-        ])
-    
-    # Generate response
-    output.seek(0)
-    filename = f"libram-export-{datetime.now().strftime('%Y-%m-%d')}.csv"
-    
-    return Response(
-        output.getvalue(),
-        mimetype='text/csv',
-        headers={'Content-Disposition': f'attachment; filename={filename}'}
-    )
 
 
 # =============================================================================

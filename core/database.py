@@ -43,6 +43,9 @@ class Database:
         # Enable foreign keys
         self.conn.execute("PRAGMA foreign_keys = ON")
         
+        # Enable WAL mode for concurrent access
+        self.conn.execute("PRAGMA journal_mode = WAL")
+        
         # Run migrations
         self._run_migrations()
         
