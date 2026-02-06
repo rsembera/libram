@@ -1,6 +1,6 @@
 # Libram User Guide
 
-**Version 1.0** — December 2025
+**Version 1.1** — February 2026
 
 Libram is a personal reading tracker. It helps you log the books you read, track your reading pace, and look back on your reading history over the years.
 
@@ -83,7 +83,7 @@ Click the X button to clear the search.
 
 ## Book Types
 
-Book types let you categorize your reading. Libram comes with Fiction and Non-Fict, but you can create your own.
+Book types let you categorize your reading. Libram comes with Fiction and Non-Fict (9-character limit), but you can create your own.
 
 Go to **Settings → Manage Book Types** to add, edit, or delete types. Each type has a color that appears as a badge on book cards.
 
@@ -95,7 +95,9 @@ Access Settings from the Navigation card on the main view.
 
 ### Appearance
 
-- **Theme** — Eight color themes: Witching Hour (default), Crimson Veil, Hardboiled, Terminal, Grimoire, Wasteland, Lost World, Nautilus
+- **Theme** — Six color themes in two families:
+  - **Light:** Ink (default), Slate, Parchment
+  - **Dark:** Witching Hour, Crimson Veil, Terminal
 - **Background** — Solid colors or upload a custom background image
 - **Font** — Choose from Lexend, Libre Baskerville, Lora, Source Sans 3, or Literata
 - **Font Size** — Small, Medium, or Large
@@ -146,7 +148,13 @@ Click **Create Backup Now** to save a snapshot of your database.
 
 ### Auto-Backup
 
-Enable automatic backups with your preferred frequency (Daily, Weekly, or Monthly) and retention period (7, 14, 30, or 90 days, or keep forever).
+Enable automatic backups with your preferred frequency and retention period:
+
+- **Frequency:** Every Session, Daily, Weekly, or Manual Only
+- **Retention:** 1 Month, 6 Months, 1 Year, or Forever
+- **Location:** App folder (default) or a detected cloud folder (iCloud, Dropbox, Google Drive, OneDrive)
+
+Backups are created on logout and app shutdown. If the database hasn't changed since the last backup, it's skipped.
 
 ### Restore
 
@@ -171,9 +179,9 @@ You can also download backup files to your computer for safekeeping.
 All your data stays on your machine:
 
 - **Database** — `data/libram.db`
-- **Cover images** — `covers/`
-- **Backups** — `backups/`
-- **Custom backgrounds** — `web/static/backgrounds/`
+- **Cover images** — `covers/` (thumbnails in `covers/thumbs/`)
+- **Backups** — `backups/` (or cloud folder if configured)
+- **Custom backgrounds** — `web/static/user_backgrounds/`
 
 Nothing is sent to the cloud. Your reading history is yours.
 
