@@ -180,7 +180,7 @@
                     <div class="compact-content">
                         {% if book.cover_filename %}
                         <div class="compact-cover" onclick="event.stopPropagation(); showCoverLightbox('{{ url_for('covers.serve_cover', filename=book.cover_filename) }}', '{{ book.title|e }}')">
-                            <img src="{{ url_for('covers.serve_cover', filename=book.cover_filename) }}" alt="">
+                            <img src="{{ url_for('covers.serve_thumb', filename=book.cover_filename) }}" alt="">
                         </div>
                         {% endif %}
                         <div class="compact-info">
