@@ -163,6 +163,11 @@ def create_app() -> Flask:
     app.register_blueprint(exports_bp)
     app.register_blueprint(covers_bp)
     
+    # Generate thumbnails for any covers that don't have them yet
+    from core.thumbnails import generate_missing_thumbnails
+    covers_dir = str(APP_ROOT / 'covers')
+    generate_missing_thumbnails(covers_dir)
+    
     # Session status API for timeout warning system
     @app.route('/api/session-status')
     def session_status():

@@ -12,6 +12,7 @@ from typing import Optional
 from flask import Blueprint, render_template, request, redirect, url_for, current_app, jsonify, session
 from core.fortunes import get_fortune
 from core.astrology import get_astrology_line
+from core.thumbnails import delete_thumbnail
 
 books_bp = Blueprint('books', __name__)
 
@@ -33,6 +34,7 @@ def _delete_cover_file(filename: Optional[str]) -> None:
             os.remove(filepath)
         except Exception:
             pass
+    delete_thumbnail(COVERS_DIR, filename)
 
 
 @books_bp.route('/')
