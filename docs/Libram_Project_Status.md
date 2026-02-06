@@ -1,8 +1,7 @@
 # Libram Project Status
 
-**Last Updated:** December 20, 2025  
+**Last Updated:** February 6, 2026  
 **Repository:** https://github.com/rsembera/libram  
-**Current Commit:** `2601de7` (79 commits total)  
 **Project Started:** December 6, 2025
 
 ---
@@ -18,7 +17,7 @@ Libram is a personal reading tracker — a self-hosted Flask web app for logging
 ### Core Functionality
 - **Book tracking** — Title, subtitle, author, pages, dates begun/finished, rating, notes
 - **ISBN lookup** — Auto-populates title, author, pages, and cover from Open Library
-- **Cover art** — Fetch via ISBN or upload manually
+- **Cover art** — Fetch via ISBN or upload manually; thumbnails generated for fast list views
 - **Dual numbering** — All-time # and yearly # (year assigned by date begun)
 - **DNF tracking** — "Did Not Finish" with pages completed
 - **Days paused** — Adjusts pace calculations for reading breaks
@@ -53,14 +52,21 @@ Libram is a personal reading tracker — a self-hosted Flask web app for logging
 
 ### Data Management
 - **Export** — CSV or Markdown with date range filtering
-- **Auto-backup** — Configurable frequency (daily/weekly/monthly) and retention
+- **Auto-backup** — Configurable frequency (every session/daily/weekly/manual) with retention
 - **Manual backup** — Create and download on demand
-- **Restore** — Restore from any backup file
+- **Cloud backup** — Auto-detects iCloud, Dropbox, Google Drive, OneDrive
+- **Restore** — Restore from any backup file (pre-restore backup created automatically)
+
+### Security
+- **Password protection** — PBKDF2-HMAC-SHA256 hashed (600k iterations, random salt)
+- **Auto-generated secret key** — Persisted to `data/.secret_key` (0o600 permissions)
+- **Session timeout** — Configurable with frontend warning system
+- **Input validation** — Settings API validates against allowed values
 
 ### Other
 - **Fortune bar** — Daily quotes with optional sun/moon astrology signs
-- **Password protection** — Secure access with configurable session timeout
 - **Responsive design** — Works on desktop, tablet, phone
+- **Cover thumbnails** — Pre-generated 300px JPEG thumbnails for fast list loading
 
 ---
 
@@ -70,7 +76,7 @@ Libram is a personal reading tracker — a self-hosted Flask web app for logging
 - Python 3.10+
 - Flask 3.x
 - Waitress (production server)
-- SQLite database
+- SQLite database (WAL mode, foreign keys enabled)
 
 ### Frontend
 - Vanilla JavaScript
@@ -83,6 +89,7 @@ flask>=3.0.0
 ephem           # Astrology calculations
 waitress>=3.0.0 # Production server
 requests>=2.28.0 # ISBN/cover lookup
+Pillow>=10.0.0  # Cover thumbnail generation
 ```
 
 ---
@@ -96,17 +103,19 @@ libram/
 ├── core/
 │   ├── database.py         # Database operations, migrations
 │   ├── astrology.py        # Sun/moon sign calculations
-│   └── fortunes.py         # Random quotes
+│   ├── fortunes.py         # Lazy-loaded random quotes
+│   ├── fortunes.json       # Fortune text data (1,666 entries)
+│   └── thumbnails.py       # Cover thumbnail generation
 ├── web/
 │   ├── app.py              # Flask app factory
 │   ├── blueprints/
 │   │   ├── auth.py         # Login, logout, password
 │   │   ├── books.py        # Add, edit, delete books
-│   │   ├── covers.py       # Cover upload, ISBN search
-│   │   ├── settings.py     # App settings
+│   │   ├── covers.py       # Cover upload, ISBN search, thumbnails
+│   │   ├── settings.py     # App settings (validated inputs)
 │   │   ├── types.py        # Book type management
 │   │   ├── exports.py      # CSV/Markdown export
-│   │   └── backups.py      # Backup/restore
+│   │   └── backups.py      # Backup/restore (WAL checkpoint before copy)
 │   ├── static/
 │   │   ├── css/            # 11 CSS files including themes.css
 │   │   ├── js/             # 4 JS files
@@ -115,18 +124,22 @@ libram/
 │   │   └── user_backgrounds/ # User uploads (gitignored)
 │   └── templates/          # 11 Jinja2 templates
 ├── data/
-│   └── libram.db           # SQLite database
+│   ├── libram.db           # SQLite database (WAL mode)
+│   └── .secret_key         # Auto-generated Flask secret key
 ├── covers/                 # Downloaded/uploaded covers
-├── backups/                # Database backups (synced to MacBook via Syncthing)
+│   └── thumbs/             # Auto-generated JPEG thumbnails
+├── backups/                # Database backups
 └── docs/
-    └── USER_GUIDE.md
+    └── Libram_Project_Status.md
 ```
 
 ---
 
-## Database Schema
+## Database
 
-### books
+### Schema
+
+#### books
 | Column | Type | Description |
 |--------|------|-------------|
 | id | INTEGER | Primary key |
@@ -149,22 +162,29 @@ libram/
 | created_at | INTEGER | Unix timestamp |
 | modified_at | INTEGER | Unix timestamp |
 
-### book_types
+#### book_types
 | Column | Type | Description |
 |--------|------|-------------|
 | id | INTEGER | Primary key |
-| name | TEXT | Type name (unique) |
-| color | TEXT | Badge color |
-| bubble_color | TEXT | Background tint |
+| name | TEXT | Type name (unique, 9 char max) |
+| color | TEXT | Badge color (hex) |
+| bubble_color | TEXT | Background tint (hex) |
 | created_at | INTEGER | Unix timestamp |
 | modified_at | INTEGER | Unix timestamp |
 
-### settings
+#### settings
 | Column | Type | Description |
 |--------|------|-------------|
 | key | TEXT | Primary key |
-| value | TEXT | JSON-encoded value |
+| value | TEXT | Setting value |
 | modified_at | INTEGER | Unix timestamp |
+
+### Database Practices
+- **WAL mode** — Enabled for concurrent read/write support
+- **Foreign keys** — Enabled via PRAGMA
+- **Checkpoint** — Called before all backup operations
+- **Password storage** — `pbkdf2:600000:<salt_hex>:<hash_hex>` format
+  - Legacy SHA-256 hashes auto-migrate on login
 
 ---
 
@@ -174,11 +194,12 @@ libram/
 - **Server:** Sentinel (ACEMAGIC V1 Mini PC)
 - **Specs:** Intel N150, 16GB RAM, 512GB SSD, Debian 13
 - **Access:** Tailscale VPN at `100.116.129.95`
+- **Port:** 8090
 
 ### First-Time Setup
 ```bash
 ssh rick@100.116.129.95
-cd ~
+cd ~/Applications
 git clone https://github.com/rsembera/libram.git
 cd libram
 python3 -m venv venv
@@ -187,7 +208,7 @@ pip install -r requirements.txt
 ```
 
 ### Systemd Service
-Create `/etc/systemd/system/libram.service`:
+File: `/etc/systemd/system/libram.service`
 ```ini
 [Unit]
 Description=Libram Reading Tracker
@@ -195,10 +216,10 @@ After=network.target
 
 [Service]
 User=rick
-WorkingDirectory=/home/rick/libram
+WorkingDirectory=/home/rick/Applications/libram
 Environment="LIBRAM_HOST=0.0.0.0"
 Environment="LIBRAM_PORT=8090"
-ExecStart=/home/rick/libram/venv/bin/python main.py
+ExecStart=/home/rick/Applications/libram/venv/bin/python main.py
 Restart=always
 
 [Install]
@@ -215,7 +236,7 @@ sudo systemctl start libram
 ### Updates
 ```bash
 ssh rick@100.116.129.95
-cd ~/libram && git pull && sudo systemctl restart libram
+cd ~/Applications/libram && git pull && sudo systemctl restart libram
 ```
 
 ### Access
@@ -226,63 +247,61 @@ cd ~/libram && git pull && sudo systemctl restart libram
 ## Backup Strategy
 
 - **Auto-backup:** Configured in app (frequency + retention)
-- **Location:** `/home/rick/libram/backups/` on Sentinel
+- **Location:** `/home/rick/Applications/libram/backups/` on Sentinel
+- **Cloud:** Optional sync to iCloud, Dropbox, Google Drive, or OneDrive
 - **Redundancy:** Syncthing syncs backups to MacBook Air M4
+- **WAL checkpoint** — Always performed before backup copy
+
+---
+
+## Security Audit (February 6, 2026)
+
+Comprehensive security review cross-referencing known vulnerabilities from Synesius and EdgeCase projects:
+
+| Issue | Status |
+|-------|--------|
+| Hardcoded secret key fallback | ✅ Fixed — auto-generated, persisted to `data/.secret_key` |
+| Unsalted SHA-256 password hash | ✅ Fixed — upgraded to PBKDF2-HMAC-SHA256 (600k iterations) |
+| Session race condition (Safari/Firefox double-login) | ✅ Already fixed (all four Flask session fixes present) |
+| WAL mode not enabled | ✅ Fixed — `PRAGMA journal_mode = WAL` in `connect()` |
+| Backup without WAL checkpoint | ✅ Fixed — `checkpoint()` before all backup copies |
+| Settings API input validation | ✅ Fixed — allowlists for theme, font, size, border, timeout |
+| N+1 query on types page | ✅ Fixed — single `GROUP BY` query |
+| Fortunes loaded at import time (157KB) | ✅ Fixed — lazy-loaded from JSON |
+| Dead code (unused export route, helper) | ✅ Removed |
 
 ---
 
 ## Development Status
 
 ### Current Phase
-**Testing** — Month of personal use before public release
+**Active use** — Running on Sentinel since December 2025
 
-### Code Health (as of Dec 20, 2025)
-- ✅ Linting clean (ruff)
-- ✅ Type hints on core modules
-- ✅ No dead code
-- ~4,300 lines Python
-- ~8,400 lines CSS
-- ~2,300 lines JS (separate files + inline)
-
-### Planned Before Public Release
-- [ ] Month of real-world testing
-- [ ] Aggressive refactor based on usage patterns
-- [ ] Add type hints to Flask routes (if beneficial)
-- [ ] Consider extracting inline JS
-- [ ] Basic tests for database methods and date calculations
-- [ ] Final documentation pass
+### Planned
+- [ ] Cover art integration improvements
+- [ ] Responsive design refinements
+- [ ] Consider TUI/console interface
 
 ---
 
-## Recent Changes (December 2025)
+## Recent Changes
 
 | Date | Change |
 |------|--------|
-| Dec 20 | Delete button theming (dark vs light styles) |
-| Dec 20 | ISBN lookup auto-populates title, author, pages |
-| Dec 20 | Ruff cleanup (4 unused imports) |
-| Dec 18 | Added Terminal dark theme, renamed old Terminal to Nautilus |
-| Dec 18 | ISBN normalization on save |
-| Dec 17 | Made Witching Hour default theme |
-| Dec 17 | Converted Crimson Veil and Hardboiled to dark themes |
-| Dec 17 | Setup screen restyled to match login |
-| Dec 17 | Empty state banner theming |
-| Dec 15 | Auto-backup system |
-| Dec 14 | Export system (CSV/Markdown) |
-| Dec 13 | Backup/restore system |
-
----
-
-## Known Issues / Future Ideas
-
-- None currently blocking
+| Feb 6, 2026 | Security audit: secret key, PBKDF2 passwords, WAL mode, backup checkpoint |
+| Feb 6, 2026 | Cover thumbnails for fast compact view loading |
+| Feb 6, 2026 | Fortunes migrated to lazy-loaded JSON |
+| Feb 6, 2026 | Settings input validation, N+1 fix, dead code cleanup |
+| Jan 2026 | Ongoing use and minor fixes |
+| Dec 20, 2025 | ISBN lookup, auto-backup, export system, 8 themes |
+| Dec 6, 2025 | Project started |
 
 ---
 
 ## Related Projects
 
-- **Synesius** — Dream journal (cosmic aesthetic, fortune integration)
-- **Basilinda Nova** — Sci-fi board game with CFR AI (planning stage)
+- **EdgeCase Equalizer** — Therapy practice management (Flask, source of session fix pattern)
+- **Synesius** — Dream journal with RAG analysis (Flask/SQLCipher, source of security patterns)
 
 ---
 
