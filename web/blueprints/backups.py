@@ -50,12 +50,12 @@ def detect_cloud_folders():
             'path': str(icloud / 'Libram Backups')
         })
     
-    # Dropbox
+    # Dropbox (use Apps folder per Dropbox conventions)
     dropbox = home / 'Dropbox'
     if dropbox.exists():
         cloud_folders.append({
             'name': 'Dropbox',
-            'path': str(dropbox / 'Libram Backups')
+            'path': str(dropbox / 'Apps' / 'Libram Backups')
         })
     
     # Google Drive (new location)
