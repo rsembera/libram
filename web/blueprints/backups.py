@@ -220,21 +220,19 @@ def check_auto_backup(app: Flask) -> None:
         return  # Auto-backup disabled
     
     # Check if database has been modified since last backup
-    # Compare db mtime against the mtime we recorded at last backup time,
-    # NOT against last_auto_backup timestamp (which itself modifies the db)
+    # State is stored in an external JSON file, NOT in the database,
+    # to avoid the circular problem where writing state modifies the db
     db_path = Path(app.config['DATABASE_PATH'])
     last_backup_str = db.get_setting('last_auto_backup', '')
-    last_backup_mtime_str = db.get_setting('last_backup_db_mtime', '')
+    state = _read_backup_state(app)
+    last_mtime = state.get('last_backup_db_mtime')
     
-    if last_backup_str and last_backup_mtime_str:
+    if last_backup_str and last_mtime is not None:
         try:
-            saved_mtime = float(last_backup_mtime_str)
             current_mtime = db_path.stat().st_mtime
-            
-            # If database mtime hasn't changed since we last recorded it, skip
-            if current_mtime <= saved_mtime:
+            if current_mtime <= last_mtime:
                 return
-        except (ValueError, OSError):
+        except OSError:
             pass  # Continue with backup if we can't determine
     
     # Check if backup is due based on frequency
@@ -263,16 +261,37 @@ def check_auto_backup(app: Flask) -> None:
         _create_auto_backup(app, db)
 
 
+def _get_backup_state_file(app):
+    """Get path to backup state file (stored outside the database)."""
+    db_path = Path(app.config['DATABASE_PATH'])
+    return db_path.parent / '.backup_state.json'
+
+
+def _read_backup_state(app):
+    """Read backup state from external file."""
+    state_file = _get_backup_state_file(app)
+    if state_file.exists():
+        try:
+            import json
+            with open(state_file, 'r') as f:
+                return json.load(f)
+        except (json.JSONDecodeError, OSError):
+            pass
+    return {}
+
+
+def _write_backup_state(app, state):
+    """Write backup state to external file."""
+    import json
+    state_file = _get_backup_state_file(app)
+    with open(state_file, 'w') as f:
+        json.dump(state, f)
+
+
 def _create_auto_backup(app, db):
     """Create an automatic backup."""
     db_path = app.config['DATABASE_PATH']
     backup_dir = get_backup_dir(db)
-    
-    # Capture db mtime BEFORE we modify it with set_setting calls
-    try:
-        db_mtime_before = os.path.getmtime(db_path)
-    except OSError:
-        db_mtime_before = None
     
     # Ensure backup directory exists
     os.makedirs(backup_dir, exist_ok=True)
@@ -288,14 +307,14 @@ def _create_auto_backup(app, db):
         shutil.copy2(db_path, backup_path)
         db.set_setting('last_auto_backup', datetime.now().isoformat())
         
-        # Store the db mtime from BEFORE set_setting modified it
-        if db_mtime_before is not None:
-            db.set_setting('last_backup_db_mtime', str(db_mtime_before))
-        
         # Cleanup old backups
         retention = db.get_setting('backup_retention', '1_month')
         if retention != 'forever':
             _cleanup_old_backups(retention, db)
+        
+        # Record db mtime in external file AFTER all db writes complete
+        current_mtime = os.path.getmtime(db_path)
+        _write_backup_state(app, {'last_backup_db_mtime': current_mtime})
     except Exception:
         pass  # Silently fail for auto-backups
 
