@@ -6,6 +6,8 @@ Database backup and restore functionality.
 from __future__ import annotations
 
 import os
+import hashlib
+import json
 import shutil
 from datetime import datetime, timedelta
 from pathlib import Path
@@ -188,19 +190,48 @@ def save_settings():
     
     return jsonify({'status': 'ok'})
 
+def _get_backup_state_file(app):
+    """Get path to backup state file (stored outside the database)."""
+    db_path = Path(app.config['DATABASE_PATH'])
+    return db_path.parent / '.backup_state.json'
+
+
+def _read_backup_state(app):
+    """Read backup state from external JSON file."""
+    state_file = _get_backup_state_file(app)
+    if state_file.exists():
+        try:
+            with open(state_file, 'r') as f:
+                return json.load(f)
+        except (json.JSONDecodeError, OSError):
+            pass
+    return {}
+
+
+def _write_backup_state(app, state):
+    """Write backup state to external JSON file."""
+    state_file = _get_backup_state_file(app)
+    with open(state_file, 'w') as f:
+        json.dump(state, f)
+
+
+def _get_db_hash(db_path):
+    """Calculate SHA-256 hash of the database file."""
+    sha256 = hashlib.sha256()
+    with open(db_path, 'rb') as f:
+        for chunk in iter(lambda: f.read(8192), b''):
+            sha256.update(chunk)
+    return sha256.hexdigest()
+
 
 def check_auto_backup(app: Flask) -> None:
     """
     Check if auto-backup is due and create one if needed.
-    Called from logout and shutdown handlers.
+    Called from logout route after WAL checkpoint.
     
-    Uses calendar-based comparison:
-    - 'startup': Always backup on session end (if data changed)
-    - 'daily': Backup if last backup was on a different calendar day
-    - 'weekly': Backup if 7+ calendar days since last backup
-    - 'manual': Never auto-backup
-    
-    Skips backup if database hasn't been modified since last backup.
+    Uses the EdgeCase pattern: all change-detection state lives in an
+    external JSON file, never in the database itself. Change detection
+    uses SHA-256 hash comparison.
     """
     db = app.get_db()
     
@@ -210,93 +241,65 @@ def check_auto_backup(app: Flask) -> None:
     legacy_map = {'0': 'manual', '24': 'daily', '168': 'weekly', '720': 'weekly'}
     if frequency in legacy_map:
         frequency = legacy_map[frequency]
-        db.set_setting('backup_frequency', frequency)  # Migrate to new value
+        db.set_setting('backup_frequency', frequency)
     
-    # Validate frequency is a known value
     if frequency not in ('startup', 'daily', 'weekly', 'manual'):
-        frequency = 'daily'  # Default to daily for unknown values
+        frequency = 'daily'
     
     if frequency == 'manual':
-        return  # Auto-backup disabled
+        return
     
-    # Check if database has been modified since last backup
-    # State is stored in an external JSON file, NOT in the database,
-    # to avoid the circular problem where writing state modifies the db
-    db_path = Path(app.config['DATABASE_PATH'])
-    last_backup_str = db.get_setting('last_auto_backup', '')
     state = _read_backup_state(app)
-    last_mtime = state.get('last_backup_db_mtime')
-    
-    if last_backup_str and last_mtime is not None:
-        try:
-            current_mtime = db_path.stat().st_mtime
-            if current_mtime <= last_mtime:
-                return
-        except OSError:
-            pass  # Continue with backup if we can't determine
     
     # Check if backup is due based on frequency
     backup_due = False
-    today = datetime.now().date()
+    last_check = state.get('last_backup_check')
     
     if frequency == 'startup':
-        # Always backup on session end (we already checked for changes above)
         backup_due = True
-    elif not last_backup_str:
+    elif not last_check:
         backup_due = True
     else:
         try:
-            last_backup = datetime.fromisoformat(last_backup_str)
-            last_backup_date = last_backup.date()
-            days_since = (today - last_backup_date).days
+            last_check_date = datetime.fromisoformat(last_check).date()
+            today = datetime.now().date()
             
-            if frequency == 'daily' and days_since >= 1:
-                backup_due = True
-            elif frequency == 'weekly' and days_since >= 7:
-                backup_due = True
+            if frequency == 'daily':
+                backup_due = today > last_check_date
+            elif frequency == 'weekly':
+                backup_due = (today - last_check_date).days >= 7
         except ValueError:
             backup_due = True
     
-    if backup_due:
-        _create_auto_backup(app, db)
-
-
-def _get_backup_state_file(app):
-    """Get path to backup state file (stored outside the database)."""
+    if not backup_due:
+        return
+    
+    # Check if data actually changed (hash comparison)
     db_path = Path(app.config['DATABASE_PATH'])
-    return db_path.parent / '.backup_state.json'
-
-
-def _read_backup_state(app):
-    """Read backup state from external file."""
-    state_file = _get_backup_state_file(app)
-    if state_file.exists():
-        try:
-            import json
-            with open(state_file, 'r') as f:
-                return json.load(f)
-        except (json.JSONDecodeError, OSError):
-            pass
-    return {}
-
-
-def _write_backup_state(app, state):
-    """Write backup state to external file."""
-    import json
-    state_file = _get_backup_state_file(app)
-    with open(state_file, 'w') as f:
-        json.dump(state, f)
+    try:
+        current_hash = _get_db_hash(db_path)
+    except OSError:
+        return
+    
+    last_hash = state.get('last_backup_hash')
+    
+    if current_hash == last_hash:
+        # No changes - just record that we checked
+        state['last_backup_check'] = datetime.now().isoformat()
+        _write_backup_state(app, state)
+        return
+    
+    # Data changed and backup is due
+    _create_auto_backup(app, db)
 
 
 def _create_auto_backup(app, db):
-    """Create an automatic backup."""
+    """Create an automatic backup and record state."""
     db_path = app.config['DATABASE_PATH']
     backup_dir = get_backup_dir(db)
     
-    # Ensure backup directory exists
     os.makedirs(backup_dir, exist_ok=True)
     
-    # Generate backup filename
     timestamp = datetime.now().strftime('%Y-%m-%d_%H%M%S')
     backup_filename = f'libram_auto_{timestamp}.db'
     backup_path = backup_dir / backup_filename
@@ -310,9 +313,14 @@ def _create_auto_backup(app, db):
         if retention != 'forever':
             _cleanup_old_backups(retention, db)
         
-        # Record db mtime in external file AFTER all db writes complete
-        current_mtime = os.path.getmtime(db_path)
-        _write_backup_state(app, {'last_backup_db_mtime': current_mtime})
+        # Checkpoint to flush set_setting writes from WAL to main db file,
+        # then hash so stored hash matches what we'll see next time
+        db.checkpoint()
+        final_hash = _get_db_hash(db_path)
+        _write_backup_state(app, {
+            'last_backup_hash': final_hash,
+            'last_backup_check': datetime.now().isoformat()
+        })
     except Exception:
         pass  # Silently fail for auto-backups
 
