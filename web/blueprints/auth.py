@@ -81,19 +81,19 @@ def setup():
 @auth_bp.route('/logout')
 def logout():
     """Log out - run backup check and checkpoint database."""
-    # Run automatic backup check before closing session
-    try:
-        from web.blueprints.backups import check_auto_backup
-        check_auto_backup(current_app)
-    except Exception as e:
-        print(f"[Backup] Auto-backup failed: {e}")
-    
-    # Checkpoint the database
+    # Checkpoint first so db file reflects all WAL changes
     try:
         db = current_app.get_db()
         db.checkpoint()
     except Exception:
         pass
+    
+    # Run automatic backup check (records mtime after its own db writes)
+    try:
+        from web.blueprints.backups import check_auto_backup
+        check_auto_backup(current_app)
+    except Exception as e:
+        print(f"[Backup] Auto-backup failed: {e}")
     
     session.clear()
     return redirect(url_for('auth.login'))
