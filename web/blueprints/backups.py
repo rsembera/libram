@@ -220,16 +220,19 @@ def check_auto_backup(app: Flask) -> None:
         return  # Auto-backup disabled
     
     # Check if database has been modified since last backup
+    # Compare db mtime against the mtime we recorded at last backup time,
+    # NOT against last_auto_backup timestamp (which itself modifies the db)
     db_path = Path(app.config['DATABASE_PATH'])
     last_backup_str = db.get_setting('last_auto_backup', '')
+    last_backup_mtime_str = db.get_setting('last_backup_db_mtime', '')
     
-    if last_backup_str:
+    if last_backup_str and last_backup_mtime_str:
         try:
-            last_backup_time = datetime.fromisoformat(last_backup_str)
-            db_mtime = datetime.fromtimestamp(db_path.stat().st_mtime)
+            saved_mtime = float(last_backup_mtime_str)
+            current_mtime = db_path.stat().st_mtime
             
-            # If database hasn't been modified since last backup, skip
-            if db_mtime <= last_backup_time:
+            # If database mtime hasn't changed since we last recorded it, skip
+            if current_mtime <= saved_mtime:
                 return
         except (ValueError, OSError):
             pass  # Continue with backup if we can't determine
@@ -265,6 +268,12 @@ def _create_auto_backup(app, db):
     db_path = app.config['DATABASE_PATH']
     backup_dir = get_backup_dir(db)
     
+    # Capture db mtime BEFORE we modify it with set_setting calls
+    try:
+        db_mtime_before = os.path.getmtime(db_path)
+    except OSError:
+        db_mtime_before = None
+    
     # Ensure backup directory exists
     os.makedirs(backup_dir, exist_ok=True)
     
@@ -278,6 +287,10 @@ def _create_auto_backup(app, db):
         db.checkpoint()
         shutil.copy2(db_path, backup_path)
         db.set_setting('last_auto_backup', datetime.now().isoformat())
+        
+        # Store the db mtime from BEFORE set_setting modified it
+        if db_mtime_before is not None:
+            db.set_setting('last_backup_db_mtime', str(db_mtime_before))
         
         # Cleanup old backups
         retention = db.get_setting('backup_retention', '1_month')
