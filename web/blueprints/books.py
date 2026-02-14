@@ -151,6 +151,8 @@ def add_book():
             errors.append('Pages must be a positive number')
         if not date_begun:
             errors.append('Date begun is required')
+        if not type_id:
+            errors.append('Type is required')
         
         if errors:
             return render_template('book_form.html',
@@ -238,6 +240,8 @@ def edit_book(book_id):
             errors.append('Pages must be a positive number')
         if not date_begun:
             errors.append('Date begun is required')
+        if not type_id:
+            errors.append('Type is required')
         
         if errors:
             return render_template('book_form.html',
@@ -305,7 +309,7 @@ def _parse_date_from_form(field_name: str) -> Optional[date]:
 def _get_form_context() -> dict:
     """Get common context for book forms including book types and rating names."""
     db = current_app.get_db()
-    book_types = db.get_all_book_types()
+    book_types = db.get_book_types_for_dropdown()
     rating_5_name = db.get_setting('rating_5_name', 'Green')
     rating_1_name = db.get_setting('rating_1_name', 'Black')
     return {

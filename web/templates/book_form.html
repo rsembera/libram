@@ -188,7 +188,7 @@
             
             <div class="form-group">
                 <label>Type</label>
-                <input type="hidden" id="type_id" name="type_id" value="{{ book.type_id if book and book.type_id else (book_types[0].id if book_types else '') }}">
+                <input type="hidden" id="type_id" name="type_id" value="{{ book.type_id if book and book.type_id else '' }}">
                 <div class="custom-dropdown" id="type-dropdown">
                     <button type="button" class="custom-dropdown-trigger" onclick="toggleTypeDropdown()">
                         <span id="type-selected-text">
@@ -198,10 +198,8 @@
                                         <span class="type-badge" style="background-color: {{ t.color }};">{{ t.name }}</span>
                                     {% endif %}
                                 {% endfor %}
-                            {% elif book_types %}
-                                <span class="type-badge" style="background-color: {{ book_types[0].color }};">{{ book_types[0].name }}</span>
                             {% else %}
-                                No types
+                                <span class="type-placeholder">Select type...</span>
                             {% endif %}
                         </span>
                         <i class="ph ph-caret-down"></i>
