@@ -322,6 +322,20 @@ class Database:
         rows = cursor.fetchall()
         columns = [desc[0] for desc in cursor.description]
         return [dict(zip(columns, row)) for row in rows]
+
+    def get_book_types_for_dropdown(self) -> list[dict]:
+        """Get book types ordered by usage frequency (most used first), then alphabetically."""
+        cursor = self.conn.cursor()
+        cursor.execute("""
+            SELECT bt.*, COUNT(b.id) as book_count
+            FROM book_types bt
+            LEFT JOIN books b ON b.type_id = bt.id
+            GROUP BY bt.id
+            ORDER BY book_count DESC, bt.name ASC
+        """)
+        rows = cursor.fetchall()
+        columns = [desc[0] for desc in cursor.description]
+        return [dict(zip(columns, row)) for row in rows]
     
     def get_book_type(self, type_id: int) -> Optional[dict]:
         """Get a single book type by ID."""

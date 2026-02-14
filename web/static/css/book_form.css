@@ -117,6 +117,12 @@
 .rating-gold { color: #F59E0B; }
 .rating-green { color: var(--rating-5-star, #10B981); }
 
+/* Type dropdown placeholder */
+.type-placeholder {
+    color: var(--text-muted);
+    font-style: italic;
+}
+
 
 /* Disabled dropdown styling */
 .custom-dropdown.disabled {
