@@ -84,14 +84,28 @@ SQLite WAL (Write-Ahead Logging) is enabled in `connect()`. This means recent wr
 
 ---
 
-## Auto-Backup Timing
+## Auto-Backup System
 
-**Evolution of the auto-backup system:**
-1. Originally triggered on login → moved to logout/shutdown (avoids backing up before user makes changes)
-2. Originally hour-based frequency → changed to calendar-based (Daily = different calendar day, not 24 hours elapsed)
-3. Added database modification check: compares `db_mtime` against `last_auto_backup` timestamp, skips if database hasn't changed
+**Key design decisions:**
+1. Triggered on logout (not login) — avoids backing up before user makes changes
+2. Calendar-based frequency: Daily = different calendar day, Weekly = 7+ days
+3. Change detection via SHA-256 hash comparison (not mtime)
+4. State stored in external JSON file (`data/.backup_state.json`), never in database
 
-**Legacy migration:** Old hour-based values (`'0'`, `'24'`, `'168'`, `'720'`) are automatically mapped to new string values on first read.
+**Critical fix (Feb 2026):** Must check frequency FIRST, then hash. The reverse order caused backups on every logout because reading DB settings could affect timing. Pattern matches Synesius.
+
+```python
+# CORRECT order (frequency first)
+if frequency == 'manual':
+    return None
+if not backup_due:  # Check date/frequency
+    return None
+if current_hash == last_hash:  # Then check hash
+    return None
+# Now create backup
+```
+
+**Hash recording:** After backup, checkpoint the DB (to flush `last_auto_backup` setting write), THEN hash and store. This ensures the stored hash matches what we'll see next time.
 
 ---
 
