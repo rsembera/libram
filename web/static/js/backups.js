@@ -115,11 +115,15 @@ function createBackup() {
     btn.innerHTML = '<i class="ph ph-circle-notch ph-spin icon-sm icon-inline"></i> Creating...';
     btn.disabled = true;
     
+    // Show progress modal
+    document.getElementById('progress-modal').style.display = 'flex';
+    
     fetch('/backups/create', {
         method: 'POST'
     })
     .then(response => response.json())
     .then(data => {
+        document.getElementById('progress-modal').style.display = 'none';
         if (data.status === 'ok') {
             if (data.no_changes) {
                 showMessage('No Changes', 'No changes since last backup.');
@@ -137,6 +141,7 @@ function createBackup() {
         }
     })
     .catch(err => {
+        document.getElementById('progress-modal').style.display = 'none';
         showMessage('Error', 'Error creating backup');
         btn.innerHTML = originalText;
         btn.disabled = false;
