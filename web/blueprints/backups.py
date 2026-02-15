@@ -8,7 +8,7 @@ from __future__ import annotations
 import os
 from datetime import datetime
 from pathlib import Path
-from flask import Blueprint, render_template, request, current_app, jsonify, send_file
+from flask import Blueprint, render_template, request, current_app, jsonify
 
 from core import backup
 
@@ -124,29 +124,6 @@ def save_settings():
 
 
 
-@backups_bp.route('/download/<filename>')
-def download_backup(filename):
-    """Download a backup file."""
-    db = current_app.get_db()
-    
-    # Security: ensure filename doesn't contain path traversal
-    if '..' in filename or '/' in filename:
-        return 'Invalid filename', 400
-    
-    # Find the backup in manifest to get correct directory
-    backups = backup.list_backups()
-    backup_info = next((b for b in backups if b['filename'] == filename), None)
-    
-    if not backup_info:
-        return 'Backup not found', 404
-    
-    backup_path = Path(backup_info['path'])
-    
-    if not backup_path.exists():
-        return 'Backup not found', 404
-    
-    return send_file(backup_path, as_attachment=True)
-
 
 @backups_bp.route('/restore/<restore_point_id>', methods=['POST'])
 def restore_backup(restore_point_id):
@@ -176,10 +153,21 @@ def restore_backup(restore_point_id):
 def check_auto_backup(app):
     """
     Check if auto-backup is due and create one if needed.
+    Also runs retention cleanup.
     Called from logout route AFTER db.checkpoint().
     """
     db = app.get_db()
     
+    # Run retention cleanup (regardless of whether a backup is created)
+    try:
+        retention = db.get_setting('backup_retention', '6_months')
+        if retention != 'forever':
+            custom_loc = db.get_setting('backup_location', '')
+            backup.cleanup_old_backups(retention, custom_loc if custom_loc else None)
+    except Exception:
+        pass  # Silently fail for cleanup
+    
+    # Run auto-backup check
     try:
         backup.check_and_run_auto_backup(db)
     except Exception:
