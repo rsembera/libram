@@ -148,25 +148,6 @@ def download_backup(filename):
     return send_file(backup_path, as_attachment=True)
 
 
-@backups_bp.route('/delete/<filename>', methods=['POST'])
-def delete_backup(filename):
-    """Delete a backup file."""
-    # Security: ensure filename doesn't contain path traversal
-    if '..' in filename or '/' in filename:
-        return jsonify({'status': 'error', 'message': 'Invalid filename'}), 400
-    
-    try:
-        result = backup.delete_backup(filename)
-        return jsonify({
-            'status': 'ok',
-            'warnings': result.get('warnings', [])
-        })
-    except ValueError as e:
-        return jsonify({'status': 'error', 'message': str(e)}), 400
-    except Exception as e:
-        return jsonify({'status': 'error', 'message': str(e)}), 500
-
-
 @backups_bp.route('/restore/<restore_point_id>', methods=['POST'])
 def restore_backup(restore_point_id):
     """Prepare restore from a backup (stages files, requires app restart)."""

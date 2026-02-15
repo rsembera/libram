@@ -1,7 +1,6 @@
 /* Libram - Backups JavaScript */
 
 let pendingRestoreId = null;
-let pendingFilename = null;
 
 // Track current dropdown values
 let currentFrequency = null;
@@ -149,16 +148,9 @@ function confirmRestore(restorePointId) {
     document.getElementById('restore-modal').style.display = 'flex';
 }
 
-function confirmDelete(filename) {
-    pendingFilename = filename;
-    document.getElementById('delete-warning').style.display = 'none';
-    document.getElementById('delete-modal').style.display = 'flex';
-}
-
 function closeModal(modalId) {
     document.getElementById(modalId).style.display = 'none';
     pendingRestoreId = null;
-    pendingFilename = null;
 }
 
 function showMessage(title, text) {
@@ -203,41 +195,6 @@ function doRestore() {
     });
 }
 
-function doDelete() {
-    if (!pendingFilename) return;
-    
-    const btn = document.querySelector('#delete-modal .btn-danger');
-    const originalText = btn.innerHTML;
-    btn.innerHTML = '<i class="ph ph-circle-notch ph-spin"></i> Deleting...';
-    btn.disabled = true;
-    
-    fetch('/backups/delete/' + encodeURIComponent(pendingFilename), {
-        method: 'POST'
-    })
-    .then(response => response.json())
-    .then(data => {
-        closeModal('delete-modal');
-        if (data.status === 'ok') {
-            if (data.warnings && data.warnings.length > 0) {
-                showMessage('Deleted', data.warnings.join('\n'));
-                setTimeout(() => location.reload(), 2000);
-            } else {
-                location.reload();
-            }
-        } else {
-            showMessage('Error', 'Error deleting backup: ' + data.message);
-        }
-    })
-    .catch(err => {
-        closeModal('delete-modal');
-        showMessage('Error', 'Error deleting backup');
-    })
-    .finally(() => {
-        btn.innerHTML = originalText;
-        btn.disabled = false;
-    });
-}
-
 // ============================================================================
 // INITIALIZATION
 // ============================================================================
@@ -254,7 +211,6 @@ document.addEventListener('click', function(e) {
     if (e.target.classList.contains('modal')) {
         e.target.style.display = 'none';
         pendingRestoreId = null;
-        pendingFilename = null;
     }
 });
 
