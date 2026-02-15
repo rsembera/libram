@@ -150,40 +150,27 @@ def download_backup(filename):
 
 @backups_bp.route('/restore/<restore_point_id>', methods=['POST'])
 def restore_backup(restore_point_id):
-    """Prepare restore from a backup (stages files, requires app restart)."""
+    """Restore from a backup immediately."""
+    from flask import g
+    
     try:
-        staging_path = backup.prepare_restore(restore_point_id)
+        # Close the current database connection so we can replace the file
+        db = g.pop('db', None)
+        if db is not None:
+            db.close()
+        
+        # Perform the restore
+        result = backup.restore_immediate(restore_point_id)
+        
         return jsonify({
             'status': 'ok',
-            'message': 'Restore prepared. Restart the application to complete.',
-            'staging_path': staging_path,
-            'requires_restart': True
+            'message': 'Backup restored successfully. The page will reload.',
+            'restored_from': result['restored_from']
         })
     except ValueError as e:
         return jsonify({'status': 'error', 'message': str(e)}), 400
     except Exception as e:
         return jsonify({'status': 'error', 'message': str(e)}), 500
-
-
-@backups_bp.route('/restore/cancel', methods=['POST'])
-def cancel_restore():
-    """Cancel a pending restore."""
-    if backup.cancel_restore():
-        return jsonify({'status': 'ok', 'message': 'Restore cancelled'})
-    return jsonify({'status': 'ok', 'message': 'No pending restore'})
-
-
-@backups_bp.route('/restore/status')
-def restore_status():
-    """Check if there's a pending restore."""
-    pending = backup.check_restore_pending()
-    if pending:
-        return jsonify({
-            'pending': True,
-            'restore_point': pending['restore_point_id'],
-            'prepared_at': pending['prepared_at']
-        })
-    return jsonify({'pending': False})
 
 
 def check_auto_backup(app):

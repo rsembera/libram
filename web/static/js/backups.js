@@ -116,6 +116,8 @@ function createBackup() {
     btn.disabled = true;
     
     // Show progress modal
+    document.getElementById('progress-modal-title').textContent = 'Creating Backup...';
+    document.getElementById('progress-modal-text').textContent = 'This may take a moment for large libraries with many covers.';
     document.getElementById('progress-modal').style.display = 'flex';
     
     fetch('/backups/create', {
@@ -167,36 +169,30 @@ function showMessage(title, text) {
 function doRestore() {
     if (!pendingRestoreId) return;
     
-    const btn = document.querySelector('#restore-modal .btn-primary');
-    const originalText = btn.innerHTML;
-    btn.innerHTML = '<i class="ph ph-circle-notch ph-spin"></i> Preparing...';
-    btn.disabled = true;
+    closeModal('restore-modal');
+    
+    // Show progress modal
+    document.getElementById('progress-modal-title').textContent = 'Restoring Backup...';
+    document.getElementById('progress-modal-text').textContent = 'Please wait while your data is being restored.';
+    document.getElementById('progress-modal').style.display = 'flex';
     
     fetch('/backups/restore/' + encodeURIComponent(pendingRestoreId), {
         method: 'POST'
     })
     .then(response => response.json())
     .then(data => {
-        closeModal('restore-modal');
+        document.getElementById('progress-modal').style.display = 'none';
         if (data.status === 'ok') {
-            if (data.requires_restart) {
-                showMessage('Restore Prepared', 
-                    'Restore has been prepared. Please restart the application to complete the restore.');
-            } else {
-                showMessage('Success', 'Backup restored successfully.');
-                setTimeout(() => location.reload(), 1500);
-            }
+            showMessage('Restore Complete', 
+                `Successfully restored from: ${data.restored_from}`);
+            setTimeout(() => location.reload(), 1500);
         } else {
             showMessage('Error', 'Error restoring backup: ' + data.message);
         }
     })
     .catch(err => {
-        closeModal('restore-modal');
+        document.getElementById('progress-modal').style.display = 'none';
         showMessage('Error', 'Error restoring backup');
-    })
-    .finally(() => {
-        btn.innerHTML = originalText;
-        btn.disabled = false;
     });
 }
 
