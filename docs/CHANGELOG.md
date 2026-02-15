@@ -4,6 +4,21 @@ All notable changes to Libram, organized by date.
 
 ---
 
+## February 15, 2026 — Backup System Improvements
+
+### Backup Retention
+- Fix: Retention cleanup now runs on every logout, not just when settings change or backups are created
+- This ensures old backups are pruned even if the user doesn't actively create new ones
+- Safety: Always keeps at least one backup chain, even if it exceeds retention period
+
+### UI Cleanup
+- Remove download button from backup restore points (users who need raw files can access the backups folder directly)
+
+### Testing
+- Add `test_cleanup.py` script to verify backup retention logic
+
+---
+
 ## February 6, 2026 — Security Audit & Performance
 
 ### Security
