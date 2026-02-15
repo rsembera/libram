@@ -169,6 +169,9 @@ function showMessage(title, text) {
 function doRestore() {
     if (!pendingRestoreId) return;
     
+    // Capture the ID before closing modal (which clears it)
+    const restoreId = pendingRestoreId;
+    
     closeModal('restore-modal');
     
     // Show progress modal
@@ -176,7 +179,7 @@ function doRestore() {
     document.getElementById('progress-modal-text').textContent = 'Please wait while your data is being restored.';
     document.getElementById('progress-modal').style.display = 'flex';
     
-    fetch('/backups/restore/' + encodeURIComponent(pendingRestoreId), {
+    fetch('/backups/restore/' + encodeURIComponent(restoreId), {
         method: 'POST'
     })
     .then(response => response.json())
