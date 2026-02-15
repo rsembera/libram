@@ -15,6 +15,7 @@ build/
 # Database and app data
 data/
 backups/
+.restore_staging/
 
 # IDE
 .idea/

@@ -1,7 +1,7 @@
 /* Libram - Backups JavaScript */
 
+let pendingRestoreId = null;
 let pendingFilename = null;
-let pendingLocation = null;
 
 // Track current dropdown values
 let currentFrequency = null;
@@ -96,13 +96,13 @@ function saveBackupSettings(locationChanged = false) {
     .then(response => response.json())
     .then(data => {
         if (data.status !== 'ok') {
-            alert('Error saving settings: ' + (data.message || 'Unknown error'));
+            showMessage('Error', 'Error saving settings: ' + (data.message || 'Unknown error'));
         } else if (locationChanged) {
             window.location.reload();
         }
     })
     .catch(err => {
-        alert('Error saving settings');
+        showMessage('Error', 'Error saving settings');
     });
 }
 
@@ -113,7 +113,7 @@ function saveBackupSettings(locationChanged = false) {
 function createBackup() {
     const btn = event.target.closest('button');
     const originalText = btn.innerHTML;
-    btn.innerHTML = '<i class="ph ph-circle-notch icon-sm icon-inline"></i> Creating...';
+    btn.innerHTML = '<i class="ph ph-circle-notch ph-spin icon-sm icon-inline"></i> Creating...';
     btn.disabled = true;
     
     fetch('/backups/create', {
@@ -122,88 +122,119 @@ function createBackup() {
     .then(response => response.json())
     .then(data => {
         if (data.status === 'ok') {
-            location.reload();
+            if (data.no_changes) {
+                showMessage('No Changes', 'No changes since last backup.');
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            } else {
+                showMessage('Backup Created', 
+                    `Created ${data.type} backup: ${data.filename} (${data.size})`);
+                setTimeout(() => location.reload(), 1500);
+            }
         } else {
-            alert('Error creating backup: ' + data.message);
+            showMessage('Error', 'Error creating backup: ' + data.message);
             btn.innerHTML = originalText;
             btn.disabled = false;
         }
     })
     .catch(err => {
-        alert('Error creating backup');
+        showMessage('Error', 'Error creating backup');
         btn.innerHTML = originalText;
         btn.disabled = false;
     });
 }
 
-function confirmRestore(filename, location) {
-    pendingFilename = filename;
-    pendingLocation = location;
+function confirmRestore(restorePointId) {
+    pendingRestoreId = restorePointId;
     document.getElementById('restore-modal').style.display = 'flex';
 }
 
-function confirmDelete(filename, location) {
+function confirmDelete(filename) {
     pendingFilename = filename;
-    pendingLocation = location;
+    document.getElementById('delete-warning').style.display = 'none';
     document.getElementById('delete-modal').style.display = 'flex';
 }
 
 function closeModal(modalId) {
     document.getElementById(modalId).style.display = 'none';
+    pendingRestoreId = null;
     pendingFilename = null;
-    pendingLocation = null;
+}
+
+function showMessage(title, text) {
+    document.getElementById('message-modal-title').textContent = title;
+    document.getElementById('message-modal-text').textContent = text;
+    document.getElementById('message-modal').style.display = 'flex';
 }
 
 function doRestore() {
-    if (!pendingFilename) return;
+    if (!pendingRestoreId) return;
     
-    const formData = new FormData();
-    formData.append('location', pendingLocation || 'default');
+    const btn = document.querySelector('#restore-modal .btn-primary');
+    const originalText = btn.innerHTML;
+    btn.innerHTML = '<i class="ph ph-circle-notch ph-spin"></i> Preparing...';
+    btn.disabled = true;
     
-    fetch('/backups/restore/' + pendingFilename, {
-        method: 'POST',
-        body: formData
+    fetch('/backups/restore/' + encodeURIComponent(pendingRestoreId), {
+        method: 'POST'
     })
     .then(response => response.json())
     .then(data => {
+        closeModal('restore-modal');
         if (data.status === 'ok') {
-            alert('Backup restored successfully. The page will reload.');
-            location.reload();
+            if (data.requires_restart) {
+                showMessage('Restore Prepared', 
+                    'Restore has been prepared. Please restart the application to complete the restore.');
+            } else {
+                showMessage('Success', 'Backup restored successfully.');
+                setTimeout(() => location.reload(), 1500);
+            }
         } else {
-            alert('Error restoring backup: ' + data.message);
+            showMessage('Error', 'Error restoring backup: ' + data.message);
         }
     })
     .catch(err => {
-        alert('Error restoring backup');
+        closeModal('restore-modal');
+        showMessage('Error', 'Error restoring backup');
     })
     .finally(() => {
-        closeModal('restore-modal');
+        btn.innerHTML = originalText;
+        btn.disabled = false;
     });
 }
 
 function doDelete() {
     if (!pendingFilename) return;
     
-    const formData = new FormData();
-    formData.append('location', pendingLocation || 'default');
+    const btn = document.querySelector('#delete-modal .btn-danger');
+    const originalText = btn.innerHTML;
+    btn.innerHTML = '<i class="ph ph-circle-notch ph-spin"></i> Deleting...';
+    btn.disabled = true;
     
-    fetch('/backups/delete/' + pendingFilename, {
-        method: 'POST',
-        body: formData
+    fetch('/backups/delete/' + encodeURIComponent(pendingFilename), {
+        method: 'POST'
     })
     .then(response => response.json())
     .then(data => {
+        closeModal('delete-modal');
         if (data.status === 'ok') {
-            location.reload();
+            if (data.warnings && data.warnings.length > 0) {
+                showMessage('Deleted', data.warnings.join('\n'));
+                setTimeout(() => location.reload(), 2000);
+            } else {
+                location.reload();
+            }
         } else {
-            alert('Error deleting backup: ' + data.message);
+            showMessage('Error', 'Error deleting backup: ' + data.message);
         }
     })
     .catch(err => {
-        alert('Error deleting backup');
+        closeModal('delete-modal');
+        showMessage('Error', 'Error deleting backup');
     })
     .finally(() => {
-        closeModal('delete-modal');
+        btn.innerHTML = originalText;
+        btn.disabled = false;
     });
 }
 
@@ -222,8 +253,8 @@ document.addEventListener('click', function(e) {
     // Close modals on click outside
     if (e.target.classList.contains('modal')) {
         e.target.style.display = 'none';
+        pendingRestoreId = null;
         pendingFilename = null;
-        pendingLocation = null;
     }
 });
 

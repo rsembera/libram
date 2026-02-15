@@ -163,6 +163,12 @@ def create_app() -> Flask:
     app.register_blueprint(exports_bp)
     app.register_blueprint(covers_bp)
     
+    # Check for pending restore and complete it before database is used
+    from core import backup as backup_module
+    restore_result = backup_module.complete_restore()
+    if restore_result:
+        app.config['RESTORE_COMPLETED'] = restore_result
+    
     # Generate thumbnails for any covers that don't have them yet
     from core.thumbnails import generate_missing_thumbnails
     covers_dir = str(APP_ROOT / 'covers')

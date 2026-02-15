@@ -194,6 +194,52 @@
     color: var(--text-muted);
 }
 
+/* Backup type badges */
+.backup-badge {
+    display: inline-block;
+    padding: 0.125rem 0.5rem;
+    border-radius: 0.25rem;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.025em;
+    margin-left: 0.5rem;
+    vertical-align: middle;
+}
+
+.badge-full {
+    background: var(--accent-primary);
+    color: white;
+}
+
+.badge-incr {
+    background: var(--bg-card-alt);
+    color: var(--text-secondary);
+    border: 1px solid var(--border-color);
+}
+
+.badge-safety {
+    background: #F59E0B;
+    color: white;
+}
+
+/* Safety backup styling */
+.backup-item.safety-backup {
+    border-left: 3px solid #F59E0B;
+}
+
+.section-description {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    margin: -0.5rem 0 1rem 0;
+}
+
+.warning-text {
+    color: #DC2626;
+    font-size: 0.875rem;
+    margin-top: 0.5rem;
+}
+
 .backup-actions {
     display: flex;
     gap: 0.5rem;
