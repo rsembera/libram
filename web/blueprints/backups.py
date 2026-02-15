@@ -176,37 +176,11 @@ def restore_backup(restore_point_id):
 def check_auto_backup(app):
     """
     Check if auto-backup is due and create one if needed.
-    Called from logout route.
+    Called from logout route AFTER db.checkpoint().
     """
     db = app.get_db()
     
-    frequency = db.get_setting('backup_frequency', 'daily')
-    
-    # Handle legacy values
-    legacy_map = {'0': 'manual', '24': 'daily', '168': 'weekly', '720': 'weekly'}
-    if frequency in legacy_map:
-        frequency = legacy_map[frequency]
-        db.set_setting('backup_frequency', frequency)
-    
-    if not backup.check_backup_needed(frequency):
-        return
-    
-    backup_dir = backup.get_backup_dir(db)
-    
     try:
-        result = backup.create_backup(backup_dir, db)
-        
-        if result:
-            db.set_setting('last_auto_backup', datetime.now().isoformat())
-            
-            # Cleanup old backups
-            retention = db.get_setting('backup_retention', '6_months')
-            if retention != 'forever':
-                custom_loc = db.get_setting('backup_location', '')
-                backup.cleanup_old_backups(retention, custom_loc if custom_loc else None)
-        
-        # Record that we checked (even if no changes)
-        backup.record_backup_check()
-        
+        backup.check_and_run_auto_backup(db)
     except Exception:
         pass  # Silently fail for auto-backups

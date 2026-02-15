@@ -851,7 +851,136 @@ def cleanup_old_backups(retention, custom_location=None):
         save_manifest(manifest)
 
 
+# ============================================================================
+# BACKUP STATE (external file to avoid database modification issues)
+# ============================================================================
 
+def _get_backup_state_file():
+    """Get path to backup state file (stored outside the database)."""
+    return DATA_DIR / '.backup_state.json'
+
+
+def _read_backup_state():
+    """Read backup state from external JSON file."""
+    state_file = _get_backup_state_file()
+    if state_file.exists():
+        try:
+            with open(state_file, 'r') as f:
+                return json.load(f)
+        except (json.JSONDecodeError, OSError):
+            pass
+    return {}
+
+
+def _write_backup_state(state):
+    """Write backup state to external JSON file."""
+    state_file = _get_backup_state_file()
+    DATA_DIR.mkdir(parents=True, exist_ok=True)
+    with open(state_file, 'w') as f:
+        json.dump(state, f)
+
+
+def _get_db_hash():
+    """Calculate SHA-256 hash of the database file."""
+    db_path = DATA_DIR / 'libram.db'
+    if not db_path.exists():
+        return None
+    sha256 = hashlib.sha256()
+    with open(db_path, 'rb') as f:
+        for chunk in iter(lambda: f.read(8192), b''):
+            sha256.update(chunk)
+    return sha256.hexdigest()
+
+
+def check_and_run_auto_backup(db, backup_dir=None):
+    """
+    Check if auto-backup is due and create one if needed.
+    
+    Uses the Synesius pattern: all change-detection state lives in an
+    external JSON file, never in the database itself. Change detection
+    uses SHA-256 hash comparison of the database file.
+    
+    This should be called AFTER db.checkpoint() to ensure WAL is flushed.
+    
+    Frequencies:
+    - 'startup': backup every session (if data changed)
+    - 'daily': backup once per calendar day (if data changed)
+    - 'weekly': backup once per calendar week (if data changed)
+    - 'manual': never auto-backup
+    
+    Returns:
+        dict with backup info, None if no backup needed, or raises exception
+    """
+    frequency = db.get_setting('backup_frequency', 'daily')
+    if frequency == 'manual':
+        return None
+    
+    state = _read_backup_state()
+    
+    # Check if backup is due based on frequency
+    backup_due = False
+    last_check = state.get('last_backup_check')
+    
+    if frequency == 'startup':
+        backup_due = True
+    elif not last_check:
+        backup_due = True
+    else:
+        try:
+            last_check_date = datetime.fromisoformat(last_check).date()
+            today = datetime.now().date()
+            
+            if frequency == 'daily':
+                backup_due = today > last_check_date
+            elif frequency == 'weekly':
+                backup_due = (today - last_check_date).days >= 7
+        except ValueError:
+            backup_due = True
+    
+    if not backup_due:
+        return None
+    
+    # Check if data actually changed (hash comparison)
+    current_hash = _get_db_hash()
+    if current_hash is None:
+        return None
+    
+    last_hash = state.get('last_backup_hash')
+    
+    if current_hash == last_hash:
+        # No changes - just record that we checked
+        state['last_backup_check'] = datetime.now().isoformat()
+        _write_backup_state(state)
+        return None
+    
+    # Data changed and backup is due - create backup
+    if backup_dir is None:
+        backup_dir = get_backup_dir(db)
+    
+    result = create_backup(backup_dir, db)
+    
+    if result:
+        db.set_setting('last_auto_backup', datetime.now().isoformat())
+        
+        # Cleanup old backups
+        retention = db.get_setting('backup_retention', '6_months')
+        if retention != 'forever':
+            custom_loc = db.get_setting('backup_location', '')
+            cleanup_old_backups(retention, custom_loc if custom_loc else None)
+        
+        # Checkpoint to flush set_setting writes, then hash
+        # so stored hash matches what we'll see next time
+        db.checkpoint()
+        final_hash = _get_db_hash()
+        _write_backup_state({
+            'last_backup_hash': final_hash,
+            'last_backup_check': datetime.now().isoformat()
+        })
+    
+    return result
+
+
+# Legacy functions for compatibility (can be removed later)
 def check_backup_needed(frequency='daily'):
     """
     Check if an automatic backup should run.
