@@ -606,6 +606,90 @@ def create_pre_restore_backup():
     return str(backup_path)
 
 
+def restore_immediate(restore_point_id):
+    """
+    Restore from a backup immediately.
+    
+    This creates a pre-restore safety backup, then extracts and applies
+    the backup directly without requiring an app restart.
+    
+    Args:
+        restore_point_id: The ID of the restore point to restore from
+        
+    Returns:
+        dict with restore info
+        
+    Raises:
+        ValueError: If restore point not found
+    """
+    restore_points = get_restore_points()
+    point = next((p for p in restore_points if p['id'] == restore_point_id), None)
+    
+    if not point:
+        raise ValueError(f"Restore point not found: {restore_point_id}")
+    
+    # Create pre-restore backup first (safety net)
+    create_pre_restore_backup()
+    
+    # Use a temporary staging directory
+    import tempfile
+    with tempfile.TemporaryDirectory() as staging_dir:
+        staging_path = Path(staging_dir)
+        
+        # Track deleted files across incrementals
+        deleted_files = set()
+        
+        # Extract backups in order (full first, then incrementals)
+        for backup_path in point['files_needed']:
+            with zipfile.ZipFile(backup_path, 'r') as zf:
+                # Check for metadata about deleted files
+                if '_backup_metadata.json' in zf.namelist():
+                    metadata = json.loads(zf.read('_backup_metadata.json'))
+                    deleted_files.update(metadata.get('deleted_files', []))
+                
+                # Extract all other files
+                for name in zf.namelist():
+                    if name != '_backup_metadata.json':
+                        zf.extract(name, staging_path)
+        
+        # Remove files that were deleted in later backups
+        for rel_path in deleted_files:
+            staged_file = staging_path / rel_path
+            if staged_file.exists():
+                staged_file.unlink()
+        
+        # Now apply the restore
+        # Replace database
+        staged_db = staging_path / 'data' / 'libram.db'
+        if staged_db.exists():
+            DATA_DIR.mkdir(parents=True, exist_ok=True)
+            target_db = DATA_DIR / 'libram.db'
+            if target_db.exists():
+                target_db.unlink()
+            shutil.copy2(staged_db, target_db)
+        
+        # Replace secret key if present
+        staged_key = staging_path / 'data' / '.secret_key'
+        if staged_key.exists():
+            target_key = DATA_DIR / '.secret_key'
+            if target_key.exists():
+                target_key.unlink()
+            shutil.copy2(staged_key, target_key)
+        
+        # Replace covers
+        staged_covers = staging_path / 'covers'
+        if staged_covers.exists():
+            if COVERS_DIR.exists():
+                shutil.rmtree(COVERS_DIR)
+            shutil.copytree(staged_covers, COVERS_DIR)
+    
+    return {
+        'restored_at': datetime.now().isoformat(),
+        'restored_from': point['display_name'],
+        'restore_point_id': restore_point_id
+    }
+
+
 def check_restore_pending():
     """Check if there's a pending restore to complete."""
     marker_path = RESTORE_STAGING_DIR / '.restore_marker'
