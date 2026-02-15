@@ -895,12 +895,7 @@ def _get_db_hash():
 def check_and_run_auto_backup(db, backup_dir=None):
     """
     Check if auto-backup is due and create one if needed.
-    
-    Uses the Synesius pattern: all change-detection state lives in an
-    external JSON file, never in the database itself. Change detection
-    uses SHA-256 hash comparison of the database file.
-    
-    This should be called AFTER db.checkpoint() to ensure WAL is flushed.
+    Called from logout route after WAL checkpoint.
     
     Frequencies:
     - 'startup': backup every session (if data changed)
@@ -917,7 +912,7 @@ def check_and_run_auto_backup(db, backup_dir=None):
     
     state = _read_backup_state()
     
-    # Check if backup is due based on frequency
+    # Check if backup is due based on frequency FIRST
     backup_due = False
     last_check = state.get('last_backup_check')
     
@@ -940,7 +935,7 @@ def check_and_run_auto_backup(db, backup_dir=None):
     if not backup_due:
         return None
     
-    # Check if data actually changed (hash comparison)
+    # Backup is due - now check if data actually changed (hash comparison)
     current_hash = _get_db_hash()
     if current_hash is None:
         return None
@@ -949,8 +944,10 @@ def check_and_run_auto_backup(db, backup_dir=None):
     
     if current_hash == last_hash:
         # No changes - just record that we checked
-        state['last_backup_check'] = datetime.now().isoformat()
-        _write_backup_state(state)
+        _write_backup_state({
+            'last_backup_hash': last_hash,
+            'last_backup_check': datetime.now().isoformat()
+        })
         return None
     
     # Data changed and backup is due - create backup
