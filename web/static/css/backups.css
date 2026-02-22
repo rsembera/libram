@@ -278,17 +278,13 @@
         gap: 0.75rem;
     }
     
-    .backup-actions {
-        width: 100%;
-    }
-    
-    .backup-actions .btn {
-        flex: 1;
-    }
-    
     .settings-row {
         flex-direction: column;
         gap: 1rem;
+    }
+    
+    .backup-settings .form-group {
+        max-width: 100%;
     }
 }
 
