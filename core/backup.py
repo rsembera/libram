@@ -29,7 +29,6 @@ APP_ROOT = Path(__file__).parent.parent
 DATA_DIR = APP_ROOT / 'data'
 COVERS_DIR = APP_ROOT / 'covers'
 BACKUPS_DIR = APP_ROOT / 'backups'
-RESTORE_STAGING_DIR = APP_ROOT / '.restore_staging'
 MANIFEST_FILE = BACKUPS_DIR / 'manifest.json'
 
 
@@ -516,63 +515,6 @@ def get_restore_points():
     return restore_points
 
 
-
-def prepare_restore(restore_point_id):
-    """
-    Prepare for restore by extracting to staging folder.
-    Does NOT replace production files yet.
-    
-    Returns path to staging folder.
-    """
-    restore_points = get_restore_points()
-    point = next((p for p in restore_points if p['id'] == restore_point_id), None)
-    
-    if not point:
-        raise ValueError(f"Restore point not found: {restore_point_id}")
-    
-    # Create pre-restore backup first (safety net)
-    create_pre_restore_backup()
-    
-    # Clear any existing staging
-    if RESTORE_STAGING_DIR.exists():
-        shutil.rmtree(RESTORE_STAGING_DIR)
-    
-    RESTORE_STAGING_DIR.mkdir(parents=True)
-    
-    # Track deleted files across incrementals
-    deleted_files = set()
-    
-    # Extract backups in order (full first, then incrementals)
-    for backup_path in point['files_needed']:
-        with zipfile.ZipFile(backup_path, 'r') as zf:
-            # Check for metadata about deleted files
-            if '_backup_metadata.json' in zf.namelist():
-                metadata = json.loads(zf.read('_backup_metadata.json'))
-                deleted_files.update(metadata.get('deleted_files', []))
-            
-            # Extract all other files (overwrites previous versions)
-            for name in zf.namelist():
-                if name != '_backup_metadata.json':
-                    zf.extract(name, RESTORE_STAGING_DIR)
-    
-    # Remove files that were deleted in later backups
-    for rel_path in deleted_files:
-        staged_path = RESTORE_STAGING_DIR / rel_path
-        if staged_path.exists():
-            staged_path.unlink()
-    
-    # Write restore marker
-    marker = {
-        'restore_point_id': restore_point_id,
-        'prepared_at': datetime.now().isoformat(),
-        'point_info': point
-    }
-    with open(RESTORE_STAGING_DIR / '.restore_marker', 'w') as f:
-        json.dump(marker, f)
-    
-    return str(RESTORE_STAGING_DIR)
-
-
 def create_pre_restore_backup():
     """Create a backup of current state before restore (safety net)."""
     ensure_backup_dir()
@@ -688,70 +630,6 @@ def restore_immediate(restore_point_id):
         'restored_from': point['display_name'],
         'restore_point_id': restore_point_id
     }
-
-
-def check_restore_pending():
-    """Check if there's a pending restore to complete."""
-    marker_path = RESTORE_STAGING_DIR / '.restore_marker'
-    if marker_path.exists():
-        with open(marker_path, 'r') as f:
-            return json.load(f)
-    return None
-
-
-def complete_restore():
-    """
-    Complete a pending restore by replacing production files.
-    Should be called at startup before database is opened.
-    
-    Returns dict with restore info or None if no restore pending.
-    """
-    marker = check_restore_pending()
-    if not marker:
-        return None
-    
-    # Replace database
-    staged_db = RESTORE_STAGING_DIR / 'data' / 'libram.db'
-    if staged_db.exists():
-        DATA_DIR.mkdir(parents=True, exist_ok=True)
-        target_db = DATA_DIR / 'libram.db'
-        if target_db.exists():
-            target_db.unlink()
-        shutil.copy2(staged_db, target_db)
-    
-    # Replace secret key if present
-    staged_key = RESTORE_STAGING_DIR / 'data' / '.secret_key'
-    if staged_key.exists():
-        target_key = DATA_DIR / '.secret_key'
-        if target_key.exists():
-            target_key.unlink()
-        shutil.copy2(staged_key, target_key)
-    
-    # Replace covers
-    staged_covers = RESTORE_STAGING_DIR / 'covers'
-    if staged_covers.exists():
-        if COVERS_DIR.exists():
-            shutil.rmtree(COVERS_DIR)
-        shutil.copytree(staged_covers, COVERS_DIR)
-    
-    # Clean up staging
-    shutil.rmtree(RESTORE_STAGING_DIR)
-    
-    return {
-        'restored_at': datetime.now().isoformat(),
-        'restore_point': marker['restore_point_id'],
-        'original_date': marker['point_info']['created_at']
-    }
-
-
-def cancel_restore():
-    """Cancel a pending restore (remove staging folder)."""
-    if RESTORE_STAGING_DIR.exists():
-        shutil.rmtree(RESTORE_STAGING_DIR)
-        return True
-    return False
-
-
 
 
 def cleanup_old_backups(retention, custom_location=None):
