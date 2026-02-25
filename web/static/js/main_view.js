@@ -193,11 +193,17 @@ function updateTime() {
 /* ============================================
    CARD DRAG AND DROP
    ============================================ */
+// Track initial card order to detect actual changes
+let initialCardOrder = null;
+
 function initCardDragDrop() {
     const container = document.getElementById('stats-container');
     if (!container) return;
     
     const cards = container.querySelectorAll('.stat-card');
+    
+    // Capture initial order for change detection
+    initialCardOrder = [...cards].map(c => c.dataset.cardId).join(',');
     
     // Disable drag-drop on touch devices or narrow screens
     const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
@@ -260,6 +266,12 @@ function initCardDragDrop() {
 function saveCardOrder() {
     const cards = document.querySelectorAll('#stats-container .stat-card');
     const order = [...cards].map(c => c.dataset.cardId);
+    const orderStr = order.join(',');
+    
+    // Only save if order actually changed
+    if (orderStr === initialCardOrder) return;
+    
+    initialCardOrder = orderStr;  // Update baseline
     
     fetch('/settings/api/card-order', {
         method: 'POST',
