@@ -299,7 +299,7 @@ def generate_markdown_detailed(books, lines, order):
         
         for book in year_books:
             # Book number
-            num = f'#{book["all_time_number"]}'
+            num = str(book["all_time_number"])
             
             # Title (with subtitle if present)
             title = book['title']
