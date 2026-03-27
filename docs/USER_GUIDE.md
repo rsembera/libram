@@ -63,6 +63,8 @@ Every book gets two numbers:
 
 **Year assignment is based on when you began the book**, not when you finished. A book started December 28, 2024 belongs to 2024 even if you finish it in January 2025.
 
+**Monthly stats** (books per month, average pages per day) are based on when you **finished** a book. These measure your reading output — what you actually completed each month.
+
 ---
 
 ## Editing and Deleting Books
@@ -160,17 +162,13 @@ Backups are created on logout and app shutdown. If the database hasn't changed s
 
 To restore from a backup, click the restore icon next to any backup file. This replaces your current data with the backup — use with caution.
 
-### Download
-
-You can also download backup files to your computer for safekeeping.
-
 ---
 
 ## Keyboard Shortcuts
 
 | Key | Action |
 |-----|--------|
-| `Escape` | Close cover image lightbox |
+| `Escape` | Close cover image lightbox, clear search |
 
 ---
 

@@ -15,7 +15,7 @@ A clean, self-hosted web app to track your reading history. Designed for persona
 - **Cover art** — Fetch covers and book info via ISBN from Open Library, or upload your own
 - **Multiple views** — Detailed (horizontal cards) and Compact (stacked) layouts
 - **Dashboard stats** — Draggable info cards with reading charts
-- **8 color themes** — Witching Hour, Crimson Veil, Hardboiled, Terminal, Grimoire, Wasteland, Lost World, Nautilus
+- **6 color themes** — Ink, Slate, Parchment, Witching Hour, Crimson Veil, Terminal
 - **Custom backgrounds** — Solid colors or upload your own images
 - **DNF tracking** — Mark books as "Did Not Finish" with pages completed
 - **Fortune bar** — Daily quotes with optional sun/moon astrology signs
@@ -86,7 +86,6 @@ On first launch, you'll be prompted to create a password. This protects access t
 
 ### Keyboard Shortcuts
 
-- `/` — Focus search box
 - `Escape` — Clear search / Close modals
 
 ## Deployment
@@ -115,7 +114,7 @@ Access from other devices at `http://your-server-ip:8090`
 - **Database**: `data/libram.db` (SQLite)
 - **Covers**: `covers/`
 - **Backups**: `backups/`
-- **Custom backgrounds**: `web/static/backgrounds/`
+- **Custom backgrounds**: `web/static/user_backgrounds/`
 
 ## Technology
 
