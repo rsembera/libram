@@ -1,6 +1,6 @@
 """
 Libram Core Module
-Database and encryption utilities.
+Database, backup, and utility functions.
 """
 
 from .database import Database

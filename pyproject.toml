@@ -4,10 +4,10 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "libram"
-version = "1.0.0"
+version = "1.1.0"
 description = "Personal reading tracker - a clean, self-hosted web app to track your reading history"
 readme = "README.md"
-license = {text = "MIT"}
+license = {text = "AGPL-3.0"}
 authors = [
     {name = "Richard Sembera"}
 ]
@@ -17,7 +17,7 @@ classifiers = [
     "Environment :: Web Environment",
     "Framework :: Flask",
     "Intended Audience :: End Users/Desktop",
-    "License :: OSI Approved :: MIT License",
+    "License :: OSI Approved :: GNU Affero General Public License v3",
     "Operating System :: OS Independent",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.10",
@@ -31,6 +31,7 @@ dependencies = [
     "ephem",
     "waitress>=3.0.0",
     "requests",
+    "Pillow>=10.0.0",
 ]
 
 [project.urls]

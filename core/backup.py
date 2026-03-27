@@ -855,65 +855,6 @@ def check_and_run_auto_backup(db, backup_dir=None):
     return result
 
 
-# Legacy functions for compatibility (can be removed later)
-def check_backup_needed(frequency='daily'):
-    """
-    Check if an automatic backup should run.
-    
-    Uses CALENDAR DATE comparison:
-    - 'startup': backup every session (if data changed)
-    - 'daily': check if last check was on a different calendar date
-    - 'weekly': check if last check was 7+ calendar days ago
-    - 'manual': never auto-backup
-    
-    Returns:
-        True if backup should run, False otherwise
-    """
-    if frequency == 'manual':
-        return False
-    
-    manifest = load_manifest()
-    backups = manifest['backups']
-    
-    if not backups:
-        return True
-    
-    all_backups = [b for b in backups if b['type'] in ('full', 'incremental')]
-    
-    if not all_backups:
-        return True
-    
-    if frequency == 'startup':
-        return True
-    
-    now = datetime.now()
-    today = now.date()
-    
-    last_check = manifest.get('last_backup_check')
-    if last_check:
-        last_date = datetime.fromisoformat(last_check).date()
-    else:
-        last_any = max(all_backups, key=lambda x: x['created_at'])
-        last_date = datetime.fromisoformat(last_any['created_at']).date()
-    
-    if frequency == 'daily' and today > last_date:
-        return True
-    elif frequency == 'weekly' and (today - last_date).days >= 7:
-        return True
-    
-    return False
-
-
-def record_backup_check():
-    """
-    Record that we checked for backup today.
-    Called after backup attempt (whether successful or no changes).
-    """
-    manifest = load_manifest()
-    manifest['last_backup_check'] = datetime.now().isoformat()
-    save_manifest(manifest)
-
-
 def get_backup_status():
     """
     Get current backup status for display.

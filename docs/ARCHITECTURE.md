@@ -13,6 +13,7 @@ libram/
 ├── main.py                  # Entry point (Waitress server, CLI args)
 ├── core/                    # Business logic (no Flask dependency except database.py's g)
 │   ├── database.py          # All SQLite operations, schema, migrations
+│   ├── backup.py            # Backup/restore logic, hash-based change detection
 │   ├── fortunes.py          # Lazy-loads fortunes.json on first call
 │   ├── fortunes.json        # 1,666 fortune strings
 │   ├── astrology.py         # Sun/moon sign calculation via ephem

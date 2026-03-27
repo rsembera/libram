@@ -103,7 +103,7 @@ Access Settings from the Navigation card on the main view.
 - **Background** — Solid colors or upload a custom background image
 - **Font** — Choose from Lexend, Libre Baskerville, Lora, Source Sans 3, or Literata
 - **Font Size** — Small, Medium, or Large
-- **Border Style** — Accent colored borders or subtle gray
+- **Border Style** — Accent colored borders or vibrant colored borders
 
 ### Rating Colors
 
@@ -209,6 +209,7 @@ python main.py --debug
 **Environment variables:**
 - `LIBRAM_HOST` — Bind address (default: `127.0.0.1`)
 - `LIBRAM_PORT` — Port (default: `8090`)
+- `LIBRAM_DEBUG=1` — Enable development mode (equivalent to `--debug`)
 - `LIBRAM_BROWSER=1` — Auto-open browser on start
 
 ---

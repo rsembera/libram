@@ -158,7 +158,6 @@ def main():
     signal.signal(signal.SIGTERM, shutdown_handler)
     
     # Desktop mode: start heartbeat monitor and auto-open browser
-    desktop_mode = os.environ.get('LIBRAM_DESKTOP') == '1'
     if desktop_mode:
         # Start heartbeat monitor thread
         monitor = threading.Thread(target=_heartbeat_monitor, daemon=True)

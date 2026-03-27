@@ -66,10 +66,6 @@ def index():
     # Get search query
     search = request.args.get('search', '').strip()
     
-    # Get theme settings
-    card_style = db.get_setting('card_style', 'tutti-frutti')
-    background_style = db.get_setting('background_style', 'suit-grey')
-    
     # Get card order
     card_order = db.get_setting('card_order', 'pages,reading-chart,navigation').split(',')
     
@@ -107,8 +103,6 @@ def index():
                           show_astrology=show_astrology,
                           view_mode=view_mode,
                           search=search,
-                          card_style=card_style,
-                          background_style=background_style,
                           card_order=card_order)
 
 
