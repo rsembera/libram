@@ -35,3 +35,6 @@ Thumbs.db
 .env.local
 covers/
 web/static/user_backgrounds/
+
+# Private docs (deployment details)
+docs/private/
