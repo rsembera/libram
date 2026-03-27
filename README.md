@@ -4,6 +4,8 @@
 
 A clean, self-hosted web app to track your reading history. Designed for personal use on your local machine or a home server like a Raspberry Pi.
 
+![Libram Screenshot](docs/screenshot.png)
+
 ## Features
 
 - **Track your reading** — Log books with title, subtitle, author, pages, dates, and ratings
@@ -123,7 +125,7 @@ Access from other devices at `http://your-server-ip:8090`
 
 ## License
 
-MIT License — see [LICENSE](LICENSE) for details.
+AGPL-3.0 License — see [LICENSE](LICENSE) for details.
 
 ## Credits
 
