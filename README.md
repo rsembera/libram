@@ -78,9 +78,11 @@ On first launch, you'll be prompted to create a password. This protects access t
 5. When finished, add the completion date
 6. Add a rating and notes if desired
 
-### Year Assignment
+### Year Assignment and Stats
 
-Books belong to the year they were **begun**, not finished. A book started December 28, 2024 belongs to 2024 even if finished in January 2025.
+**Yearly numbering** is based on when you **began** a book. A book started December 28, 2024 belongs to 2024 (and counts toward your 2024 total) even if finished in January 2025.
+
+**Monthly stats** (books per month, average pages per day) are based on when you **finished** a book. These track your reading output - what you actually completed each month.
 
 ### Keyboard Shortcuts
 
