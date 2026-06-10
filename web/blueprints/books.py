@@ -122,7 +122,8 @@ def add_book():
         date_begun = _parse_date_from_form('date_begun')
         date_finished = _parse_date_from_form('date_finished')
         
-        rating = int(request.form.get('rating', 0))
+        rating_str = request.form.get('rating', '0')
+        rating = int(rating_str) if rating_str.isdigit() else 0
         days_paused = request.form.get('days_paused', '')
         days_paused = int(days_paused) if days_paused.isdigit() else 0
         did_not_finish = request.form.get('did_not_finish') == '1'
@@ -210,7 +211,8 @@ def edit_book(book_id):
         date_begun = _parse_date_from_form('date_begun')
         date_finished = _parse_date_from_form('date_finished')
         
-        rating = int(request.form.get('rating', 0))
+        rating_str = request.form.get('rating', '0')
+        rating = int(rating_str) if rating_str.isdigit() else 0
         days_paused = request.form.get('days_paused', '')
         days_paused = int(days_paused) if days_paused.isdigit() else 0
         did_not_finish = request.form.get('did_not_finish') == '1'

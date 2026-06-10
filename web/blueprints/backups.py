@@ -69,11 +69,17 @@ def create_backup():
     try:
         result = backup.create_backup(backup_dir, db)
         if result is None:
+            # Even with no changes, record the check so auto-backup
+            # logic stays in sync with the current database hash
+            backup.record_backup_state(db)
             return jsonify({
                 'status': 'ok', 
                 'message': 'No changes since last backup',
                 'no_changes': True
             })
+        # Record state so logout's auto-backup check doesn't see this
+        # freshly backed-up data as "changed" and run a redundant pass
+        backup.record_backup_state(db)
         return jsonify({
             'status': 'ok', 
             'filename': result['filename'],
