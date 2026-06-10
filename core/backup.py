@@ -608,6 +608,14 @@ def restore_immediate(restore_point_id):
             target_db = DATA_DIR / 'libram.db'
             if target_db.exists():
                 target_db.unlink()
+            # Remove stale WAL/SHM sidecar files. A concurrent connection
+            # (e.g. the session-status poller in another Waitress thread)
+            # can leave these behind, and SQLite pairing a stale WAL with
+            # the freshly restored db file is undefined behavior.
+            for suffix in ('-wal', '-shm'):
+                sidecar = DATA_DIR / f'libram.db{suffix}'
+                if sidecar.exists():
+                    sidecar.unlink()
             shutil.copy2(staged_db, target_db)
         
         # Replace secret key if present
@@ -770,6 +778,25 @@ def _get_db_hash():
     return sha256.hexdigest()
 
 
+def record_backup_state(db=None):
+    """
+    Record the current database hash and check time in the backup state file.
+    
+    Called after any successful backup (manual or automatic) so that
+    subsequent auto-backup checks see the current state as "already
+    backed up" and don't run redundant no-op backups.
+    
+    Checkpoints first (if db provided) so the hash reflects all WAL content.
+    """
+    if db:
+        db.checkpoint()
+    current_hash = _get_db_hash()
+    _write_backup_state({
+        'last_backup_hash': current_hash,
+        'last_backup_check': datetime.now().isoformat()
+    })
+
+
 def check_and_run_auto_backup(db, backup_dir=None):
     """
     Check if auto-backup is due and create one if needed.
@@ -845,10 +872,13 @@ def check_and_run_auto_backup(db, backup_dir=None):
         
         # Checkpoint to flush set_setting writes, then hash
         # so stored hash matches what we'll see next time
-        db.checkpoint()
-        final_hash = _get_db_hash()
+        record_backup_state(db)
+    else:
+        # create_backup found no file-level changes (e.g. a manual backup
+        # already captured this state). Record the current hash so we
+        # don't repeat this no-op check on every subsequent logout.
         _write_backup_state({
-            'last_backup_hash': final_hash,
+            'last_backup_hash': current_hash,
             'last_backup_check': datetime.now().isoformat()
         })
     

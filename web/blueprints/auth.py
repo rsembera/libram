@@ -141,7 +141,10 @@ def check_session():
     
     # Check session timeout
     db = current_app.get_db()
-    timeout_minutes = int(db.get_setting('session_timeout', '30'))
+    try:
+        timeout_minutes = int(db.get_setting('session_timeout', '30'))
+    except (ValueError, TypeError):
+        timeout_minutes = 30
     
     if timeout_minutes > 0:
         last_activity = session.get('last_activity', 0)

@@ -8,6 +8,7 @@ from __future__ import annotations
 import os
 import time
 import hashlib
+import hmac
 import sqlite3
 from datetime import datetime, date
 from pathlib import Path
@@ -709,11 +710,11 @@ class Database:
                 bytes.fromhex(salt_hex),
                 int(iterations)
             ).hex()
-            return test_hash == hash_hex
+            return hmac.compare_digest(test_hash, hash_hex)
         else:
             # Legacy SHA-256 format — verify then auto-migrate
             test_hash = hashlib.sha256(password.encode()).hexdigest()
-            if test_hash == stored_hash:
+            if hmac.compare_digest(test_hash, stored_hash):
                 # Upgrade to PBKDF2 on successful login
                 self.set_password(password)
                 return True

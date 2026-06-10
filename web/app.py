@@ -46,6 +46,8 @@ def create_app() -> Flask:
     app.config['SESSION_COOKIE_NAME'] = 'libram_session'
     app.config['SESSION_COOKIE_HTTPONLY'] = True
     app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
+    # Cap upload size (cover images, background images)
+    app.config['MAX_CONTENT_LENGTH'] = 10 * 1024 * 1024  # 10 MB
     
     # Database path
     app.config['DATABASE_PATH'] = os.environ.get(
@@ -167,6 +169,11 @@ def create_app() -> Flask:
     from core.thumbnails import generate_missing_thumbnails
     covers_dir = str(APP_ROOT / 'covers')
     generate_missing_thumbnails(covers_dir)
+    
+    # Remove app-generated covers no longer referenced by any book
+    # (left behind when a cover is uploaded but the form is abandoned)
+    from web.blueprints.covers import cleanup_orphaned_covers
+    cleanup_orphaned_covers(app.config['DATABASE_PATH'])
     
     # Session status API for timeout warning system
     @app.route('/api/session-status')

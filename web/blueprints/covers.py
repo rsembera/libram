@@ -3,13 +3,17 @@ Libram Covers Blueprint
 Book cover upload, search, and serving.
 """
 
+import logging
 import os
+import re
 import uuid
 import requests
 from pathlib import Path
 from flask import Blueprint, request, jsonify, send_file, Response
 
 from core.thumbnails import generate_thumbnail, delete_thumbnail
+
+logger = logging.getLogger(__name__)
 
 covers_bp = Blueprint('covers', __name__, url_prefix='/covers')
 
@@ -19,6 +23,56 @@ COVERS_DIR = str(APP_ROOT / 'covers')
 
 # Ensure covers directory exists
 os.makedirs(COVERS_DIR, exist_ok=True)
+
+# Filenames Libram itself generates: uuid4().hex + allowed extension.
+# The orphan sweep only ever touches files matching this pattern.
+_APP_GENERATED_COVER_RE = re.compile(r'^[0-9a-f]{32}\.(jpg|jpeg|png|gif|webp)$')
+
+
+def cleanup_orphaned_covers(db_path: str) -> int:
+    """Delete app-generated cover files not referenced by any book.
+
+    Orphans accumulate when a cover is uploaded but the book form is
+    abandoned before saving. Runs at startup. Deliberately conservative:
+    - Never deletes anything if the database can't be read
+    - Only deletes files matching Libram's own uuid naming pattern
+    
+    Returns the number of covers removed.
+    """
+    from core.database import Database
+    try:
+        with Database(db_path) as db:
+            cursor = db.conn.cursor()
+            cursor.execute(
+                "SELECT cover_filename FROM books WHERE cover_filename IS NOT NULL"
+            )
+            referenced = {row[0] for row in cursor.fetchall()}
+    except Exception as e:
+        logger.warning(f"Skipping orphaned cover cleanup (db unavailable): {e}")
+        return 0
+    
+    covers = Path(COVERS_DIR)
+    if not covers.exists():
+        return 0
+    
+    removed = 0
+    for f in covers.iterdir():
+        if not f.is_file():
+            continue
+        if not _APP_GENERATED_COVER_RE.match(f.name):
+            continue
+        if f.name in referenced:
+            continue
+        try:
+            f.unlink()
+            delete_thumbnail(COVERS_DIR, f.name)
+            removed += 1
+        except Exception:
+            pass
+    
+    if removed:
+        logger.info(f"Removed {removed} orphaned cover(s)")
+    return removed
 
 
 @covers_bp.route('/thumb/<filename>')

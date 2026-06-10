@@ -77,6 +77,18 @@ def download():
         return generate_csv(all_books)
 
 
+def _csv_safe(value):
+    """Guard against CSV formula injection in spreadsheet apps.
+    
+    Cells beginning with =, +, -, or @ are interpreted as formulas by
+    Excel and others. Prefixing with a single quote forces them to be
+    treated as plain text.
+    """
+    if isinstance(value, str) and value and value[0] in ('=', '+', '-', '@'):
+        return "'" + value
+    return value
+
+
 def generate_csv(books):
     """Generate CSV export."""
     output = io.StringIO()
@@ -105,9 +117,9 @@ def generate_csv(books):
         writer.writerow([
             book['all_time_number'],
             book['yearly_number'],
-            book['title'],
-            book.get('subtitle', '') or '',
-            book['author'],
+            _csv_safe(book['title']),
+            _csv_safe(book.get('subtitle', '') or ''),
+            _csv_safe(book['author']),
             book['pages'],
             book['date_begun_date'].strftime('%Y-%m-%d') if book['date_begun_date'] else '',
             book['date_finished_date'].strftime('%Y-%m-%d') if book['date_finished_date'] else '',
@@ -117,8 +129,8 @@ def generate_csv(books):
             rating,
             'Yes' if book['did_not_finish'] else '',
             pages_completed,
-            book.get('type_name', '') or '',
-            book['notes']
+            _csv_safe(book.get('type_name', '') or ''),
+            _csv_safe(book['notes'])
         ])
     
     # Create response
