@@ -10,12 +10,53 @@ import time
 import hashlib
 import hmac
 import sqlite3
-from datetime import datetime, date
+from datetime import datetime, date, timedelta
 from pathlib import Path
 from typing import Optional
 
 # App root is parent of 'core' directory
 APP_ROOT = Path(__file__).parent.parent
+
+
+def distribute_pages_across_months(
+    begun: date, finished: date, pages: int
+) -> dict[tuple[int, int], float]:
+    """
+    Distribute a book's pages across the calendar months its reading window spans,
+    proportional to the number of days that fall within each month.
+
+    A book read June 20 -> July 10 contributes a slice of its pages to June and the
+    rest to July, in proportion to how many days landed in each month. Reading is
+    assumed to proceed uniformly across the inclusive [begun, finished] span.
+
+    Note on days_paused: it is intentionally NOT used here. Without per-day pause data
+    we can only assume pauses are spread evenly, which leaves the month proportions
+    unchanged — pauses affect pace (pages/day), not how total pages split across months.
+
+    Returns a dict mapping (year, month) -> pages attributed to that month (float).
+    Callers round for display.
+    """
+    if finished < begun:
+        finished = begun
+    total_days = (finished - begun).days + 1  # inclusive
+
+    result: dict[tuple[int, int], float] = {}
+    year, month = begun.year, begun.month
+    while (year, month) <= (finished.year, finished.month):
+        month_first = date(year, month, 1)
+        next_first = date(year + 1, 1, 1) if month == 12 else date(year, month + 1, 1)
+        month_last = next_first - timedelta(days=1)
+
+        seg_start = begun if begun > month_first else month_first
+        seg_end = finished if finished < month_last else month_last
+        days_in_month = (seg_end - seg_start).days + 1
+
+        if days_in_month > 0:
+            result[(year, month)] = pages * days_in_month / total_days
+
+        year, month = (year + 1, 1) if month == 12 else (year, month + 1)
+
+    return result
 
 
 class Database:
@@ -617,6 +658,66 @@ class Database:
                 'avg': avg
             })
         
+        return results
+    
+    def get_pages_per_month(self, months: int = 12) -> list[dict]:
+        """
+        Get total pages read per month for the last N months.
+
+        Unlike get_books_per_month (which counts each book in its finish month),
+        each book's pages are distributed across the calendar months its reading
+        spanned, proportional to the days in each month — so a book read 25% in
+        June and 75% in July contributes pages to both months in that ratio.
+
+        Finished books contribute their full page count; did-not-finish books
+        contribute pages_completed. In-progress books (no finish date) are excluded
+        because their final page total isn't yet known.
+
+        Returns:
+            List of dicts with 'month', 'year', 'label', and 'pages' keys,
+            ordered from oldest to newest.
+        """
+        cursor = self.conn.cursor()
+        now = datetime.now()
+
+        # Build the ordered month slots and a (year, month) -> total accumulator
+        slots: list[tuple[int, int]] = []
+        totals: dict[tuple[int, int], float] = {}
+        for i in range(months - 1, -1, -1):
+            month_offset = now.month - 1 - i
+            year = now.year + (month_offset // 12)
+            month = (month_offset % 12) + 1
+            slots.append((year, month))
+            totals[(year, month)] = 0.0
+
+        # Pull every book with both a begun and finished date, then attribute its
+        # pages across months. A book spanning outside the window still contributes
+        # its in-window months; out-of-window months are simply dropped below.
+        cursor.execute("""
+            SELECT date_begun, date_finished, pages, did_not_finish, pages_completed
+            FROM books
+            WHERE date_begun IS NOT NULL AND date_finished IS NOT NULL
+        """)
+
+        for date_begun, date_finished, pages, dnf, pages_completed in cursor.fetchall():
+            page_count = (pages_completed or 0) if dnf else (pages or 0)
+            if page_count <= 0:
+                continue
+            begun = datetime.fromtimestamp(date_begun).date()
+            finished = datetime.fromtimestamp(date_finished).date()
+            for ym, attributed in distribute_pages_across_months(begun, finished, page_count).items():
+                if ym in totals:
+                    totals[ym] += attributed
+
+        results = []
+        for (year, month) in slots:
+            results.append({
+                'month': month,
+                'year': year,
+                'label': datetime(year, month, 1).strftime('%b'),
+                'pages': round(totals[(year, month)])
+            })
+
         return results
     
     # =========================================================================
