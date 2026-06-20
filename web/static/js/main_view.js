@@ -296,10 +296,10 @@ function getCookie(name) {
 }
 
 /* ============================================
-   CHART (BOOKS PER MONTH / AVG PAGES PER DAY / BY TYPE)
+   CHART (BOOKS PER MONTH / PAGES PER MONTH / AVG PAGES PER DAY / BY TYPE)
    ============================================ */
-let currentChartView = 'books'; // 'books', 'pages', or 'types'
-let chartDataCache = { books: null, pages: null, types: null };
+let currentChartView = 'books'; // 'books', 'pagesmonth', 'pages', or 'types'
+let chartDataCache = { books: null, pages: null, types: null, pagesmonth: null };
 
 async function initBooksChart() {
     const container = document.getElementById('books-chart');
@@ -321,7 +321,22 @@ async function toggleChartView() {
     if (!container) return;
     
     if (currentChartView === 'books') {
-        // Switch to pages per day
+        // Switch to pages per month (proportional attribution)
+        currentChartView = 'pagesmonth';
+        titleEl.textContent = 'Pages Per Month';
+        
+        if (!chartDataCache.pagesmonth) {
+            try {
+                const response = await fetch('/api/pages-per-month');
+                chartDataCache.pagesmonth = await response.json();
+            } catch (error) {
+                console.error('Failed to load pages-per-month chart data:', error);
+                return;
+            }
+        }
+        renderPagesPerMonthChart(container, chartDataCache.pagesmonth);
+    } else if (currentChartView === 'pagesmonth') {
+        // Switch to average pages per day
         currentChartView = 'pages';
         titleEl.textContent = 'Avg Pages/Day';
         
@@ -423,6 +438,76 @@ function renderBooksChart(container, data) {
         }
     });
     
+    svg += '</svg>';
+    container.innerHTML = svg;
+}
+
+function renderPagesPerMonthChart(container, data) {
+    // Theme colors. Shares the primary bar color with Books Per Month; the two
+    // views are never shown at the same time, and the title makes the view clear.
+    const styles = getComputedStyle(document.documentElement);
+    const barColor = styles.getPropertyValue('--chart-bar').trim() || '#667eea';
+    const emptyColor = styles.getPropertyValue('--chart-empty').trim() || '#E5E7EB';
+    const textColor = styles.getPropertyValue('--text-secondary').trim() || '#4B5563';
+    const gridColor = styles.getPropertyValue('--chart-grid').trim() || '#c8c4d8';
+
+    // Chart dimensions (wider left padding than Books Per Month for larger numbers)
+    const width = container.clientWidth || 280;
+    const height = container.clientHeight || 100;
+    const padding = { top: 8, right: 8, bottom: 20, left: 36 };
+
+    const chartWidth = width - padding.left - padding.right;
+    const chartHeight = height - padding.top - padding.bottom;
+
+    // Find max value for scaling
+    const maxPages = Math.max(...data.map(d => d.pages), 1);
+    const yMax = Math.ceil(maxPages * 1.1) || 100; // Add 10% headroom
+
+    // Calculate bar dimensions
+    const barCount = data.length;
+    const barGap = 4;
+    const barWidth = (chartWidth - (barCount - 1) * barGap) / barCount;
+
+    // Create SVG
+    let svg = `<svg width="${width}" height="${height}" class="books-chart-svg">`;
+
+    // Y-axis gridlines and labels
+    const gridLines = 4;
+    for (let i = 0; i <= gridLines; i++) {
+        const y = padding.top + chartHeight - (i / gridLines) * chartHeight;
+        const value = Math.round((i / gridLines) * yMax);
+
+        // Gridline
+        svg += `<line x1="${padding.left}" y1="${y}" x2="${width - padding.right}" y2="${y}" 
+                      stroke="${gridColor}" stroke-width="1" />`;
+
+        // Y-axis label (only show a few)
+        if (i === 0 || i === gridLines || i === gridLines / 2) {
+            svg += `<text x="${padding.left - 6}" y="${y + 3}" 
+                          text-anchor="end" font-size="9" fill="${textColor}">${value.toLocaleString()}</text>`;
+        }
+    }
+
+    // Bars
+    data.forEach((d, i) => {
+        const x = padding.left + i * (barWidth + barGap);
+        const barHeight = (d.pages / yMax) * chartHeight;
+        const y = padding.top + chartHeight - barHeight;
+
+        // Bar
+        const color = d.pages > 0 ? barColor : emptyColor;
+        svg += `<rect x="${x}" y="${y}" width="${barWidth}" height="${barHeight}" 
+                      fill="${color}" rx="2" class="chart-bar">
+                  <title>${d.label} ${d.year}: ${d.pages.toLocaleString()} pages</title>
+                </rect>`;
+
+        // X-axis label (show every other month to avoid crowding)
+        if (i % 2 === 0 || barCount <= 6) {
+            svg += `<text x="${x + barWidth / 2}" y="${height - 4}" 
+                          text-anchor="middle" font-size="9" fill="${textColor}">${d.label}</text>`;
+        }
+    });
+
     svg += '</svg>';
     container.innerHTML = svg;
 }

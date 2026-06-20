@@ -335,3 +335,10 @@ def books_by_type():
     db = current_app.get_db()
     data = db.get_books_by_type_stats(6)
     return jsonify(data)
+
+@books_bp.route('/api/pages-per-month')
+def pages_per_month():
+    """API endpoint returning pages per month (proportional attribution) for chart."""
+    db = current_app.get_db()
+    data = db.get_pages_per_month(12)
+    return jsonify(data)

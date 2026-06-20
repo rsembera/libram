@@ -4,6 +4,22 @@ All notable changes to Libram, organized by date.
 
 ---
 
+## June 20, 2026 — Pages Per Month Chart
+
+### Features
+- Add a "Pages Per Month" view to the dashboard chart card (toggles in after "Books Per Month")
+- Each book's pages are distributed across the calendar months its reading spanned, proportional to the days in each month — a book read 25% in June and 75% in July contributes pages to both months in that ratio, rather than dumping the whole total into the finish month
+
+### Implementation
+- `distribute_pages_across_months()` pure helper in `core/database.py` (unit-tested, no DB required)
+- `get_pages_per_month()` aggregates attributed pages into the last 12 monthly buckets; in-progress books are excluded (final page count unknown), DNF books contribute `pages_completed`
+- New `/api/pages-per-month` endpoint and `renderPagesPerMonthChart()` renderer
+
+### Testing
+- Add `test_pages_per_month.py` covering single-month, 25/75 split, multi-month, single-day, year-boundary, and sum-invariant cases
+
+---
+
 ## February 15, 2026 — Backup System Improvements
 
 ### Backup Retention

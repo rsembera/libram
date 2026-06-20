@@ -4,6 +4,20 @@ Patterns, gotchas, and lessons learned during Libram development. Reference for 
 
 ---
 
+## Pages Per Month — Proportional Attribution
+
+**What it does:** The "Pages Per Month" chart distributes each book's pages across the calendar months its reading spanned, weighted by how many days fell in each month. A book read June 27 → July 12 (4 days in June, 12 in July) splits its pages 25% / 75%.
+
+**Deliberate asymmetry with "Books Per Month":** Books Per Month counts each book once, in its *finish* month. Pages Per Month *spreads* pages across the span. This is intentional — don't "fix" it to match. A 900-page book finished in July shouldn't make July look like a 900-page month if most of it was read in June.
+
+**Why days_paused is ignored in the split:** We only store a *count* of paused days, not *which* days. Under the only assumption the data supports (pauses spread evenly), the month proportions are unchanged — pauses scale pace (pages/day), not the page split. So the attribution uses raw calendar days from `date_begun` to `date_finished` inclusive.
+
+**In-progress books are excluded:** A book with no `date_finished` has an unknown final page count, so there's nothing reliable to attribute yet. DNF books contribute `pages_completed` over their begun→finished window.
+
+**Where the logic lives:** `distribute_pages_across_months(begun, finished, pages)` in `core/database.py` is a pure function (no DB, no `self`) so it's directly unit-testable — see `test_pages_per_month.py`. `get_pages_per_month()` is thin glue: build 12 month buckets, run every finished/DNF book through the helper, drop contributions outside the window.
+
+---
+
 ## Flask Session Race Condition (Safari/Firefox Double-Login)
 
 **Problem:** After entering correct credentials, Safari and Firefox redirect back to login with `?timeout=1`. User has to log in twice. Chrome works fine.
