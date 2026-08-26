@@ -296,10 +296,10 @@ function getCookie(name) {
 }
 
 /* ============================================
-   CHART (BOOKS PER MONTH / PAGES PER MONTH / AVG PAGES PER DAY / BY TYPE)
+   CHART (BOOKS PER MONTH / PAGES PER MONTH / AVG PAGES PER DAY / BY TYPE / BY RATING)
    ============================================ */
-let currentChartView = 'books'; // 'books', 'pagesmonth', 'pages', or 'types'
-let chartDataCache = { books: null, pages: null, types: null, pagesmonth: null };
+let currentChartView = 'books'; // 'books', 'pagesmonth', 'pages', 'types', or 'ratings'
+let chartDataCache = { books: null, pages: null, types: null, pagesmonth: null, ratings: null };
 
 async function initBooksChart() {
     const container = document.getElementById('books-chart');
@@ -365,6 +365,21 @@ async function toggleChartView() {
             }
         }
         renderTypesChart(container, chartDataCache.types);
+    } else if (currentChartView === 'types') {
+        // Switch to by rating
+        currentChartView = 'ratings';
+        titleEl.textContent = 'By Rating';
+        
+        if (!chartDataCache.ratings) {
+            try {
+                const response = await fetch('/api/books-by-rating');
+                chartDataCache.ratings = await response.json();
+            } catch (error) {
+                console.error('Failed to load ratings chart data:', error);
+                return;
+            }
+        }
+        renderRatingsChart(container, chartDataCache.ratings);
     } else {
         // Switch to books per month
         currentChartView = 'books';
@@ -623,6 +638,70 @@ function renderTypesChart(container, data) {
             svg += `<rect x="${padding.left + labelWidth}" y="${y}" 
                           width="${barWidth}" height="${barHeight}" 
                           fill="${d.color}" rx="3" class="chart-bar">
+                      <title>${d.name}: ${d.count} book${d.count !== 1 ? 's' : ''}</title>
+                    </rect>`;
+        }
+        
+        // Count (right of bar)
+        svg += `<text x="${padding.left + labelWidth + barWidth + 6}" y="${y + barHeight / 2 + 4}" 
+                      font-size="10" fill="${textColor}">${d.count}</text>`;
+    });
+    
+    svg += '</svg>';
+    container.innerHTML = svg;
+}
+
+function renderRatingsChart(container, data) {
+    // Get theme colors. Rating tier colors match the rating star CSS classes,
+    // including any custom colors set for the 5 and 1 tiers via CSS variables.
+    const styles = getComputedStyle(document.documentElement);
+    const textColor = styles.getPropertyValue('--text-secondary').trim() || '#4B5563';
+    const textPrimary = styles.getPropertyValue('--text-primary').trim() || '#1F2937';
+    const ratingColors = {
+        5: styles.getPropertyValue('--rating-5-star').trim() || '#10B981',
+        4: '#F59E0B',
+        3: '#9CA3AF',
+        2: '#B8860B',
+        1: styles.getPropertyValue('--rating-1-star').trim() || '#1F2937',
+    };
+    
+    // Chart dimensions (same horizontal bar layout as By Type)
+    const width = container.clientWidth || 280;
+    const height = container.clientHeight || 100;
+    const padding = { top: 4, right: 8, bottom: 4, left: 8 };
+    
+    const chartWidth = width - padding.left - padding.right;
+    const chartHeight = height - padding.top - padding.bottom;
+    
+    // Find max count for scaling
+    const maxCount = Math.max(...data.map(d => d.count), 1);
+    
+    // Calculate bar dimensions
+    const barCount = data.length;
+    const barGap = 6;
+    const barHeight = Math.min(18, (chartHeight - (barCount - 1) * barGap) / barCount);
+    const labelWidth = 60; // Space for rating name on left
+    const countWidth = 24; // Space for count on right
+    const barMaxWidth = chartWidth - labelWidth - countWidth - 8;
+    
+    // Create SVG
+    let svg = `<svg width="${width}" height="${height}" class="types-chart-svg">`;
+    
+    // Bars with labels (ordered 5 down to 1 by the API)
+    data.forEach((d, i) => {
+        const y = padding.top + i * (barHeight + barGap);
+        const barWidth = maxCount > 0 ? (d.count / maxCount) * barMaxWidth : 0;
+        const color = ratingColors[d.rating] || textColor;
+        
+        // Rating name (left)
+        svg += `<text x="${padding.left}" y="${y + barHeight / 2 + 4}" 
+                      font-size="11" font-weight="500" fill="${textPrimary}">${d.name}</text>`;
+        
+        // Bar (use the rating tier's color)
+        if (barWidth > 0) {
+            svg += `<rect x="${padding.left + labelWidth}" y="${y}" 
+                          width="${barWidth}" height="${barHeight}" 
+                          fill="${color}" rx="3" class="chart-bar">
                       <title>${d.name}: ${d.count} book${d.count !== 1 ? 's' : ''}</title>
                     </rect>`;
         }

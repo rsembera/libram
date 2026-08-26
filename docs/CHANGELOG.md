@@ -4,6 +4,20 @@ All notable changes to Libram, organized by date.
 
 ---
 
+## August 26, 2026 — Books by Rating Chart
+
+### Features
+- Add a "By Rating" view to the dashboard chart card (toggles in after "By Type")
+- All-time book counts for the five rating tiers, ordered 5 (best) to 1, each bar in its rating tier's color (custom 5/1 colors and names from settings carry through)
+- Unrated books (rating 0, including in-progress books) are excluded; all five tiers are always shown, even at zero
+
+### Implementation
+- `get_books_by_rating_stats()` in `core/database.py` returns fixed-order tier counts
+- New `/api/books-by-rating` endpoint resolves tier display names (`rating_5_name`/`rating_1_name` settings, Gold/Silver/Bronze fixed)
+- `renderRatingsChart()` renderer reuses the By Type horizontal bar layout; tier colors read from `--rating-5-star`/`--rating-1-star` CSS variables with the same fallbacks as the rating star classes
+
+---
+
 ## June 20, 2026 — Pages Per Month Chart
 
 ### Features

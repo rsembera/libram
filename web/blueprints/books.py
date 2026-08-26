@@ -342,3 +342,19 @@ def pages_per_month():
     db = current_app.get_db()
     data = db.get_pages_per_month(12)
     return jsonify(data)
+
+@books_bp.route('/api/books-by-rating')
+def books_by_rating():
+    """API endpoint returning all-time book counts by rating for chart."""
+    db = current_app.get_db()
+    data = db.get_books_by_rating_stats()
+    rating_names = {
+        5: db.get_setting('rating_5_name', 'Green'),
+        4: 'Gold',
+        3: 'Silver',
+        2: 'Bronze',
+        1: db.get_setting('rating_1_name', 'Black'),
+    }
+    for entry in data:
+        entry['name'] = rating_names[entry['rating']]
+    return jsonify(data)

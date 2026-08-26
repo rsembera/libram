@@ -460,6 +460,22 @@ class Database:
         """, (limit,))
         return [{'name': row[0], 'color': row[1], 'count': row[2]} for row in cursor.fetchall()]
 
+    def get_books_by_rating_stats(self) -> list[dict]:
+        """Get all-time book counts by rating for chart, ordered 5 (best) to 1.
+
+        Unrated books (rating 0, including in-progress books) are excluded.
+        All five tiers are always returned, even with a count of zero, so the
+        chart shows the full rating scale.
+        """
+        cursor = self.conn.cursor()
+        cursor.execute("""
+            SELECT rating, COUNT(*) FROM books
+            WHERE rating BETWEEN 1 AND 5
+            GROUP BY rating
+        """)
+        counts = {row[0]: row[1] for row in cursor.fetchall()}
+        return [{'rating': r, 'count': counts.get(r, 0)} for r in range(5, 0, -1)]
+
     # =========================================================================
     # SETTINGS
     # =========================================================================
