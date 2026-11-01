@@ -4,6 +4,17 @@ All notable changes to Libram, organized by date.
 
 ---
 
+## November 1, 2026 — Auto-Growing Notes Field
+
+### Improvements
+- The Notes field on the add/edit book form now grows to fit its content, both on load and while typing, so long notes are visible in full without scrolling inside the box (100px minimum height retained)
+
+### Implementation
+- Inline auto-resize handler in `book_form.html` (sets height from `scrollHeight` plus border width on `input` and window `resize`)
+- `overflow-y: hidden` on `.form-group textarea` in `shared.css` to prevent scrollbar flash during resize
+
+---
+
 ## August 26, 2026 — Books by Rating Chart
 
 ### Features
