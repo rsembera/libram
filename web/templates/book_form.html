@@ -252,9 +252,11 @@
             {% endif %}
             <div class="actions-right">
                 <a href="{{ url_for('books.index') }}" class="btn btn-secondary">Cancel</a>
-                <button type="submit" class="btn btn-primary">
-                    {{ 'Save Changes' if mode == 'edit' else 'Add Book' }}
-                </button>
+                {% if mode == 'edit' %}
+                <button type="submit" class="btn btn-primary" data-dirty-save data-dirty-label="Save Changes">Save Changes</button>
+                {% else %}
+                <button type="submit" class="btn btn-primary">Add Book</button>
+                {% endif %}
             </div>
         </div>
     </form>
@@ -540,6 +542,8 @@ function searchCover() {
     .finally(() => {
         btn.innerHTML = originalHtml;
         btn.disabled = false;
+        // Async field/cover writes fire no events; re-check dirty state
+        document.dispatchEvent(new Event('form-guard:refresh'));
     });
 }
 
@@ -589,6 +593,9 @@ function setCoverPreview(filename) {
         removeBtn.onclick = removeCover;
         container.appendChild(removeBtn);
     }
+
+    // Called after async upload/search; re-check dirty state
+    document.dispatchEvent(new Event('form-guard:refresh'));
 }
 
 function removeCover() {

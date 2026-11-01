@@ -238,6 +238,18 @@ html.font-size-l { font-size: 20px; }
     box-shadow: 0 4px 12px var(--shadow-color);
 }
 
+.btn:disabled,
+.btn:disabled:hover {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+.btn-primary:disabled:hover {
+    background: var(--btn-primary-bg);
+}
+
 .btn-secondary {
     background: var(--btn-secondary-bg);
     color: var(--btn-secondary-text);

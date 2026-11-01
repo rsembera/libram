@@ -1,9 +1,14 @@
 // ---------------------------------------------------------------------------
 // form-guard.js — unsaved-changes protection for the book form.
-// Ported from EdgeCase's form-guard.js (leave-protection half only; no
-// dirty-state Save button).
+// Ported from EdgeCase's form-guard.js.
 //
 // Opt-in: <form data-dirty-guard>. Per guarded form:
+//
+// - Dirty-state Save button (edit mode; button marked [data-dirty-save]):
+//   disabled and labelled "No Changes" until the form differs from its
+//   load-time state; the active label lives in data-dirty-label. The Add
+//   form has no such button, so Add Book is always enabled. Async writes
+//   that fire no events must dispatch `form-guard:refresh` on document.
 //
 // - beforeunload: tab close / reload / browser back / address bar gets the
 //   browser's native "leave site?" prompt when the form is dirty.
@@ -37,15 +42,43 @@ document.addEventListener('DOMContentLoaded', function() {
         let baseline = serialize();
         const isDirty = function() { return serialize() !== baseline; };
 
+        // --- Dirty-state Save button (edit mode only) ---
+        const saveBtn = form.querySelector('[data-dirty-save]');
+        const activeLabel = saveBtn
+            ? (saveBtn.getAttribute('data-dirty-label') || 'Save Changes')
+            : null;
+
+        const refreshSaveButton = function() {
+            if (!saveBtn) return;
+            const dirty = isDirty();
+            saveBtn.disabled = !dirty;
+            // Write the label ONLY when it changes. This runs mid-click
+            // (pressing Save blurs the edited field, whose `change` lands
+            // here between mousedown and mouseup); replacing the text node
+            // even with the same string makes WebKit drop the click, so
+            // Save would need a second press.
+            const label = dirty ? activeLabel : 'No Changes';
+            if (saveBtn.textContent !== label) saveBtn.textContent = label;
+        };
+
         let userTouched = false;
-        const markTouched = function() { userTouched = true; };
-        form.addEventListener('input', markTouched);
-        form.addEventListener('change', markTouched);
-        form.addEventListener('click', markTouched);
+        const onUserEdit = function() { userTouched = true; refreshSaveButton(); };
+        form.addEventListener('input', onUserEdit);
+        form.addEventListener('change', onUserEdit);
+        form.addEventListener('click', function() { userTouched = true; });
+
+        // Picker and dropdown writes dispatch no events, but their click
+        // handlers run before this document-level bubble listener.
+        document.addEventListener('click', refreshSaveButton);
+        // Async writes (cover upload, ISBN lookup) dispatch this explicitly.
+        document.addEventListener('form-guard:refresh', refreshSaveButton);
 
         window.addEventListener('load', function() {
             if (!userTouched) baseline = serialize();
+            refreshSaveButton();
         });
+
+        refreshSaveButton();
 
         // --- Native prompt for tab close / reload / back ---
         const onBeforeUnload = function(e) {
