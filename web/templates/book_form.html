@@ -293,6 +293,21 @@
 {% block extra_js %}
 <script src="{{ url_for('static', filename='js/pickers.js') }}"></script>
 <script>
+// Auto-grow Notes textarea to fit its content
+document.addEventListener('DOMContentLoaded', function() {
+    const notes = document.getElementById('notes');
+    if (!notes) return;
+    const fit = () => {
+        notes.style.height = 'auto';
+        // scrollHeight excludes borders; add them back so no scrollbar appears
+        const borders = notes.offsetHeight - notes.clientHeight;
+        notes.style.height = (notes.scrollHeight + borders) + 'px';
+    };
+    notes.addEventListener('input', fit);
+    window.addEventListener('resize', fit);
+    fit();
+});
+
 // Initialize date pickers
 document.addEventListener('DOMContentLoaded', function() {
     // Date Begun picker

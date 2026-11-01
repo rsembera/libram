@@ -320,6 +320,7 @@ html.font-size-l { font-size: 20px; }
 .form-group textarea {
     resize: vertical;
     min-height: 100px;
+    overflow-y: hidden; /* auto-grown via JS in book_form.html */
 }
 
 .helper-text {
