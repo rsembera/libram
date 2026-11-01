@@ -27,7 +27,7 @@
     </div>
     {% endif %}
     
-    <form method="post" id="book-form" enctype="multipart/form-data">
+    <form method="post" id="book-form" enctype="multipart/form-data" data-dirty-guard>
         <!-- Cover Art Section -->
         <div class="cover-section">
             <div class="cover-preview-container">
@@ -258,6 +258,18 @@
             </div>
         </div>
     </form>
+</div>
+
+<!-- Unsaved Changes Modal (wired by form-guard.js) -->
+<div id="unsaved-changes-modal" class="modal">
+    <div class="modal-content">
+        <h3>Unsaved Changes</h3>
+        <p>This book has unsaved changes. Leave without saving?</p>
+        <div class="modal-actions">
+            <button type="button" id="unsaved-stay-btn" class="btn btn-secondary">Stay Here</button>
+            <button type="button" id="unsaved-leave-btn" class="btn btn-danger">Leave Without Saving</button>
+        </div>
+    </div>
 </div>
 
 <!-- Delete Confirmation Modal -->
@@ -598,4 +610,6 @@ function removeCover() {
     if (removeBtn) removeBtn.remove();
 }
 </script>
+<!-- Must load after the inline init above (see form-guard.js header) -->
+<script src="{{ url_for('static', filename='js/form-guard.js') }}"></script>
 {% endblock %}

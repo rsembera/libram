@@ -4,14 +4,16 @@ All notable changes to Libram, organized by date.
 
 ---
 
-## November 1, 2026 — Auto-Growing Notes Field
+## November 1, 2026 — Auto-Growing Notes Field, Unsaved-Changes Warning
 
 ### Improvements
 - The Notes field on the add/edit book form now grows to fit its content, both on load and while typing, so long notes are visible in full without scrolling inside the box (100px minimum height retained)
+- Leaving the add/edit book form with unsaved changes now asks first: Cancel opens an "Unsaved Changes" modal (Stay Here / Leave Without Saving); closing the tab, reloading, or browser Back gets the browser's native prompt. Save and Delete never prompt
 
 ### Implementation
 - Inline auto-resize handler in `book_form.html` (sets height from `scrollHeight` plus border width on `input` and window `resize`)
 - `overflow-y: hidden` on `.form-group textarea` in `shared.css` to prevent scrollbar flash during resize
+- New `static/js/form-guard.js`, ported from EdgeCase (leave-protection only, no dirty-state Save button). Opt-in via `<form data-dirty-guard>`; snapshot-and-compare dirty detection so programmatic picker writes and edit-then-undo are handled. Loaded after the page's inline init so the baseline is taken after the date pickers set their initial values, with a re-baseline at window `load` if the user hasn't touched the form
 
 ---
 
