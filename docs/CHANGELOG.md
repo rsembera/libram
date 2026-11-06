@@ -4,6 +4,13 @@ All notable changes to Libram, organized by date.
 
 ---
 
+## November 5, 2026 — Save Button Fix
+
+### Fixes
+- Changing Date Begun or Date Finished now enables Save Changes. The date picker stops its clicks from bubbling, so the dirty check (a document-level bubble listener) never ran; it now listens in the capture phase on `window` for clicks and keydowns and re-checks after the handlers finish (`setTimeout 0`). The Cancel warning was unaffected because it compares on demand
+
+---
+
 ## November 1, 2026 — Auto-Growing Notes Field, Unsaved-Changes Warning
 
 ### Improvements
