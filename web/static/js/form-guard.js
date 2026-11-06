@@ -65,11 +65,17 @@ document.addEventListener('DOMContentLoaded', function() {
         const onUserEdit = function() { userTouched = true; refreshSaveButton(); };
         form.addEventListener('input', onUserEdit);
         form.addEventListener('change', onUserEdit);
-        form.addEventListener('click', function() { userTouched = true; });
 
-        // Picker and dropdown writes dispatch no events, but their click
-        // handlers run before this document-level bubble listener.
-        document.addEventListener('click', refreshSaveButton);
+        // Picker and dropdown writes dispatch no events, and pickers.js
+        // stopPropagation()s its clicks, so a bubble listener never sees
+        // them. Listen in the capture phase (fires before anything can stop
+        // it) and defer the re-check until the click's handlers have run.
+        const afterInteraction = function() {
+            userTouched = true;
+            setTimeout(refreshSaveButton, 0);
+        };
+        window.addEventListener('click', afterInteraction, true);
+        window.addEventListener('keydown', afterInteraction, true);
         // Async writes (cover upload, ISBN lookup) dispatch this explicitly.
         document.addEventListener('form-guard:refresh', refreshSaveButton);
 
