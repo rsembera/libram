@@ -12,13 +12,18 @@ Backup contents:
 - data/.secret_key (if exists)
 - covers/ (cover images)
 - covers/thumbs/ (thumbnails)
+- user_backgrounds/ (uploaded background images)
 """
 
 from __future__ import annotations
 
+import contextlib
 import os
+import re
 import json
 import hashlib
+import sqlite3
+import tempfile
 import zipfile
 import shutil
 from datetime import datetime, timedelta
@@ -30,6 +35,23 @@ DATA_DIR = APP_ROOT / 'data'
 COVERS_DIR = APP_ROOT / 'covers'
 BACKUPS_DIR = APP_ROOT / 'backups'
 MANIFEST_FILE = BACKUPS_DIR / 'manifest.json'
+USER_BG_DIR = APP_ROOT / 'web' / 'static' / 'user_backgrounds'
+
+# Name of the database inside every backup zip. Fixed, regardless of where
+# the live database file actually lives (see _db_path).
+DB_ARCNAME = 'data/libram.db'
+METADATA_NAME = '_backup_metadata.json'
+
+# libram_<kind>_<YYYY-MM-DD_HHMMSS>[_n].zip
+_BACKUP_NAME_RE = re.compile(
+    r'^libram_(full|incr|pre_restore)_(\d{4}-\d{2}-\d{2}_\d{6})(?:_\d+)?\.zip$'
+)
+
+
+def _db_path() -> Path:
+    """Path of the live database. Honours LIBRAM_DB_PATH, like the web app."""
+    override = os.environ.get('LIBRAM_DB_PATH')
+    return Path(override) if override else DATA_DIR / 'libram.db'
 
 
 def ensure_backup_dir():
@@ -54,9 +76,9 @@ def get_all_backup_files():
     files = {}
     
     # Database
-    db_path = DATA_DIR / 'libram.db'
+    db_path = _db_path()
     if db_path.exists():
-        files['data/libram.db'] = db_path
+        files[DB_ARCNAME] = db_path
     
     # Secret key (essential for session security)
     secret_key_path = DATA_DIR / '.secret_key'
@@ -67,10 +89,52 @@ def get_all_backup_files():
     if COVERS_DIR.exists():
         for filepath in COVERS_DIR.rglob('*'):
             if filepath.is_file() and not filepath.name.startswith('.'):
-                rel_path = filepath.relative_to(APP_ROOT)
-                files[str(rel_path)] = filepath
+                rel_path = filepath.relative_to(COVERS_DIR)
+                files[f'covers/{rel_path.as_posix()}'] = filepath
+    
+    # Uploaded background images (referenced by the background_style setting)
+    if USER_BG_DIR.exists():
+        for filepath in USER_BG_DIR.iterdir():
+            if filepath.is_file() and not filepath.name.startswith('.'):
+                files[f'user_backgrounds/{filepath.name}'] = filepath
     
     return files
+
+
+@contextlib.contextmanager
+def _consistent_sources(files):
+    """
+    Yield {relative_path: path_to_read} for a backup, with the live database
+    swapped for a consistent snapshot taken through SQLite's backup API.
+
+    Zipping the live .db file directly can miss commits still sitting in the
+    WAL (a checkpoint is skipped, without error, while another connection is
+    reading) or catch the file mid-write. The snapshot has neither problem.
+    """
+    live_db = files.get(DB_ARCNAME)
+    if live_db is None:
+        yield files
+        return
+    
+    with tempfile.TemporaryDirectory() as tmp:
+        snapshot = Path(tmp) / 'libram.db'
+        try:
+            src = sqlite3.connect(str(live_db))
+            try:
+                dst = sqlite3.connect(str(snapshot))
+                try:
+                    src.backup(dst)
+                finally:
+                    dst.close()
+            finally:
+                src.close()
+        except sqlite3.Error:
+            # Not readable as SQLite: fall back to copying the file as-is
+            snapshot = live_db
+        
+        sources = dict(files)
+        sources[DB_ARCNAME] = snapshot
+        yield sources
 
 
 def get_file_hashes():
@@ -85,16 +149,8 @@ def get_file_hashes():
     return hashes
 
 
-def load_manifest():
-    """Load backup manifest from disk."""
-    if MANIFEST_FILE.exists():
-        try:
-            with open(MANIFEST_FILE, 'r') as f:
-                return json.load(f)
-        except (json.JSONDecodeError, ValueError):
-            # Manifest corrupted - backup the bad file and start fresh
-            corrupted_path = MANIFEST_FILE.with_suffix('.json.corrupted')
-            shutil.copy(MANIFEST_FILE, corrupted_path)
+
+def _empty_manifest():
     return {
         'backups': [],
         'last_full_hashes': {},
@@ -103,17 +159,167 @@ def load_manifest():
     }
 
 
+def _write_json_atomic(path, data, **dump_kwargs):
+    """Write JSON via a temp file + rename so a crash can't leave half a file."""
+    path = Path(path)
+    tmp_path = path.with_name(path.name + '.tmp')
+    with open(tmp_path, 'w') as f:
+        json.dump(data, f, **dump_kwargs)
+    os.replace(tmp_path, path)
+
+
+def load_manifest():
+    """Load backup manifest from disk."""
+    if MANIFEST_FILE.exists():
+        try:
+            with open(MANIFEST_FILE, 'r') as f:
+                manifest = json.load(f)
+            if not isinstance(manifest, dict) or not isinstance(manifest.get('backups'), list):
+                raise ValueError('unexpected manifest structure')
+            for key, default in _empty_manifest().items():
+                manifest.setdefault(key, default)
+            return manifest
+        except (json.JSONDecodeError, ValueError, OSError):
+            # Manifest corrupted - backup the bad file and start fresh
+            try:
+                shutil.copy(MANIFEST_FILE, MANIFEST_FILE.with_suffix('.json.corrupted'))
+            except OSError:
+                pass
+    return _empty_manifest()
+
+
 def save_manifest(manifest):
-    """Save backup manifest to disk."""
+    """
+    Save backup manifest to disk.
+
+    Also mirrors it into every other folder that holds backups (e.g. a cloud
+    folder), so the backups there can still be restored if this machine's
+    copy of the manifest is lost. See recover_manifest().
+    """
     ensure_backup_dir()
-    with open(MANIFEST_FILE, 'w') as f:
-        json.dump(manifest, f, indent=2)
+    _write_json_atomic(MANIFEST_FILE, manifest, indent=2)
+    
+    mirror_dirs = {b.get('backup_dir') for b in manifest.get('backups', [])}
+    for mirror_dir in mirror_dirs:
+        if not mirror_dir:
+            continue
+        mirror = Path(mirror_dir) / 'manifest.json'
+        if mirror == MANIFEST_FILE:
+            continue
+        try:
+            if mirror.parent.is_dir():
+                _write_json_atomic(mirror, manifest, indent=2)
+        except OSError:
+            pass  # Mirror is best-effort
 
 
-def generate_backup_filename(backup_type):
-    """Generate unique backup filename."""
+def recover_manifest(search_dirs=()):
+    """
+    Rebuild the manifest when it is missing or empty but backup zips exist.
+
+    Looks in the default backups folder plus any `search_dirs` (the custom
+    backup location). Prefers a mirrored manifest.json found there; otherwise
+    reconstructs the chains from the zip filenames (each full backup starts a
+    chain, and the incrementals that follow it belong to that chain).
+
+    Does nothing if the manifest already lists backups.
+    Returns the number of backups recovered.
+    """
+    manifest = load_manifest()
+    if manifest['backups']:
+        return 0
+    
+    dirs = []
+    for d in [BACKUPS_DIR, *search_dirs]:
+        if not d:
+            continue
+        d = Path(d)
+        if d.is_dir() and d not in dirs:
+            dirs.append(d)
+    
+    # 1. A mirrored manifest written by save_manifest()
+    for d in dirs:
+        mirror = d / 'manifest.json'
+        if mirror == MANIFEST_FILE or not mirror.exists():
+            continue
+        try:
+            with open(mirror, 'r') as f:
+                data = json.load(f)
+        except (json.JSONDecodeError, ValueError, OSError):
+            continue
+        if not isinstance(data, dict) or not isinstance(data.get('backups'), list) or not data['backups']:
+            continue
+        # Point each entry at wherever its zip actually is on this machine
+        for entry in data['backups']:
+            recorded = Path(entry.get('backup_dir') or BACKUPS_DIR) / entry['filename']
+            if not recorded.exists():
+                for candidate in dirs:
+                    if (candidate / entry['filename']).exists():
+                        entry['backup_dir'] = str(candidate)
+                        break
+        for key, default in _empty_manifest().items():
+            data.setdefault(key, default)
+        data['last_full_hashes'] = {}  # Unknown local state: next backup is a full one
+        save_manifest(data)
+        return len(data['backups'])
+    
+    # 2. No manifest anywhere: reconstruct from the zip files themselves
+    found = []
+    for d in dirs:
+        for zip_path in d.glob('libram_*.zip'):
+            match = _BACKUP_NAME_RE.match(zip_path.name)
+            if not match:
+                continue
+            try:
+                with zipfile.ZipFile(zip_path, 'r') as zf:
+                    file_count = len([n for n in zf.namelist() if n != METADATA_NAME])
+            except (zipfile.BadZipFile, OSError):
+                continue
+            created = datetime.strptime(match.group(2), '%Y-%m-%d_%H%M%S')
+            found.append((created, zip_path.name, match.group(1), zip_path, file_count))
+    found.sort(key=lambda item: (item[0], item[1]))
+    
+    chain_id = None
+    for position, (created, _name, kind, zip_path, file_count) in enumerate(found):
+        # Filenames only have one-second resolution; keep same-second
+        # backups in order by nudging each timestamp by its position
+        created = created + timedelta(microseconds=position)
+        if kind == 'full':
+            chain_id = created.strftime('%Y%m%d_%H%M%S')
+            backup_type, entry_chain = 'full', chain_id
+        elif kind == 'pre_restore':
+            backup_type, entry_chain = 'pre_restore', 'pre_restore'
+        elif chain_id is None:
+            continue  # Incremental with no full backup before it: unusable
+        else:
+            backup_type, entry_chain = 'incremental', chain_id
+        manifest['backups'].append({
+            'filename': zip_path.name,
+            'type': backup_type,
+            'chain_id': entry_chain,
+            'created_at': created.isoformat(),
+            'file_count': file_count,
+            'backup_size': zip_path.stat().st_size,
+            'backup_dir': str(zip_path.parent)
+        })
+    
+    if manifest['backups']:
+        manifest['current_chain_id'] = chain_id
+        manifest['last_full_hashes'] = {}
+        save_manifest(manifest)
+    return len(manifest['backups'])
+
+
+def generate_backup_filename(backup_type, backup_dir=None):
+    """Generate unique backup filename (never one that already exists in backup_dir)."""
     timestamp = datetime.now().strftime('%Y-%m-%d_%H%M%S')
-    return f"libram_{backup_type}_{timestamp}.zip"
+    filename = f"libram_{backup_type}_{timestamp}.zip"
+    if backup_dir is not None:
+        counter = 2
+        while (Path(backup_dir) / filename).exists():
+            filename = f"libram_{backup_type}_{timestamp}_{counter}.zip"
+            counter += 1
+    return filename
 
 
 def validate_backup_location(backup_dir):
@@ -141,7 +347,7 @@ def validate_backup_location(backup_dir):
             return False, "Permission denied. Cannot write to this location."
         except OSError as e:
             if is_cloud:
-                return False, f"Cloud folder not accessible. Please check your internet connection."
+                return False, "Cloud folder not accessible. Please check your internet connection."
             return False, f"Cannot write to backup location: {e}"
         
         return True, None
@@ -199,6 +405,7 @@ def create_backup(backup_dir=None, db=None):
         return create_incremental_backup(backup_dir, db)
 
 
+
 def create_full_backup(backup_dir=None, db=None):
     """
     Create a full backup of all data.
@@ -224,23 +431,24 @@ def create_full_backup(backup_dir=None, db=None):
     if db:
         db.checkpoint()
     
-    filename = generate_backup_filename('full')
-    backup_path = backup_dir / filename
-    
     files = get_all_backup_files()
     if not files:
         raise ValueError("No files to backup")
+    
+    filename = generate_backup_filename('full', backup_dir)
+    backup_path = backup_dir / filename
     
     # Calculate hashes and create zip
     hashes = {}
     total_size = 0
     
     try:
-        with zipfile.ZipFile(backup_path, 'w', zipfile.ZIP_DEFLATED) as zf:
-            for rel_path, abs_path in files.items():
-                zf.write(abs_path, rel_path)
-                hashes[rel_path] = get_file_hash(abs_path)
-                total_size += abs_path.stat().st_size
+        with _consistent_sources(files) as sources:
+            with zipfile.ZipFile(backup_path, 'w', zipfile.ZIP_DEFLATED) as zf:
+                for rel_path, src_path in sources.items():
+                    zf.write(src_path, rel_path)
+                    hashes[rel_path] = get_file_hash(src_path)
+                    total_size += src_path.stat().st_size
     except OSError as e:
         if backup_path.exists():
             backup_path.unlink()
@@ -302,43 +510,42 @@ def create_incremental_backup(backup_dir=None, db=None):
     if db:
         db.checkpoint()
     
-    # Get current state
-    current_hashes = get_file_hashes()
+    # Note: despite the name, last_full_hashes is the state as of the most
+    # recent backup in the chain (full or incremental).
     previous_hashes = manifest['last_full_hashes']
-    
-    # Find changes
-    changed_files = {}
     files = get_all_backup_files()
     
-    for rel_path, current_hash in current_hashes.items():
-        if rel_path not in previous_hashes or previous_hashes[rel_path] != current_hash:
-            changed_files[rel_path] = files[rel_path]
-    
-    # Check for deleted files
-    deleted_files = [p for p in previous_hashes if p not in current_hashes]
-    
-    if not changed_files and not deleted_files:
-        return None  # No changes
-    
-    filename = generate_backup_filename('incr')
-    backup_path = backup_dir / filename
-    
-    total_size = 0
-    
-    try:
-        with zipfile.ZipFile(backup_path, 'w', zipfile.ZIP_DEFLATED) as zf:
-            for rel_path, abs_path in changed_files.items():
-                zf.write(abs_path, rel_path)
-                total_size += abs_path.stat().st_size
-            
-            # Include metadata about deleted files
-            if deleted_files:
-                metadata = {'deleted_files': deleted_files}
-                zf.writestr('_backup_metadata.json', json.dumps(metadata))
-    except OSError as e:
-        if backup_path.exists():
-            backup_path.unlink()
-        raise ValueError(f"Failed to create backup: {e}")
+    with _consistent_sources(files) as sources:
+        # Hash exactly what would be written, so hashes and contents agree
+        current_hashes = {rel: get_file_hash(src) for rel, src in sources.items()}
+        
+        changed_files = {
+            rel: src for rel, src in sources.items()
+            if previous_hashes.get(rel) != current_hashes[rel]
+        }
+        deleted_files = [p for p in previous_hashes if p not in current_hashes]
+        
+        if not changed_files and not deleted_files:
+            return None  # No changes
+        
+        filename = generate_backup_filename('incr', backup_dir)
+        backup_path = backup_dir / filename
+        total_size = 0
+        
+        try:
+            with zipfile.ZipFile(backup_path, 'w', zipfile.ZIP_DEFLATED) as zf:
+                for rel_path, src_path in changed_files.items():
+                    zf.write(src_path, rel_path)
+                    total_size += src_path.stat().st_size
+                
+                # Include metadata about deleted files
+                if deleted_files:
+                    metadata = {'deleted_files': deleted_files}
+                    zf.writestr(METADATA_NAME, json.dumps(metadata))
+        except OSError as e:
+            if backup_path.exists():
+                backup_path.unlink()
+            raise ValueError(f"Failed to create backup: {e}")
     
     # Verify backup
     verify_backup(backup_path)
@@ -409,6 +616,12 @@ def list_backups():
     return backups
 
 
+
+def _format_restore_time(created_at):
+    created = datetime.fromisoformat(created_at)
+    return created.strftime('%b %d, %Y at %I:%M %p').replace(' 0', ' ')
+
+
 def get_restore_points():
     """
     Get available restore points.
@@ -418,40 +631,28 @@ def get_restore_points():
     - Incremental backups restore by applying chain (full + incrementals)
     - Pre-restore backups are also valid restore points
     
+    An incremental is only offered if the full backup and every incremental
+    before it are still on disk; a chain with a missing link stops there.
+    
     Returns list of restore points with display info.
     """
     manifest = load_manifest()
-    backups = manifest['backups']
+    
+    def path_of(backup):
+        return Path(backup.get('backup_dir') or BACKUPS_DIR) / backup['filename']
     
     # Group by chain
     chains = {}
-    for backup in backups:
-        chain_id = backup['chain_id']
-        if chain_id not in chains:
-            chains[chain_id] = {'full': None, 'incrementals': [], 'pre_restore': None}
-        
-        if backup['type'] == 'full':
-            chains[chain_id]['full'] = backup
-        elif backup['type'] == 'pre_restore':
-            chains[chain_id]['pre_restore'] = backup
-        else:
-            chains[chain_id]['incrementals'].append(backup)
-    
     restore_points = []
-    
-    for chain_id, chain in chains.items():
-        # Handle pre_restore backups (standalone)
-        if chain_id == 'pre_restore' and chain.get('pre_restore'):
-            backup = chain['pre_restore']
-            backup_path = Path(backup.get('backup_dir', BACKUPS_DIR)) / backup['filename']
+    for backup in manifest['backups']:
+        if backup['type'] == 'pre_restore':
+            # Safety backups are standalone restore points
+            backup_path = path_of(backup)
             if backup_path.exists():
-                created = datetime.fromisoformat(backup['created_at'])
-                display_time = created.strftime('%b %d, %Y at %I:%M %p').replace(' 0', ' ')
-                
                 restore_points.append({
                     'id': f"pre_restore_{backup['filename']}",
                     'filename': backup['filename'],
-                    'display_name': f"{display_time} (Safety backup)",
+                    'display_name': f"{_format_restore_time(backup['created_at'])} (Safety backup)",
                     'created_at': backup['created_at'],
                     'type': 'pre_restore',
                     'is_safety': True,
@@ -461,55 +662,56 @@ def get_restore_points():
                 })
             continue
         
-        if not chain['full']:
+        chain = chains.setdefault(backup['chain_id'], {'full': None, 'incrementals': []})
+        if backup['type'] == 'full':
+            chain['full'] = backup
+        else:
+            chain['incrementals'].append(backup)
+    
+    for chain_id, chain in chains.items():
+        full_backup = chain['full']
+        if not full_backup:
             continue  # Skip orphaned incrementals
+        
+        full_path = path_of(full_backup)
+        if not full_path.exists():
+            continue  # Nothing in this chain can be restored without its full backup
         
         # Sort incrementals by date
         chain['incrementals'].sort(key=lambda x: x['created_at'])
         
-        dependent_count = len(chain['incrementals'])
+        restore_points.append({
+            'id': f"{chain_id}_full",
+            'filename': full_backup['filename'],
+            'display_name': _format_restore_time(full_backup['created_at']),
+            'created_at': full_backup['created_at'],
+            'type': 'full',
+            'is_safety': False,
+            'chain_id': chain_id,
+            'dependent_count': len(chain['incrementals']),
+            'files_needed': [str(full_path)]
+        })
         
-        # Full backup as restore point
-        full_backup = chain['full']
-        backup_path = Path(full_backup.get('backup_dir', BACKUPS_DIR)) / full_backup['filename']
-        
-        if backup_path.exists():
-            created = datetime.fromisoformat(full_backup['created_at'])
-            display_time = created.strftime('%b %d, %Y at %I:%M %p').replace(' 0', ' ')
+        # Each incremental is also a restore point, as long as the chain
+        # leading up to it is unbroken
+        files_needed = [str(full_path)]
+        for i, incr in enumerate(chain['incrementals']):
+            incr_path = path_of(incr)
+            if not incr_path.exists():
+                break  # Later incrementals depend on this one
+            files_needed = files_needed + [str(incr_path)]
             
             restore_points.append({
-                'id': f"{chain_id}_full",
-                'filename': full_backup['filename'],
-                'display_name': display_time,
-                'created_at': full_backup['created_at'],
-                'type': 'full',
+                'id': f"{chain_id}_incr_{i}",
+                'filename': incr['filename'],
+                'display_name': _format_restore_time(incr['created_at']),
+                'created_at': incr['created_at'],
+                'type': 'incremental',
                 'is_safety': False,
                 'chain_id': chain_id,
-                'dependent_count': dependent_count,
-                'files_needed': [str(backup_path)]
+                'dependent_count': 0,
+                'files_needed': files_needed.copy()
             })
-        
-        # Each incremental is also a restore point
-        files_needed = [str(backup_path)]
-        for i, incr in enumerate(chain['incrementals']):
-            incr_path = Path(incr.get('backup_dir', BACKUPS_DIR)) / incr['filename']
-            if incr_path.exists():
-                files_needed = files_needed + [str(incr_path)]
-                
-                created = datetime.fromisoformat(incr['created_at'])
-                display_time = created.strftime('%b %d, %Y at %I:%M %p').replace(' 0', ' ')
-                
-                restore_points.append({
-                    'id': f"{chain_id}_incr_{i}",
-                    'filename': incr['filename'],
-                    'display_name': display_time,
-                    'created_at': incr['created_at'],
-                    'type': 'incremental',
-                    'is_safety': False,
-                    'chain_id': chain_id,
-                    'dependent_count': 0,
-                    'files_needed': files_needed.copy()
-                })
     
     restore_points.sort(key=lambda x: x['created_at'], reverse=True)
     return restore_points
@@ -519,16 +721,17 @@ def create_pre_restore_backup():
     """Create a backup of current state before restore (safety net)."""
     ensure_backup_dir()
     
-    filename = f"libram_pre_restore_{datetime.now().strftime('%Y-%m-%d_%H%M%S')}.zip"
-    backup_path = BACKUPS_DIR / filename
-    
     files = get_all_backup_files()
     if not files:
         return None
     
-    with zipfile.ZipFile(backup_path, 'w', zipfile.ZIP_DEFLATED) as zf:
-        for rel_path, abs_path in files.items():
-            zf.write(abs_path, rel_path)
+    filename = generate_backup_filename('pre_restore', BACKUPS_DIR)
+    backup_path = BACKUPS_DIR / filename
+    
+    with _consistent_sources(files) as sources:
+        with zipfile.ZipFile(backup_path, 'w', zipfile.ZIP_DEFLATED) as zf:
+            for rel_path, src_path in sources.items():
+                zf.write(src_path, rel_path)
     
     verify_backup(backup_path)
     
@@ -548,6 +751,42 @@ def create_pre_restore_backup():
     return str(backup_path)
 
 
+def _stage_backup_chain(backup_paths, staging_path):
+    """
+    Rebuild the state captured by a restore point inside `staging_path`.
+
+    Archives are applied oldest first. An incremental's deletion list is
+    applied BEFORE its own files are extracted: the list names files that
+    were gone when that incremental was made, while the files inside it are
+    ones that existed at that moment. Doing it in this order means a file
+    deleted in one incremental and added back in a later one survives.
+    """
+    staging_root = staging_path.resolve()
+    
+    for backup_path in backup_paths:
+        with zipfile.ZipFile(backup_path, 'r') as zf:
+            names = zf.namelist()
+            
+            if METADATA_NAME in names:
+                metadata = json.loads(zf.read(METADATA_NAME))
+                for rel_path in metadata.get('deleted_files', []):
+                    staged_file = (staging_path / rel_path).resolve()
+                    if staged_file.is_relative_to(staging_root) and staged_file.is_file():
+                        staged_file.unlink()
+            
+            for name in names:
+                if name != METADATA_NAME:
+                    zf.extract(name, staging_path)
+
+
+def _replace_file(staged_file, target):
+    """Replace `target` with `staged_file` without ever leaving it missing."""
+    target.parent.mkdir(parents=True, exist_ok=True)
+    tmp_target = target.with_name(target.name + '.restoring')
+    shutil.copy2(staged_file, tmp_target)
+    os.replace(tmp_target, target)
+
+
 def restore_immediate(restore_point_id):
     """
     Restore from a backup immediately.
@@ -562,7 +801,7 @@ def restore_immediate(restore_point_id):
         dict with restore info
         
     Raises:
-        ValueError: If restore point not found
+        ValueError: If restore point not found, or one of its files is missing
     """
     restore_points = get_restore_points()
     point = next((p for p in restore_points if p['id'] == restore_point_id), None)
@@ -570,68 +809,57 @@ def restore_immediate(restore_point_id):
     if not point:
         raise ValueError(f"Restore point not found: {restore_point_id}")
     
+    missing = [Path(p).name for p in point['files_needed'] if not Path(p).exists()]
+    if missing:
+        raise ValueError(f"Backup file missing: {', '.join(missing)}")
+    
     # Create pre-restore backup first (safety net)
     create_pre_restore_backup()
     
     # Use a temporary staging directory
-    import tempfile
     with tempfile.TemporaryDirectory() as staging_dir:
         staging_path = Path(staging_dir)
         
-        # Track deleted files across incrementals
-        deleted_files = set()
-        
-        # Extract backups in order (full first, then incrementals)
-        for backup_path in point['files_needed']:
-            with zipfile.ZipFile(backup_path, 'r') as zf:
-                # Check for metadata about deleted files
-                if '_backup_metadata.json' in zf.namelist():
-                    metadata = json.loads(zf.read('_backup_metadata.json'))
-                    deleted_files.update(metadata.get('deleted_files', []))
-                
-                # Extract all other files
-                for name in zf.namelist():
-                    if name != '_backup_metadata.json':
-                        zf.extract(name, staging_path)
-        
-        # Remove files that were deleted in later backups
-        for rel_path in deleted_files:
-            staged_file = staging_path / rel_path
-            if staged_file.exists():
-                staged_file.unlink()
+        # Rebuild the backed-up state (full first, then incrementals)
+        _stage_backup_chain(point['files_needed'], staging_path)
         
         # Now apply the restore
         # Replace database
-        staged_db = staging_path / 'data' / 'libram.db'
+        staged_db = staging_path / DB_ARCNAME
         if staged_db.exists():
-            DATA_DIR.mkdir(parents=True, exist_ok=True)
-            target_db = DATA_DIR / 'libram.db'
-            if target_db.exists():
-                target_db.unlink()
+            target_db = _db_path()
             # Remove stale WAL/SHM sidecar files. A concurrent connection
             # (e.g. the session-status poller in another Waitress thread)
             # can leave these behind, and SQLite pairing a stale WAL with
             # the freshly restored db file is undefined behavior.
             for suffix in ('-wal', '-shm'):
-                sidecar = DATA_DIR / f'libram.db{suffix}'
+                sidecar = Path(str(target_db) + suffix)
                 if sidecar.exists():
                     sidecar.unlink()
-            shutil.copy2(staged_db, target_db)
+            _replace_file(staged_db, target_db)
         
         # Replace secret key if present
         staged_key = staging_path / 'data' / '.secret_key'
         if staged_key.exists():
-            target_key = DATA_DIR / '.secret_key'
-            if target_key.exists():
-                target_key.unlink()
-            shutil.copy2(staged_key, target_key)
+            _replace_file(staged_key, DATA_DIR / '.secret_key')
         
-        # Replace covers
+        # Replace covers. Always start from an empty folder, even when the
+        # backup holds no covers, so nothing newer than the backup lingers.
         staged_covers = staging_path / 'covers'
+        if COVERS_DIR.exists():
+            shutil.rmtree(COVERS_DIR)
         if staged_covers.exists():
-            if COVERS_DIR.exists():
-                shutil.rmtree(COVERS_DIR)
             shutil.copytree(staged_covers, COVERS_DIR)
+        else:
+            COVERS_DIR.mkdir(parents=True, exist_ok=True)
+        
+        # Replace uploaded backgrounds, if this backup includes them
+        # (backups made before they were added leave the folder untouched)
+        staged_backgrounds = staging_path / 'user_backgrounds'
+        if staged_backgrounds.exists():
+            if USER_BG_DIR.exists():
+                shutil.rmtree(USER_BG_DIR)
+            shutil.copytree(staged_backgrounds, USER_BG_DIR)
     
     return {
         'restored_at': datetime.now().isoformat(),
@@ -654,6 +882,7 @@ def cleanup_old_backups(retention, custom_location=None):
     - Always keep at least one valid restore point
     - Delete entire chains when their newest incremental exceeds retention
     - Only delete if a newer chain exists
+    - Safety (pre-restore) backups older than the retention period are deleted
     """
     if retention == 'forever':
         return
@@ -691,11 +920,10 @@ def cleanup_old_backups(retention, custom_location=None):
     sorted_chain_ids = sorted(chains.keys(), 
                               key=lambda cid: chains[cid]['full']['created_at'] if chains[cid]['full'] else '')
     
-    if len(sorted_chain_ids) <= 1:
-        return  # Keep at least one chain
-    
     chains_to_delete = []
+    manifest_changed = False
     
+    # The newest chain is always kept, whatever its age
     for chain_id in sorted_chain_ids[:-1]:
         chain = chains[chain_id]
         if not chain['full']:
@@ -723,6 +951,7 @@ def cleanup_old_backups(retention, custom_location=None):
                 full_path.unlink()
             if chain['full'] in manifest['backups']:
                 manifest['backups'].remove(chain['full'])
+        manifest_changed = True
     
     # Clean up old safety backups
     for backup in safety_backups:
@@ -732,8 +961,9 @@ def cleanup_old_backups(retention, custom_location=None):
                 backup_path.unlink()
             if backup in manifest['backups']:
                 manifest['backups'].remove(backup)
+                manifest_changed = True
     
-    if chains_to_delete or safety_backups:
+    if manifest_changed:
         save_manifest(manifest)
 
 
@@ -762,20 +992,15 @@ def _write_backup_state(state):
     """Write backup state to external JSON file."""
     state_file = _get_backup_state_file()
     DATA_DIR.mkdir(parents=True, exist_ok=True)
-    with open(state_file, 'w') as f:
-        json.dump(state, f)
+    _write_json_atomic(state_file, state)
 
 
 def _get_db_hash():
     """Calculate SHA-256 hash of the database file."""
-    db_path = DATA_DIR / 'libram.db'
+    db_path = _db_path()
     if not db_path.exists():
         return None
-    sha256 = hashlib.sha256()
-    with open(db_path, 'rb') as f:
-        for chunk in iter(lambda: f.read(8192), b''):
-            sha256.update(chunk)
-    return sha256.hexdigest()
+    return get_file_hash(db_path)
 
 
 def record_backup_state(db=None):
@@ -862,16 +1087,15 @@ def check_and_run_auto_backup(db, backup_dir=None):
     result = create_backup(backup_dir, db)
     
     if result:
-        db.set_setting('last_auto_backup', datetime.now().isoformat())
-        
         # Cleanup old backups
         retention = db.get_setting('backup_retention', '6_months')
         if retention != 'forever':
             custom_loc = db.get_setting('backup_location', '')
             cleanup_old_backups(retention, custom_loc if custom_loc else None)
         
-        # Checkpoint to flush set_setting writes, then hash
-        # so stored hash matches what we'll see next time
+        # Checkpoint, then hash, so the stored hash matches what the next
+        # check will see. (Nothing is written to the database here: a write
+        # after the backup would make the data look changed again.)
         record_backup_state(db)
     else:
         # create_backup found no file-level changes (e.g. a manual backup

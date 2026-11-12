@@ -28,6 +28,8 @@ os.makedirs(COVERS_DIR, exist_ok=True)
 # The orphan sweep only ever touches files matching this pattern.
 _APP_GENERATED_COVER_RE = re.compile(r'^[0-9a-f]{32}\.(jpg|jpeg|png|gif|webp)$')
 
+_ISBN_RE = re.compile(r'^(\d{9}[\dX]|\d{13})$')
+
 
 def cleanup_orphaned_covers(db_path: str) -> int:
     """Delete app-generated cover files not referenced by any book.
@@ -154,11 +156,17 @@ def search_cover() -> tuple[Response, int] | Response:
     if not isbn:
         return jsonify({'status': 'error', 'message': 'ISBN required'}), 400
 
-    isbn = isbn.replace('-', '').replace(' ', '')
+    isbn = isbn.replace('-', '').replace(' ', '').upper()
+
+    # ISBN-10 (last character may be X) or ISBN-13. Anything else would be
+    # passed straight into the Open Library URL below.
+    if not _ISBN_RE.match(isbn):
+        return jsonify({'status': 'error', 'message': 'That does not look like an ISBN (10 or 13 digits).'}), 400
 
     try:
         api_url = f"https://openlibrary.org/api/books?bibkeys=ISBN:{isbn}&format=json&jscmd=data"
         api_resp = requests.get(api_url, timeout=10)
+        api_resp.raise_for_status()
         api_data = api_resp.json()
 
         book_key = f"ISBN:{isbn}"
@@ -194,22 +202,3 @@ def search_cover() -> tuple[Response, int] | Response:
 
     except requests.RequestException as e:
         return jsonify({'status': 'error', 'message': f'Failed to search: {str(e)}'}), 500
-
-
-@covers_bp.route('/delete/<filename>', methods=['POST'])
-def delete_cover(filename: str) -> tuple[Response, int] | Response:
-    """Delete a cover image and its thumbnail."""
-    if '..' in filename or '/' in filename:
-        return jsonify({'status': 'error', 'message': 'Invalid filename'}), 400
-
-    filepath = os.path.join(COVERS_DIR, filename)
-
-    if os.path.exists(filepath):
-        try:
-            os.remove(filepath)
-        except Exception:
-            pass
-
-    delete_thumbnail(COVERS_DIR, filename)
-
-    return jsonify({'status': 'ok'})

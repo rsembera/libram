@@ -4,6 +4,45 @@ All notable changes to Libram, organized by date.
 
 ---
 
+## November 12, 2026 — Code Review Fixes
+
+### Backup and Restore
+- **Fix restore so a file deleted and re-added in one chain survives.** Deletions recorded by an incremental are now applied before that incremental's files are extracted, instead of all deletions being applied at the end (same bug as Hermanubis)
+- A chain with a missing backup file stops there: later incrementals, which depend on the missing one, are no longer offered as restore points. Restore checks that every file it needs exists before doing anything
+- Restoring a backup that contains no covers now clears the covers folder instead of leaving newer covers behind
+- Every safety (pre-restore) backup is listed as a restore point, not just the newest
+- Backups zip a consistent snapshot of the database (SQLite backup API) rather than the live file
+- `manifest.json` is written atomically and copied into any custom backup folder; if it is missing, it is rebuilt from that copy or from the backup files themselves
+- Uploaded background images are included in backups and restored
+- `LIBRAM_DB_PATH` is honoured by backup and restore
+- Two backups in the same second no longer overwrite each other
+- Old safety backups are cleaned up even when only one backup chain exists
+- Removed the unused `last_auto_backup` setting write, which changed the database right after backing it up
+
+### Fixes
+- Day counts no longer come out one short for books spanning the spring clock change (March 1–20 is 20 days, not 19); the pages/day averages use the same rule
+- A validation error on the add/edit form keeps everything entered, including both dates, rating, type and cover (the dates used to reset to today / blank)
+- Date Finished earlier than Date Begun is rejected; ratings are limited to 0–5
+- Pressing Enter in the ISBN field searches again (it threw an error); ISBNs are checked before being sent to Open Library
+- The cover lightbox opens for titles containing an apostrophe
+- "Stay Logged In" extends the session in place instead of reloading the page, and typing or clicking now counts as activity, so long notes can't time out mid-sentence
+- Desktop mode: the login and setup pages keep the server alive, the heartbeat timeout is 90 seconds (background tabs), and waking the computer no longer shuts the server down
+- Searching updates the per-year book counts
+- A book's yearly number is reassigned when its begun date moves to another year
+- The edit form decides which old cover to delete from the database, not from a form field
+- Thumbnails respect photo orientation (EXIF)
+- Malformed JSON sent to a settings endpoint no longer causes a server error; background and type colour values are validated
+- Multi-line notes and `|` characters no longer break Markdown exports; DNF page totals in exports match the dashboard
+
+### Implementation
+- Schema setup runs once per process instead of on every request; theme settings load in one query instead of nine (`Database.get_settings()`)
+- `add_book` / `edit_book` share `_parse_book_form()`; the five chart renderers are two (`renderMonthlyBarChart`, `renderHorizontalBarChart`) driven by a `CHART_VIEWS` table; `main.py` shutdown paths share `_run_shutdown_tasks()`; the Markdown exporters share `_group_by_year()`
+- Removed dead code: `/covers/delete` route, `updateTime()`, server-side search filter, `original_cover_filename` field
+- New `/api/keep-alive` endpoint
+- New `test_backup_restore.py` (10 tests, temp folders only)
+
+---
+
 ## November 5, 2026 — Save Button Fix
 
 ### Fixes

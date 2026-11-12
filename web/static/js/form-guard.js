@@ -97,6 +97,8 @@ document.addEventListener('DOMContentLoaded', function() {
             window.removeEventListener('beforeunload', onBeforeUnload);
         };
         window.addEventListener('beforeunload', onBeforeUnload);
+        // base.html blanks the page when the session expires; stop guarding
+        window.addEventListener('libram:session-expired', disarm);
 
         // Any form on the page (Save, Delete modal). Bubble phase on document
         // so form-level handlers have already had their chance to cancel.

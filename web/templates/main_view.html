@@ -179,7 +179,7 @@
                     <!-- Compact View Content -->
                     <div class="compact-content">
                         {% if book.cover_filename %}
-                        <div class="compact-cover" onclick="event.stopPropagation(); showCoverLightbox('{{ url_for('covers.serve_cover', filename=book.cover_filename) }}', '{{ book.title|e }}')">
+                        <div class="compact-cover" data-cover-src="{{ url_for('covers.serve_cover', filename=book.cover_filename) }}" data-cover-title="{{ book.title }}" onclick="event.stopPropagation(); showCoverLightbox(this.dataset.coverSrc, this.dataset.coverTitle)">
                             <img src="{{ url_for('covers.serve_thumb', filename=book.cover_filename) }}" alt="">
                         </div>
                         {% endif %}

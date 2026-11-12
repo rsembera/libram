@@ -119,34 +119,25 @@ def create_app() -> Flask:
             heartbeat_func()
     
     # Context processor to inject theme settings into all templates
+    theme_defaults = {
+        'theme': 'ink',
+        'background_style': '',
+        'font_style': 'lexend',
+        'font_size': 's',
+        'border_style': 'accent',
+        'rating_5_color': '',
+        'rating_1_color': '',
+        'rating_5_name': 'Green',
+        'rating_1_name': 'Black',
+    }
+    
     @app.context_processor
     def inject_theme_settings():
         """Inject theme, background_style, font_style, font_size, border_style, and rating colors into all templates."""
         try:
-            db = get_db()
-            return {
-                'theme': db.get_setting('theme', 'ink'),
-                'background_style': db.get_setting('background_style', ''),
-                'font_style': db.get_setting('font_style', 'lexend'),
-                'font_size': db.get_setting('font_size', 's'),
-                'border_style': db.get_setting('border_style', 'accent'),
-                'rating_5_color': db.get_setting('rating_5_color', ''),
-                'rating_1_color': db.get_setting('rating_1_color', ''),
-                'rating_5_name': db.get_setting('rating_5_name', 'Green'),
-                'rating_1_name': db.get_setting('rating_1_name', 'Black')
-            }
+            return get_db().get_settings(theme_defaults)
         except Exception:
-            return {
-                'theme': 'ink',
-                'background_style': '',
-                'font_style': 'lexend',
-                'font_size': 's',
-                'border_style': 'accent',
-                'rating_5_color': '',
-                'rating_1_color': '',
-                'rating_5_name': 'Green',
-                'rating_1_name': 'Black'
-            }
+            return dict(theme_defaults)
     
     # Register blueprints
     from web.blueprints.auth import auth_bp
@@ -174,6 +165,16 @@ def create_app() -> Flask:
     # (left behind when a cover is uploaded but the form is abandoned)
     from web.blueprints.covers import cleanup_orphaned_covers
     cleanup_orphaned_covers(app.config['DATABASE_PATH'])
+    
+    # Keep-alive for the timeout system: "Stay Logged In", and typing or
+    # clicking on a page that makes no requests of its own (e.g. writing
+    # long notes on the book form).
+    @app.route('/api/keep-alive', methods=['POST'])
+    def keep_alive():
+        """Count as activity. The session check that runs before every
+        request has already refreshed last_activity by the time we get here
+        (or redirected to the login page if the session had expired)."""
+        return jsonify({'logged_in': True})
     
     # Session status API for timeout warning system
     @app.route('/api/session-status')

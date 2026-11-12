@@ -31,7 +31,7 @@
         <div class="timeout-modal">
             <h2>Session Expiring</h2>
             <p>Your session will expire in <span id="timeout-countdown">60</span> seconds due to inactivity.</p>
-            <button type="button" class="btn btn-primary" onclick="window.location.reload()">Stay Logged In</button>
+            <button type="button" class="btn btn-primary" onclick="libramStayLoggedIn()">Stay Logged In</button>
         </div>
     </div>
     
@@ -51,6 +51,35 @@
         let countdownInterval = null;
         let secondsRemaining = 0;
         let checkInterval = null;
+        
+        // Typing or clicking counts as activity, even on a page that makes
+        // no requests of its own (e.g. writing long notes on the book form).
+        // Noted here, reported to the server by tick() at most once a minute.
+        let userActive = false;
+        let lastKeepAlive = Date.now();
+        ['keydown', 'pointerdown', 'input'].forEach(function(type) {
+            document.addEventListener(type, function() { userActive = true; }, true);
+        });
+        
+        function keepAlive() {
+            userActive = false;
+            lastKeepAlive = Date.now();
+            return fetch('/api/keep-alive', { method: 'POST' }).catch(() => {});
+        }
+        
+        // "Stay Logged In": extend the session in place. (A page reload would
+        // discard unsaved edits on the book form.)
+        window.libramStayLoggedIn = function() {
+            keepAlive().then(checkSession);
+        };
+        
+        function tick() {
+            if (userActive && (warningShown || Date.now() - lastKeepAlive >= 60000)) {
+                keepAlive().then(checkSession);
+            } else {
+                checkSession();
+            }
+        }
         
         // Check session status periodically
         function checkSession() {
@@ -124,6 +153,10 @@
                 clearInterval(countdownInterval);
             }
             
+            // Nothing left to protect: let the book form's unsaved-changes
+            // guard stand down so "Log In" isn't met with a leave prompt
+            window.dispatchEvent(new Event('libram:session-expired'));
+            
             // Hide all page content
             document.body.innerHTML = '';
             document.body.style.background = 'var(--bg-primary, #1a1a2e)';
@@ -150,7 +183,7 @@
         // Only run on authenticated pages (not login/setup)
         if (!window.location.pathname.includes('/login') && !window.location.pathname.includes('/setup')) {
             // Check every 10 seconds
-            checkInterval = setInterval(checkSession, 10000);
+            checkInterval = setInterval(tick, 10000);
             // Initial check after 2 seconds
             setTimeout(checkSession, 2000);
             

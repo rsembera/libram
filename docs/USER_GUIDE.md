@@ -160,7 +160,11 @@ Backups are created on logout and app shutdown. If the database hasn't changed s
 
 ### Restore
 
-To restore from a backup, click the restore icon next to any backup file. This replaces your current data with the backup — use with caution.
+To restore from a backup, click the restore icon next to any backup file. This replaces your current data with the backup — use with caution. Libram saves a safety backup of the current state first, and that safety backup appears in the list too.
+
+Backups include the database, cover images, and any background images you uploaded.
+
+**Restoring on a new computer:** copy your backup `.zip` files into Libram's `backups` folder (or choose the same cloud folder under Backup Location), then open the Backup page. Libram rebuilds its list of restore points from the files it finds.
 
 ---
 

@@ -52,10 +52,10 @@
                     <label for="isbn">ISBN</label>
                     <div class="isbn-row">
                         <input type="text" id="isbn" name="isbn" 
-                               value="{{ book.isbn if book else '' }}"
+                               value="{{ book.isbn if book and book.isbn else '' }}"
                                placeholder="978-0-123456-78-9"
                                onkeydown="if(event.key==='Enter'){event.preventDefault(); searchCover();}">
-                        <button type="button" class="btn btn-secondary" onclick="searchCover()">
+                        <button type="button" class="btn btn-secondary" id="isbn-search-btn" onclick="searchCover()">
                             <i class="ph ph-magnifying-glass"></i> Find Cover
                         </button>
                     </div>
@@ -69,9 +69,7 @@
                 </div>
             </div>
             <input type="hidden" id="cover_filename" name="cover_filename" 
-                   value="{{ book.cover_filename if book else '' }}">
-            <input type="hidden" name="original_cover_filename" 
-                   value="{{ book.cover_filename if book else '' }}">
+                   value="{{ book.cover_filename if book and book.cover_filename else '' }}">
         </div>
         
         <!-- Title -->
@@ -484,7 +482,10 @@ function searchCover() {
         return;
     }
     
-    const btn = event.target.closest('button');
+    // Look the button up by id: this also runs from Enter in the ISBN field,
+    // where the event target is the input, not the button.
+    const btn = document.getElementById('isbn-search-btn');
+    if (btn.disabled) return;  // a search is already running
     const originalHtml = btn.innerHTML;
     btn.innerHTML = '<i class="ph ph-circle-notch ph-spin"></i> Searching...';
     btn.disabled = true;

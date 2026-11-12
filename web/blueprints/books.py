@@ -48,9 +48,8 @@ def index():
     # Get stats for info cards
     stats = db.get_stats()
     
-    # Get current time for display
+    # Get current date for display
     now = datetime.now()
-    current_time = now.strftime('%I:%M %p').lstrip('0')
     current_date = now.strftime('%A, %B %d, %Y')
     
     # Get fortune from session (set at login)
@@ -63,24 +62,13 @@ def index():
     # Get view mode from query string or cookie
     view_mode = request.args.get('view', request.cookies.get('libram_view', 'detailed'))
     
-    # Get search query
+    # Search query (?search=...) only pre-fills the search box; the
+    # filtering itself is done client-side in main_view.js
     search = request.args.get('search', '').strip()
     
     # Get card order
     card_order = db.get_setting('card_order', 'pages,reading-chart,navigation').split(',')
-    
-    # Filter books if search provided
-    if search:
-        search_lower = search.lower()
-        filtered_by_year = {}
-        for year, books in books_by_year.items():
-            filtered = [b for b in books 
-                       if search_lower in b['title'].lower() 
-                       or search_lower in b['author'].lower()]
-            if filtered:
-                filtered_by_year[year] = filtered
-        books_by_year = filtered_by_year
-    
+        
     # Build year groups for template
     current_year = now.year
     year_groups = []
@@ -96,7 +84,6 @@ def index():
                           year_groups=year_groups,
                           stats=stats,
                           current_year=current_year,
-                          current_time=current_time,
                           current_date=current_date,
                           fortune=fortune,
                           astrology=astrology,
@@ -106,74 +93,23 @@ def index():
                           card_order=card_order)
 
 
+
 @books_bp.route('/book/new', methods=['GET', 'POST'])
 def add_book():
     """Add a new book."""
     db = current_app.get_db()
     
     if request.method == 'POST':
-        # Parse form data
-        title = request.form.get('title', '').strip()
-        subtitle = request.form.get('subtitle', '').strip()
-        author = request.form.get('author', '').strip()
-        pages = request.form.get('pages', '')
-        
-        # Parse dates (from hidden fields with YYYY-MM-DD format)
-        date_begun = _parse_date_from_form('date_begun')
-        date_finished = _parse_date_from_form('date_finished')
-        
-        rating_str = request.form.get('rating', '0')
-        rating = int(rating_str) if rating_str.isdigit() else 0
-        days_paused = request.form.get('days_paused', '')
-        days_paused = int(days_paused) if days_paused.isdigit() else 0
-        did_not_finish = request.form.get('did_not_finish') == '1'
-        pages_completed_str = request.form.get('pages_completed', '')
-        # Only keep pages_completed if DNF is checked
-        pages_completed = int(pages_completed_str) if (did_not_finish and pages_completed_str.isdigit()) else None
-        notes = request.form.get('notes', '').strip()
-        type_id = request.form.get('type_id', '')
-        type_id = int(type_id) if type_id.isdigit() else None
-        isbn = request.form.get('isbn', '').strip().replace('-', '').replace(' ', '') or None
-        cover_filename = request.form.get('cover_filename', '').strip() or None
-        
-        # Validation
-        errors = []
-        if not title:
-            errors.append('Title is required')
-        if not author:
-            errors.append('Author is required')
-        if not pages or not pages.isdigit() or int(pages) < 1:
-            errors.append('Pages must be a positive number')
-        if not date_begun:
-            errors.append('Date begun is required')
-        if not type_id:
-            errors.append('Type is required')
+        data, errors = _parse_book_form()
         
         if errors:
             return render_template('book_form.html',
                                   mode='add',
                                   errors=errors,
-                                  book=request.form,
+                                  book=_book_for_form(data),
                                   **_get_form_context())
         
-        # Create book
-        db.add_book(
-            title=title,
-            subtitle=subtitle,
-            author=author,
-            pages=int(pages),
-            date_begun=date_begun,
-            date_finished=date_finished,
-            days_paused=days_paused,
-            rating=rating,
-            did_not_finish=did_not_finish,
-            notes=notes,
-            type_id=type_id,
-            pages_completed=pages_completed,
-            isbn=isbn,
-            cover_filename=cover_filename
-        )
-        
+        db.add_book(**data)
         return redirect(url_for('books.index'))
     
     # GET - show empty form
@@ -195,79 +131,27 @@ def edit_book(book_id):
     if request.method == 'POST':
         # Check for delete action
         if request.form.get('action') == 'delete':
-            # Delete cover file if exists
-            if book.get('cover_filename'):
-                _delete_cover_file(book['cover_filename'])
             db.delete_book(book_id)
+            _delete_cover_file(book.get('cover_filename'))
             return redirect(url_for('books.index'))
         
-        # Parse form data
-        title = request.form.get('title', '').strip()
-        subtitle = request.form.get('subtitle', '').strip()
-        author = request.form.get('author', '').strip()
-        pages = request.form.get('pages', '')
-        
-        # Parse dates (from hidden fields with YYYY-MM-DD format)
-        date_begun = _parse_date_from_form('date_begun')
-        date_finished = _parse_date_from_form('date_finished')
-        
-        rating_str = request.form.get('rating', '0')
-        rating = int(rating_str) if rating_str.isdigit() else 0
-        days_paused = request.form.get('days_paused', '')
-        days_paused = int(days_paused) if days_paused.isdigit() else 0
-        did_not_finish = request.form.get('did_not_finish') == '1'
-        pages_completed_str = request.form.get('pages_completed', '')
-        # Only keep pages_completed if DNF is checked
-        pages_completed = int(pages_completed_str) if (did_not_finish and pages_completed_str.isdigit()) else None
-        notes = request.form.get('notes', '').strip()
-        type_id = request.form.get('type_id', '')
-        type_id = int(type_id) if type_id.isdigit() else None
-        isbn = request.form.get('isbn', '').strip().replace('-', '').replace(' ', '') or None
-        cover_filename = request.form.get('cover_filename', '').strip() or None
-        original_cover = request.form.get('original_cover_filename', '').strip() or None
-        
-        # Validation
-        errors = []
-        if not title:
-            errors.append('Title is required')
-        if not author:
-            errors.append('Author is required')
-        if not pages or not pages.isdigit() or int(pages) < 1:
-            errors.append('Pages must be a positive number')
-        if not date_begun:
-            errors.append('Date begun is required')
-        if not type_id:
-            errors.append('Type is required')
+        data, errors = _parse_book_form()
         
         if errors:
             return render_template('book_form.html',
                                   mode='edit',
                                   errors=errors,
-                                  book=request.form,
+                                  book=_book_for_form(data),
                                   book_id=book_id,
                                   **_get_form_context())
         
-        # Delete old cover if it changed
-        if original_cover and original_cover != cover_filename:
-            _delete_cover_file(original_cover)
+        db.update_book(book_id, **data)
         
-        # Update book
-        db.update_book(book_id,
-            title=title,
-            subtitle=subtitle,
-            author=author,
-            pages=int(pages),
-            date_begun=date_begun,
-            date_finished=date_finished,
-            days_paused=days_paused,
-            rating=rating,
-            did_not_finish=did_not_finish,
-            notes=notes,
-            type_id=type_id,
-            pages_completed=pages_completed,
-            isbn=isbn,
-            cover_filename=cover_filename
-        )
+        # Delete the old cover if it was replaced or removed. The "old cover"
+        # is whatever the database had, not a value sent back by the form.
+        old_cover = book.get('cover_filename')
+        if old_cover and old_cover != data['cover_filename']:
+            _delete_cover_file(old_cover)
         
         return redirect(url_for('books.index'))
     
@@ -279,10 +163,75 @@ def edit_book(book_id):
                           **_get_form_context())
 
 
-
 # =============================================================================
 # HELPER FUNCTIONS
 # =============================================================================
+
+def _parse_book_form() -> tuple[dict, list[str]]:
+    """
+    Parse and validate the add/edit book form.
+    
+    Returns (data, errors). `data` holds keyword arguments for
+    Database.add_book() / update_book(); `errors` is a list of messages
+    (empty when the form is valid).
+    """
+    form = request.form
+    
+    def to_int(field_name: str) -> Optional[int]:
+        value = form.get(field_name, '').strip()
+        return int(value) if value.isdigit() else None
+    
+    did_not_finish = form.get('did_not_finish') == '1'
+    
+    data = {
+        'title': form.get('title', '').strip(),
+        'subtitle': form.get('subtitle', '').strip(),
+        'author': form.get('author', '').strip(),
+        'pages': to_int('pages'),
+        # Dates come from hidden fields in YYYY-MM-DD format
+        'date_begun': _parse_date_from_form('date_begun'),
+        'date_finished': _parse_date_from_form('date_finished'),
+        'days_paused': to_int('days_paused') or 0,
+        'rating': min(to_int('rating') or 0, 5),
+        'did_not_finish': did_not_finish,
+        # Only keep pages_completed if DNF is checked
+        'pages_completed': to_int('pages_completed') if did_not_finish else None,
+        'notes': form.get('notes', '').strip(),
+        'type_id': to_int('type_id'),
+        'isbn': form.get('isbn', '').strip().replace('-', '').replace(' ', '') or None,
+        'cover_filename': form.get('cover_filename', '').strip() or None,
+    }
+    
+    errors = []
+    if not data['title']:
+        errors.append('Title is required')
+    if not data['author']:
+        errors.append('Author is required')
+    if not data['pages'] or data['pages'] < 1:
+        errors.append('Pages must be a positive number')
+    if not data['date_begun']:
+        errors.append('Date begun is required')
+    if data['date_begun'] and data['date_finished'] and data['date_finished'] < data['date_begun']:
+        errors.append('Date finished cannot be before date begun')
+    if not data['type_id']:
+        errors.append('Type is required')
+    
+    return data, errors
+
+
+def _book_for_form(data: dict) -> dict:
+    """
+    Shape parsed form data like a database book, for re-showing the form
+    after a validation error with everything the user entered still in place
+    (dates, rating, type and cover included).
+    """
+    book = dict(data)
+    book['date_begun_date'] = data['date_begun']
+    book['date_finished_date'] = data['date_finished']
+    if not book['pages']:
+        book['pages'] = request.form.get('pages', '').strip()
+    return book
+
 
 def _parse_date_from_form(field_name: str) -> Optional[date]:
     """Parse date from hidden field (YYYY-MM-DD format)."""

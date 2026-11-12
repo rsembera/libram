@@ -4,7 +4,6 @@ Generates and serves pre-sized cover thumbnails for fast list views.
 Gracefully degrades to serving originals if Pillow is unavailable.
 """
 
-import os
 import logging
 from pathlib import Path
 
@@ -14,7 +13,7 @@ THUMB_HEIGHT = 300  # pixels — plenty for 145px CSS display
 THUMB_QUALITY = 85  # JPEG quality
 
 try:
-    from PIL import Image
+    from PIL import Image, ImageOps
     HAS_PILLOW = True
 except ImportError:
     HAS_PILLOW = False
@@ -46,6 +45,10 @@ def generate_thumbnail(covers_dir: str, filename: str) -> str | None:
 
     try:
         with Image.open(source) as img:
+            # Apply the EXIF orientation (phone photos). Browsers honour it
+            # for the full-size image; the thumbnail has to bake it in.
+            img = ImageOps.exif_transpose(img)
+            
             # Convert to RGB (handles RGBA PNGs, palette images, etc.)
             if img.mode not in ('RGB', 'L'):
                 img = img.convert('RGB')

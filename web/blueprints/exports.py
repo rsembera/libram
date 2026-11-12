@@ -80,13 +80,49 @@ def download():
 def _csv_safe(value):
     """Guard against CSV formula injection in spreadsheet apps.
     
-    Cells beginning with =, +, -, or @ are interpreted as formulas by
-    Excel and others. Prefixing with a single quote forces them to be
-    treated as plain text.
+    Cells beginning with =, +, -, @ (or a tab / carriage return) are
+    interpreted as formulas by Excel and others. Prefixing with a single
+    quote forces them to be treated as plain text.
     """
-    if isinstance(value, str) and value and value[0] in ('=', '+', '-', '@'):
+    if isinstance(value, str) and value and value[0] in ('=', '+', '-', '@', '\t', '\r'):
         return "'" + value
     return value
+
+
+def _pages_read(book) -> int:
+    """Pages counted toward totals: full count if finished, pages completed
+    if DNF, nothing while still in progress (same rule as the dashboard)."""
+    if book['did_not_finish']:
+        return book.get('pages_completed') or 0
+    return book['pages'] if book['date_finished'] else 0
+
+
+def _group_by_year(books, order):
+    """Group books by the year they were begun. Returns [(year, books), ...]
+    with years newest- or oldest-first to match `order`."""
+    books_by_year = {}
+    for book in books:
+        year = book['date_begun_date'].year if book.get('date_begun_date') else 'Unknown'
+        books_by_year.setdefault(year, []).append(book)
+    
+    years = sorted((y for y in books_by_year if isinstance(y, int)), reverse=(order == 'newest'))
+    if 'Unknown' in books_by_year:
+        years.append('Unknown')
+    return [(year, books_by_year[year]) for year in years]
+
+
+def _md_cell(text) -> str:
+    """Make text safe inside a Markdown table cell."""
+    return str(text or '').replace('|', '\\|').replace('\r', '').replace('\n', ' ')
+
+
+def _markdown_response(lines):
+    filename = f"libram-export-{date.today().strftime('%Y-%m-%d')}.md"
+    return Response(
+        '\n'.join(lines),
+        mimetype='text/markdown',
+        headers={'Content-Disposition': f'attachment; filename={filename}'}
+    )
 
 
 def generate_csv(books):
@@ -164,11 +200,7 @@ def generate_markdown(books, from_date=None, to_date=None, order='newest', style
     
     # Stats
     total_books = len(books)
-    total_pages = sum(
-        book.get('pages_completed') if book['did_not_finish'] and book.get('pages_completed') 
-        else book['pages'] if book['date_finished'] else 0 
-        for book in books
-    )
+    total_pages = sum(_pages_read(book) for book in books)
     lines.append(f'**{total_books} books** · **{total_pages:,} pages**')
     lines.append('')
     lines.append('---')
@@ -182,26 +214,7 @@ def generate_markdown(books, from_date=None, to_date=None, order='newest', style
 
 def generate_markdown_compact(books, lines, order):
     """Generate compact Markdown format (grouped list with notes)."""
-    # Group by year
-    books_by_year = {}
-    for book in books:
-        if book['date_begun_date']:
-            year = book['date_begun_date'].year
-        else:
-            year = 'Unknown'
-        if year not in books_by_year:
-            books_by_year[year] = []
-        books_by_year[year].append(book)
-    
-    # Sort years based on order preference
-    reverse_years = (order == 'newest')
-    sorted_years = sorted([y for y in books_by_year.keys() if isinstance(y, int)], reverse=reverse_years)
-    if 'Unknown' in books_by_year:
-        sorted_years.append('Unknown')
-    
-    # Output each year
-    for year in sorted_years:
-        year_books = books_by_year[year]
+    for year, year_books in _group_by_year(books, order):
         lines.append(f'## {year}')
         lines.append('')
         
@@ -261,47 +274,22 @@ def generate_markdown_compact(books, lines, order):
             
             lines.append(f'  {" · ".join(stats)}')
             
-            # Notes (if any)
+            # Notes (if any). Every line needs the quote marker, or a
+            # multi-line note breaks out of the list item.
             if book.get('notes') and book['notes'].strip():
-                lines.append(f'  > {book["notes"].strip()}')
+                for note_line in book['notes'].strip().splitlines():
+                    lines.append(f'  > {note_line}'.rstrip())
             
             lines.append('')
         
         lines.append('')
     
-    # Create response
-    content = '\n'.join(lines)
-    filename = f"libram-export-{date.today().strftime('%Y-%m-%d')}.md"
-    
-    return Response(
-        content,
-        mimetype='text/markdown',
-        headers={'Content-Disposition': f'attachment; filename={filename}'}
-    )
+    return _markdown_response(lines)
 
 
 def generate_markdown_detailed(books, lines, order):
     """Generate detailed Markdown format (table)."""
-    # Group by year
-    books_by_year = {}
-    for book in books:
-        if book['date_begun_date']:
-            year = book['date_begun_date'].year
-        else:
-            year = 'Unknown'
-        if year not in books_by_year:
-            books_by_year[year] = []
-        books_by_year[year].append(book)
-    
-    # Sort years based on order preference
-    reverse_years = (order == 'newest')
-    sorted_years = sorted([y for y in books_by_year.keys() if isinstance(y, int)], reverse=reverse_years)
-    if 'Unknown' in books_by_year:
-        sorted_years.append('Unknown')
-    
-    # Output each year
-    for year in sorted_years:
-        year_books = books_by_year[year]
+    for year, year_books in _group_by_year(books, order):
         lines.append(f'## {year}')
         lines.append('')
         
@@ -317,14 +305,13 @@ def generate_markdown_detailed(books, lines, order):
             title = book['title']
             if book.get('subtitle'):
                 title += f': {book["subtitle"]}'
-            # Escape pipe characters in title
-            title = title.replace('|', '\\|')
+            title = _md_cell(title)
             
             # Author
-            author = book['author'].replace('|', '\\|')
+            author = _md_cell(book['author'])
             
             # Type
-            book_type = book.get('type_name', '') or ''
+            book_type = _md_cell(book.get('type_name'))
             
             # Pages
             if book['did_not_finish'] and book.get('pages_completed'):
@@ -351,12 +338,4 @@ def generate_markdown_detailed(books, lines, order):
         lines.append('')
         lines.append('')
     
-    # Create response
-    content = '\n'.join(lines)
-    filename = f"libram-export-{date.today().strftime('%Y-%m-%d')}.md"
-    
-    return Response(
-        content,
-        mimetype='text/markdown',
-        headers={'Content-Disposition': f'attachment; filename={filename}'}
-    )
+    return _markdown_response(lines)

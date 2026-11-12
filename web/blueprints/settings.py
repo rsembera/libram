@@ -20,6 +20,8 @@ VALID_BORDER_STYLES = {'accent', 'vibrant'}
 VALID_CARD_IDS = {'pages', 'reading-chart', 'navigation'}
 VALID_TIMEOUTS = {'15', '30', '60', '120', '0'}
 
+USER_BG_DIR = Path(__file__).parent.parent / 'static' / 'user_backgrounds'
+
 
 @settings_bp.route('/')
 def settings_page():
@@ -52,7 +54,7 @@ def settings_page():
 def save_theme():
     """Save theme preference."""
     db = current_app.get_db()
-    data = request.get_json()
+    data = request.get_json(silent=True) or {}
     
     theme = data.get('theme', 'ink')
     if theme not in VALID_THEMES:
@@ -66,9 +68,14 @@ def save_theme():
 def save_background():
     """Save background preference."""
     db = current_app.get_db()
-    data = request.get_json()
+    data = request.get_json(silent=True) or {}
     
-    style = data.get('style', 'suit-grey')
+    # '' = theme default; 'user:<filename>' = an uploaded background that exists
+    style = data.get('style') or ''
+    if style:
+        name = style[5:] if style.startswith('user:') else ''
+        if not name or name != Path(name).name or not (USER_BG_DIR / name).is_file():
+            return jsonify({'status': 'error', 'message': 'Invalid background'}), 400
     db.set_setting('background_style', style)
     
     return jsonify({'status': 'ok'})
@@ -78,7 +85,7 @@ def save_background():
 def save_font():
     """Save font preference."""
     db = current_app.get_db()
-    data = request.get_json()
+    data = request.get_json(silent=True) or {}
     
     style = data.get('style', 'lexend')
     if style not in VALID_FONTS:
@@ -92,7 +99,7 @@ def save_font():
 def save_font_size():
     """Save font size preference."""
     db = current_app.get_db()
-    data = request.get_json()
+    data = request.get_json(silent=True) or {}
     
     size = data.get('size', 's')
     if size not in VALID_FONT_SIZES:
@@ -106,7 +113,7 @@ def save_font_size():
 def save_show_astrology():
     """Save show astrology preference."""
     db = current_app.get_db()
-    data = request.get_json()
+    data = request.get_json(silent=True) or {}
     
     show = '1' if data.get('show', True) else '0'
     db.set_setting('show_astrology', show)
@@ -118,7 +125,7 @@ def save_show_astrology():
 def save_border_style():
     """Save border style preference (accent or vibrant)."""
     db = current_app.get_db()
-    data = request.get_json()
+    data = request.get_json(silent=True) or {}
     
     style = data.get('style', 'accent')
     if style not in VALID_BORDER_STYLES:
@@ -132,7 +139,7 @@ def save_border_style():
 def save_rating_color():
     """Save rating color preference."""
     db = current_app.get_db()
-    data = request.get_json()
+    data = request.get_json(silent=True) or {}
     
     rating = data.get('rating')
     color = data.get('color', '')
@@ -159,10 +166,10 @@ def save_rating_color():
 def save_card_order():
     """Save card order preference."""
     db = current_app.get_db()
-    data = request.get_json()
+    data = request.get_json(silent=True) or {}
     
     order = data.get('order', [])
-    if order and all(card in VALID_CARD_IDS for card in order):
+    if isinstance(order, list) and set(order) == VALID_CARD_IDS and len(order) == len(VALID_CARD_IDS):
         db.set_setting('card_order', ','.join(order))
     
     return jsonify({'status': 'ok'})
@@ -172,7 +179,7 @@ def save_card_order():
 def save_timeout():
     """Save session timeout preference."""
     db = current_app.get_db()
-    data = request.get_json()
+    data = request.get_json(silent=True) or {}
     
     timeout = str(data.get('timeout', 30))
     if timeout not in VALID_TIMEOUTS:
@@ -225,8 +232,11 @@ def upload_background():
     if file_ext not in allowed_extensions:
         return jsonify({'success': False, 'error': 'Invalid file type. Use: png, jpg, jpeg, gif, or webp'})
     
-    # Create safe filename
+    # Create safe filename (secure_filename can strip a non-ASCII name down
+    # to nothing, or to just the extension)
     filename = secure_filename(file.filename)
+    if '.' not in filename or not filename.rsplit('.', 1)[0]:
+        filename = f'background.{file_ext}'
     
     # Create user_backgrounds directory if it doesn't exist
     upload_dir = Path(__file__).parent.parent / 'static' / 'user_backgrounds'
@@ -245,7 +255,7 @@ def upload_background():
 @settings_bp.route('/delete_background', methods=['POST'])
 def delete_background():
     """Delete a user-uploaded background."""
-    data = request.get_json()
+    data = request.get_json(silent=True) or {}
     filename = data.get('filename')
     
     if not filename:

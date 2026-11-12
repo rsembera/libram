@@ -308,6 +308,13 @@
     </div>
     
     <script>
+        // Desktop mode (LIBRAM_DESKTOP=1) shuts the server down when no page
+        // has checked in for a while. This page has no session to poll, so
+        // check in explicitly while it is open.
+        setInterval(function() {
+            fetch('/api/session-status').catch(function() {});
+        }, 10000);
+        
         function togglePassword(inputId, btn) {
             const input = document.getElementById(inputId);
             const showIcon = btn.querySelector('.icon-show');

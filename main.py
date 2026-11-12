@@ -27,7 +27,11 @@ _app = None
 # Heartbeat tracking for desktop mode
 _last_heartbeat = time.time()
 _heartbeat_lock = threading.Lock()
-HEARTBEAT_TIMEOUT = 30  # seconds without heartbeat before shutdown
+# Seconds without a heartbeat before shutdown. Pages ping every 10 seconds,
+# but browsers throttle timers in background tabs to as little as once a
+# minute, so this has to be comfortably longer than that.
+HEARTBEAT_TIMEOUT = 90
+HEARTBEAT_CHECK_INTERVAL = 5
 
 
 def update_heartbeat():
@@ -39,13 +43,20 @@ def update_heartbeat():
 
 def _heartbeat_monitor():
     """Background thread that monitors for heartbeat timeout in desktop mode."""
-    global _last_heartbeat
-    
+    last_check = time.time()
     while True:
-        time.sleep(5)  # Check every 5 seconds
+        time.sleep(HEARTBEAT_CHECK_INTERVAL)
+        now = time.time()
+        
+        # If this loop itself was frozen (the computer was asleep), the
+        # browser was frozen too. Give it a fresh window to check in rather
+        # than shutting down the moment the machine wakes.
+        if now - last_check > HEARTBEAT_CHECK_INTERVAL * 3:
+            update_heartbeat()
+        last_check = now
         
         with _heartbeat_lock:
-            elapsed = time.time() - _last_heartbeat
+            elapsed = now - _last_heartbeat
         
         if elapsed > HEARTBEAT_TIMEOUT:
             print(f"\n[Desktop] No browser heartbeat for {int(elapsed)}s - shutting down...")
@@ -54,8 +65,8 @@ def _heartbeat_monitor():
             break
 
 
-def _cleanup():
-    """Cleanup function for atexit - backup and checkpoint database."""
+def _run_shutdown_tasks(verbose: bool = False) -> None:
+    """Auto-backup check and WAL checkpoint. Runs at most once per process."""
     global _cleanup_done
     if _cleanup_done or _app is None:
         return
@@ -69,12 +80,22 @@ def _cleanup():
                 try:
                     from web.blueprints.backups import check_auto_backup
                     check_auto_backup(_app)
+                    if verbose:
+                        print("[Backup] Auto-backup check completed.")
                 except Exception as e:
                     print(f"[Backup] Warning: {e}")
                 
                 db.checkpoint()
-    except Exception:
-        pass  # Silent fail on exit
+                if verbose:
+                    print("[Database] Checkpoint completed.")
+    except Exception as e:
+        if verbose:
+            print(f"[Shutdown] Warning: {e}")
+
+
+def _cleanup():
+    """atexit handler - backup and checkpoint database (silent)."""
+    _run_shutdown_tasks()
 
 
 # Register atexit handler
@@ -92,30 +113,9 @@ class QuietRequestFilter(logging.Filter):
 
 
 def shutdown_handler(signum, frame):
-    """Handle Ctrl-C gracefully - backup and checkpoint database before exit."""
-    global _cleanup_done
-    
+    """Handle Ctrl-C / SIGTERM gracefully - backup and checkpoint database before exit."""
     print("\n\nShutting down...")
-    
-    if not _cleanup_done and _app is not None:
-        _cleanup_done = True
-        try:
-            with _app.app_context():
-                db = _app.get_db()
-                if db:
-                    # Run backup check before shutdown
-                    try:
-                        from web.blueprints.backups import check_auto_backup
-                        check_auto_backup(_app)
-                        print("[Backup] Auto-backup check completed.")
-                    except Exception as e:
-                        print(f"[Backup] Warning: {e}")
-                    
-                    db.checkpoint()
-                    print("[Database] Checkpoint completed.")
-        except Exception as e:
-            print(f"[Shutdown] Warning: {e}")
-    
+    _run_shutdown_tasks(verbose=True)
     sys.exit(0)
 
 

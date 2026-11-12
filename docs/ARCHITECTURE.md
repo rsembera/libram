@@ -142,10 +142,12 @@ Settings API endpoints validate against allowlists (`VALID_THEMES`, `VALID_FONTS
 Triggered on logout and app shutdown (not login):
 
 1. Check frequency setting (startup/daily/weekly/manual)
-2. Compare `db_mtime` against `last_auto_backup` — skip if unchanged
-3. For daily/weekly, compare calendar dates (not hours elapsed)
-4. Checkpoint WAL, copy database file
+2. For daily/weekly, compare calendar dates (not hours elapsed)
+3. Compare the database file's SHA-256 against the hash recorded at the last backup (`data/.backup_state.json`) — skip if unchanged
+4. Checkpoint WAL, then zip a consistent snapshot of the database (SQLite backup API) plus covers and uploaded backgrounds
 5. Run retention cleanup (1 month / 6 months / 1 year / forever)
+
+Restore rebuilds the chosen point in a staging folder (full backup, then each incremental in order, applying an incremental's deletions before extracting its files), then swaps the database, covers, and backgrounds into place. `backups/manifest.json` records the chains; a copy is kept beside backups stored in a custom location, and the manifest is rebuilt from the zip files if it is ever missing.
 
 Cloud detection scans for iCloud, Dropbox, Google Drive, and OneDrive folders.
 

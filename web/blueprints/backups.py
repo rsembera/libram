@@ -6,11 +6,10 @@ Database and cover image backup/restore functionality.
 from __future__ import annotations
 
 import os
-from datetime import datetime
-from pathlib import Path
-from flask import Blueprint, render_template, request, current_app, jsonify
+from flask import Blueprint, render_template, request, current_app, jsonify, g
 
 from core import backup
+from core.database import Database
 
 backups_bp = Blueprint('backups', __name__)
 
@@ -34,6 +33,13 @@ RETENTION_OPTIONS = [
 def backups_page():
     """Display backups page with list of available backups."""
     db = current_app.get_db()
+    
+    # If the manifest is missing but backup zips exist (new machine, lost
+    # file), rebuild it so those backups can be restored. No-op otherwise.
+    try:
+        backup.recover_manifest([backup.get_backup_dir(db)])
+    except Exception:
+        pass
     
     # Get restore points (unified view of all backups)
     restore_points = backup.get_restore_points()
@@ -134,8 +140,6 @@ def save_settings():
 @backups_bp.route('/restore/<restore_point_id>', methods=['POST'])
 def restore_backup(restore_point_id):
     """Restore from a backup immediately."""
-    from flask import g
-    
     try:
         # Close the current database connection so we can replace the file
         db = g.pop('db', None)
@@ -145,6 +149,10 @@ def restore_backup(restore_point_id):
         # Perform the restore
         result = backup.restore_immediate(restore_point_id)
         
+        # The database file was replaced: let the next connection re-check
+        # its schema (an older backup may predate a table or index)
+        Database.reset_schema_cache()
+                
         return jsonify({
             'status': 'ok',
             'message': 'Backup restored successfully. The page will reload.',

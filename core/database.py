@@ -62,6 +62,16 @@ def distribute_pages_across_months(
 class Database:
     """SQLite database for Libram."""
     
+    # Database files whose schema has already been set up in this process.
+    # A connection is opened per request, so table/index creation only needs
+    # to run for the first one.
+    _schema_ready: set[str] = set()
+    
+    @classmethod
+    def reset_schema_cache(cls) -> None:
+        """Forget which files are set up (call after the db file is replaced)."""
+        cls._schema_ready.clear()
+    
     def __init__(self, db_path: Optional[str] = None) -> None:
         """
         Initialize database connection.
@@ -88,8 +98,10 @@ class Database:
         # Enable WAL mode for concurrent access
         self.conn.execute("PRAGMA journal_mode = WAL")
         
-        # Run migrations
-        self._run_migrations()
+        # Run migrations (once per process for each database file)
+        if self.db_path not in Database._schema_ready:
+            self._run_migrations()
+            Database._schema_ready.add(self.db_path)
         
         return self
     
@@ -297,6 +309,17 @@ class Database:
         updates = []
         values = []
         
+        # A book's yearly number belongs to the year it was begun. If the
+        # begun date moves to a different year, give it the next free number
+        # in the new year rather than keeping one from the old year.
+        new_begun = kwargs.get('date_begun')
+        if isinstance(new_begun, date):
+            cursor.execute("SELECT date_begun FROM books WHERE id = ?", (book_id,))
+            row = cursor.fetchone()
+            if row and row[0] and datetime.fromtimestamp(row[0]).year != new_begun.year:
+                updates.append("yearly_number = ?")
+                values.append(self._get_next_yearly_number(new_begun.year))
+        
         for key, value in kwargs.items():
             if key not in allowed_fields:
                 continue
@@ -487,6 +510,13 @@ class Database:
         row = cursor.fetchone()
         return row[0] if row else default
     
+    def get_settings(self, defaults: dict[str, str]) -> dict[str, str]:
+        """Get several settings in one query: {key: stored value or its default}."""
+        cursor = self.conn.cursor()
+        cursor.execute("SELECT key, value FROM settings")
+        stored = dict(cursor.fetchall())
+        return {key: stored.get(key, default) for key, default in defaults.items()}
+    
     def set_setting(self, key: str, value: str) -> None:
         """Set a setting value."""
         cursor = self.conn.cursor()
@@ -549,8 +579,8 @@ class Database:
         
         # Average days to finish (completed books only)
         cursor.execute("""
-            SELECT AVG((date_finished - date_begun) / 86400.0 + 1)
-            FROM books 
+            SELECT AVG(ROUND((date_finished - date_begun) / 86400.0) + 1)
+            FROM books  
             WHERE date_finished IS NOT NULL AND did_not_finish = 0
         """)
         avg_days = cursor.fetchone()[0]
@@ -650,13 +680,15 @@ class Database:
             else:
                 month_end = int(datetime(year, month + 1, 1).timestamp())
             
-            # Calculate pages_per_day inline: pages / (total_days - days_paused)
-            # total_days = (date_finished - date_begun) / 86400 + 1
+            # Calculate pages_per_day inline: pages / (total_days - days_paused),
+            # with at least one active day (same rule as _row_to_book).
+            # total_days = ROUND((date_finished - date_begun) / 86400) + 1; the
+            # ROUND absorbs the hour gained/lost across a clock change.
             cursor.execute("""
                 SELECT AVG(
                     CAST(pages AS REAL) / 
-                    NULLIF((date_finished - date_begun) / 86400.0 + 1 - COALESCE(days_paused, 0), 0)
-                ) FROM books 
+                    MAX(ROUND((date_finished - date_begun) / 86400.0) + 1 - COALESCE(days_paused, 0), 1)
+                ) FROM books  
                 WHERE date_finished >= ? AND date_finished < ?
                 AND date_finished IS NOT NULL
                 AND did_not_finish = 0
@@ -781,7 +813,9 @@ class Database:
         
         # Calculate derived fields
         if book['date_begun'] and book['date_finished']:
-            days = (book['date_finished'] - book['date_begun']) // 86400 + 1
+            # round(), not //: dates are local-midnight timestamps, so a span
+            # crossing the spring clock change is an hour short of whole days
+            days = round((book['date_finished'] - book['date_begun']) / 86400) + 1
             book['total_days'] = days
             # Calculate active reading days (excluding paused days)
             days_paused = book.get('days_paused', 0) or 0

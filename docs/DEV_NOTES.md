@@ -82,7 +82,9 @@ Patterns, gotchas, and lessons learned during Libram development. Reference for 
 
 SQLite WAL (Write-Ahead Logging) is enabled in `connect()`. This means recent writes may be in the WAL file rather than the main `.db` file. Copying just the `.db` file without checkpointing can produce an incomplete backup.
 
-**Fix:** `db.checkpoint()` (which runs `PRAGMA wal_checkpoint(TRUNCATE)`) is called before every `shutil.copy2()` in both `create_backup()` and `_create_auto_backup()`.
+**Fix, part 1:** `db.checkpoint()` (which runs `PRAGMA wal_checkpoint(TRUNCATE)`) is called before every backup.
+
+**Fix, part 2 (Nov 2026):** A checkpoint is silently skipped while another connection is reading (the session-status poller runs on its own Waitress thread), so the checkpoint alone is not a guarantee. Backups now zip a snapshot taken with SQLite's backup API (`_consistent_sources()` in `core/backup.py`), which includes WAL content and can't catch the file mid-write. Hashes in the manifest are taken from that snapshot, so "what was hashed" and "what was zipped" are always the same bytes.
 
 ---
 
@@ -119,7 +121,37 @@ if current_hash == last_hash:  # Then check hash
 # Now create backup
 ```
 
-**Hash recording:** After backup, checkpoint the DB (to flush `last_auto_backup` setting write), THEN hash and store. This ensures the stored hash matches what we'll see next time.
+**Hash recording:** After backup, checkpoint the DB, THEN hash and store, so the stored hash matches what we'll see next time. Nothing is written to the database after a backup (the old `last_auto_backup` setting was never read and made every backed-up database look changed again).
+
+---
+
+## Restore: Order of Operations in a Chain
+
+**Bug (fixed Nov 2026, same one found in Hermanubis):** restore collected the deletion lists from every incremental and applied them all at the end. A file deleted in one incremental and back in a later one was extracted and then deleted again. Reachable from the UI: delete a book with a cover → back up → restore to before the delete → back up → restore the newest point.
+
+**Rule:** apply archives oldest first, and for each incremental apply its deletion list *before* extracting its files. The list names files that were gone when that incremental was made; the files inside it existed at that moment. See `_stage_backup_chain()`.
+
+**Related rules:**
+- A chain stops at its first missing zip. Later incrementals depend on the missing one, so they are not offered as restore points.
+- Covers are always replaced, even when the backup has none; otherwise covers newer than the backup linger.
+- The database and secret key are swapped in with copy-to-temp + `os.replace`, never unlink-then-copy.
+- `manifest.json` is written atomically and mirrored into any custom backup folder. `recover_manifest()` adopts that mirror, or rebuilds the chains from the zip filenames, when the local manifest is missing. After a recovery the next backup is always a full one.
+
+**Tests:** `test_backup_restore.py` (runs entirely in temp folders).
+
+---
+
+## Day Counts and Daylight Saving Time
+
+Dates are stored as local-midnight Unix timestamps. A span that crosses the spring clock change is an hour short of a whole number of days, so `(finished - begun) // 86400 + 1` came out one day low (March 1–20 showed 19 days). Use `round((finished - begun) / 86400) + 1` in Python and `ROUND(.../86400.0) + 1` in SQL. Never floor.
+
+---
+
+## Session Keep-Alive
+
+The session-status poll deliberately does not count as activity. Typing and clicking do: `base.html` notes them and POSTs `/api/keep-alive` at most once a minute, so writing long notes on the book form no longer runs out the session. "Stay Logged In" uses the same endpoint instead of reloading the page (a reload discards unsaved edits and trips the form guard's leave prompt).
+
+Desktop mode: the login and setup pages ping `/api/session-status` so the heartbeat monitor sees them, the timeout is 90 seconds (browsers throttle background-tab timers to once a minute), and the monitor resets the clock after the computer wakes from sleep.
 
 ---
 
@@ -135,7 +167,7 @@ VALID_BORDERS = {'accent', 'vibrant'}
 VALID_TIMEOUTS = {'0', '15', '30', '60', '120'}
 ```
 
-Rating colors validated as hex format. Card order validated against known card IDs. Background style and astrology toggle left as freeform (no security risk).
+Rating colors validated as hex format. Card order validated against known card IDs. Background style must be empty or `user:<an uploaded file that exists>`; book type colors must be `#RRGGBB` (both end up inside inline `style` attributes).
 
 ---
 

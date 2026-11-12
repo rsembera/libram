@@ -4,6 +4,8 @@ Libram Book Types Blueprint
 Handles book type management (CRUD operations)
 """
 
+import re
+
 from flask import Blueprint, render_template, request, redirect, url_for, jsonify, current_app, Response
 
 # Initialize blueprint
@@ -22,6 +24,14 @@ COLOR_PALETTE: list[dict[str, str]] = [
     {'hex': '#CFD8DC', 'name': 'Slate', 'bubble': '#EEF1F3'},
     {'hex': '#E1BEE7', 'name': 'Orchid', 'bubble': '#F7EFF9'},
 ]
+
+_HEX_COLOR_RE = re.compile(r'^#[0-9A-Fa-f]{6}$')
+
+
+def _safe_color(value: str | None, default: str) -> str:
+    """Colors end up inside inline style attributes, so accept #RRGGBB only."""
+    return value if value and _HEX_COLOR_RE.match(value) else default
+
 
 # Helper to get color name from hex
 def get_color_name(hex_color: str) -> str:
@@ -50,8 +60,8 @@ def add_type() -> str | Response:
     db = current_app.get_db()
     if request.method == 'POST':
         name = request.form.get('name', '').strip()[:9]  # 9 char limit
-        color = request.form.get('color', '#9FCFC0')
-        bubble_color = request.form.get('bubble_color', '#E0F2EE')
+        color = _safe_color(request.form.get('color'), '#9FCFC0')
+        bubble_color = _safe_color(request.form.get('bubble_color'), '#E0F2EE')
         
         if name:
             try:
@@ -80,8 +90,8 @@ def edit_type(type_id):
     
     if request.method == 'POST':
         name = request.form.get('name', '').strip()[:9]
-        color = request.form.get('color')
-        bubble_color = request.form.get('bubble_color')
+        color = _safe_color(request.form.get('color'), type_obj['color'])
+        bubble_color = _safe_color(request.form.get('bubble_color'), type_obj['bubble_color'])
         
         if name:
             try:
