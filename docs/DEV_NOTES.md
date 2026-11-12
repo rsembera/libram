@@ -76,6 +76,10 @@ Patterns, gotchas, and lessons learned during Libram development. Reference for 
 
 **Dependency:** `Pillow>=10.0.0` added to requirements.txt.
 
+**Loading (Nov 2026):** The main page used to request every thumbnail at once, including those in collapsed years and in the hidden compact layout while in detailed view. With 4 Waitress threads that queued requests on every page load ("Task queue depth" warnings, ~1,800 in six weeks). Three changes: thumbnails are `loading="lazy"` (only visible ones are fetched), covers and thumbnails are sent with `Cache-Control: private, max-age=31536000, immutable` (filenames are unique per upload, so they never go stale), and Waitress runs 8 threads (`LIBRAM_THREADS`), more than the 6 connections a browser opens per site.
+
+**Gotcha — session cookie vs. browser cache:** `Cache-Control` alone did nothing at first. Every authenticated response carries a refreshed session cookie and `Vary: Cookie`, so the cached image never matched the next request and the browser re-validated all of them. Cover responses now set `g.skip_session_cookie`, which `LibramSessionInterface` (in `app.py`) honours by leaving the cookie and `Vary` header off. The login check still runs on the request.
+
 ---
 
 ## WAL Mode and Backup Integrity
@@ -196,3 +200,4 @@ These patterns are shared with Synesius and/or EdgeCase:
 | `LIBRAM_DB_PATH` | `data/libram.db` | Database file location |
 | `LIBRAM_BROWSER` | unset | Set to `1` to auto-open browser on start |
 | `LIBRAM_DESKTOP` | unset | Set to `1` for desktop mode (heartbeat monitoring) |
+| `LIBRAM_THREADS` | `8` | Waitress worker threads |

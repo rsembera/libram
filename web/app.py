@@ -11,6 +11,7 @@ import time
 from datetime import datetime
 from pathlib import Path
 from flask import Flask, g, session, jsonify
+from flask.sessions import SecureCookieSessionInterface
 
 from core.database import Database
 
@@ -34,6 +35,25 @@ def _get_or_create_secret_key() -> str:
     return key
 
 
+class LibramSessionInterface(SecureCookieSessionInterface):
+    """
+    Standard Flask cookie sessions, except that a response can opt out of
+    carrying the session cookie by setting `g.skip_session_cookie = True`.
+
+    Every authenticated response normally gets a fresh session cookie (the
+    last-activity time changes) plus `Vary: Cookie`. On a response meant to
+    be cached by the browser, that combination defeats the cache: the cookie
+    is different on the next request, so the cached copy never matches.
+    Cover images opt out. The request itself is still checked for a valid
+    session before anything is served.
+    """
+    
+    def save_session(self, app, session, response):
+        if g.get('skip_session_cookie'):
+            return
+        super().save_session(app, session, response)
+
+
 def create_app() -> Flask:
     """Create and configure the Flask application."""
     
@@ -43,6 +63,7 @@ def create_app() -> Flask:
     
     # Configuration
     app.secret_key = os.environ.get('LIBRAM_SECRET_KEY') or _get_or_create_secret_key()
+    app.session_interface = LibramSessionInterface()
     app.config['SESSION_COOKIE_NAME'] = 'libram_session'
     app.config['SESSION_COOKIE_HTTPONLY'] = True
     app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'

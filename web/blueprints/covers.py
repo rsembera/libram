@@ -9,7 +9,7 @@ import re
 import uuid
 import requests
 from pathlib import Path
-from flask import Blueprint, request, jsonify, send_file, Response
+from flask import Blueprint, g, request, jsonify, send_file, Response
 
 from core.thumbnails import generate_thumbnail, delete_thumbnail
 
@@ -29,6 +29,22 @@ os.makedirs(COVERS_DIR, exist_ok=True)
 _APP_GENERATED_COVER_RE = re.compile(r'^[0-9a-f]{32}\.(jpg|jpeg|png|gif|webp)$')
 
 _ISBN_RE = re.compile(r'^(\d{9}[\dX]|\d{13})$')
+
+
+# Cover filenames are unique per upload (uuid) and their contents never
+# change, so the browser can keep them. "private": covers sit behind the
+# login, so only the user's own browser should cache them.
+_COVER_CACHE_CONTROL = 'private, max-age=31536000, immutable'
+
+
+def _send_cover(path: str) -> Response:
+    """Send a cover or thumbnail with long-lived browser caching."""
+    response = send_file(path)
+    response.headers['Cache-Control'] = _COVER_CACHE_CONTROL
+    # No session cookie / Vary: Cookie on this response, or the browser's
+    # cached copy would never match (see LibramSessionInterface)
+    g.skip_session_cookie = True
+    return response
 
 
 def cleanup_orphaned_covers(db_path: str) -> int:
@@ -91,9 +107,10 @@ def serve_thumb(filename: str) -> Response | tuple[str, int]:
     thumb_path = os.path.join(COVERS_DIR, 'thumbs', thumb_name)
 
     if os.path.exists(thumb_path):
-        return send_file(thumb_path)
+        return _send_cover(thumb_path)
 
-    # Fall back to original
+    # Fall back to original (not cached long-term: a thumbnail may be
+    # generated for this cover later, and should replace it)
     filepath = os.path.join(COVERS_DIR, filename)
     if os.path.exists(filepath):
         return send_file(filepath)
@@ -115,7 +132,7 @@ def serve_cover(filename: str) -> Response | tuple[str, int]:
     if not os.path.exists(filepath):
         return '', 204
 
-    return send_file(filepath)
+    return _send_cover(filepath)
 
 
 @covers_bp.route('/upload', methods=['POST'])

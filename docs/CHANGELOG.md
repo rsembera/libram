@@ -34,6 +34,10 @@ All notable changes to Libram, organized by date.
 - Malformed JSON sent to a settings endpoint no longer causes a server error; background and type colour values are validated
 - Multi-line notes and `|` characters no longer break Markdown exports; DNF page totals in exports match the dashboard
 
+### Performance
+- Cover thumbnails load only when visible, and the browser now caches covers instead of re-requesting them on every page load
+- Waitress runs 8 worker threads (was 4; `LIBRAM_THREADS` to change), which stops the "Task queue depth" warnings on page load
+
 ### Implementation
 - Schema setup runs once per process instead of on every request; theme settings load in one query instead of nine (`Database.get_settings()`)
 - `add_book` / `edit_book` share `_parse_book_form()`; the five chart renderers are two (`renderMonthlyBarChart`, `renderHorizontalBarChart`) driven by a `CHART_VIEWS` table; `main.py` shutdown paths share `_run_shutdown_tasks()`; the Markdown exporters share `_group_by_year()`

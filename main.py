@@ -188,7 +188,11 @@ def main():
         logger = logging.getLogger('waitress')
         logger.setLevel(logging.INFO)
         
-        serve(app, host=host, port=port, threads=4)
+        # A browser opens up to 6 connections per site; with fewer worker
+        # threads than that, every page load queues requests (and Waitress
+        # logs a "Task queue depth" warning for each one).
+        threads = int(os.environ.get('LIBRAM_THREADS', 8))
+        serve(app, host=host, port=port, threads=threads)
 
 
 if __name__ == '__main__':
